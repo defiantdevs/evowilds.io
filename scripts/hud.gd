@@ -140,7 +140,7 @@ func _draw() -> void:
 		var ha := clampf((9.0 - main.time) / 2.0, 0.0, 1.0)
 		_center("EVO WILDS", S.y * 0.5 - 120.0, 54, Color(0.5 * 1.5, 1.3, 1.5, ha))
 		_center("Move with WASD or the mouse   -   Swing with SPACE or click   -   Sprint with SHIFT (costs XP)", S.y * 0.5 - 80.0, 18, Color(0.9, 0.97, 1.0, ha))
-		_center("Eat food and defeat rivals to level up. Evolve through 19 tiers!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+		_center("Eat food and defeat rivals to level up. Evolve through 24 tiers!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 
 	if main.player_dead:
 		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0, 0.04, 0.6))

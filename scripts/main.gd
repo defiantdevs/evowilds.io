@@ -110,23 +110,27 @@ func _setup_env() -> void:
 func _build_world() -> void:
 	var rng := RandomNumberGenerator.new()
 	rng.seed = 424242
-	var pal := [Color(0.45, 0.74, 0.34), Color(0.3, 0.58, 0.28), Color(0.8, 0.72, 0.45), Color(0.55, 0.8, 0.42), Color(0.34, 0.62, 0.36)]
-	for i in range(9):
-		var rad := rng.randf_range(300.0, 520.0)
+	var pal := [Color(0.42, 0.7, 0.33), Color(0.3, 0.56, 0.27), Color(0.78, 0.7, 0.44), Color(0.5, 0.76, 0.4), Color(0.35, 0.63, 0.35), Color(0.66, 0.6, 0.4)]
+	for i in range(12):
+		var rad := rng.randf_range(260.0, 560.0)
 		var a := rng.randf() * TAU
 		var d := sqrt(rng.randf()) * (ARENA_R - rad - 60.0)
 		patches.append({"pos": Vector2.from_angle(a) * d, "rad": rad, "col": pal[i % pal.size()]})
-	for i in range(230):
+	for i in range(260):
 		var a := rng.randf() * TAU
 		var d := sqrt(rng.randf()) * (ARENA_R - 130.0)
-		var k := rng.randi() % 10
+		var k := rng.randi() % 12
 		var kind := 0
 		if k >= 4 and k < 6:
 			kind = 1
-		elif k >= 6 and k < 9:
+		elif k >= 6 and k < 8:
 			kind = 2
-		elif k >= 9:
+		elif k >= 8 and k < 10:
 			kind = 3
+		elif k >= 10 and k < 11:
+			kind = 4
+		elif k >= 11:
+			kind = 5
 		var sz := rng.randf_range(46.0, 86.0)
 		if kind == 1:
 			sz = rng.randf_range(30.0, 60.0)
@@ -134,6 +138,10 @@ func _build_world() -> void:
 			sz = rng.randf_range(34.0, 56.0)
 		elif kind == 3:
 			sz = rng.randf_range(90.0, 170.0)
+		elif kind == 4:
+			sz = rng.randf_range(40.0, 70.0)
+		elif kind == 5:
+			sz = rng.randf_range(26.0, 48.0)
 		var seeds: Array = []
 		for j in range(rng.randi_range(5, 8)):
 			seeds.append(rng.randf())
@@ -464,6 +472,7 @@ func _draw() -> void:
 	if cam == null:
 		return
 	var view := _view_rect()
+	var vr := view.grow(220.0)
 	draw_rect(view.grow(200.0), Color(0.17, 0.46, 0.68))
 	for i in range(6):
 		var wr := ARENA_R + 150.0 + float(i) * 170.0 + sin(time * 0.8 + float(i)) * 14.0
@@ -472,27 +481,38 @@ func _draw() -> void:
 	draw_circle(Vector2.ZERO, ARENA_R + 70.0, Color(0.88, 0.8, 0.55))
 	draw_circle(Vector2.ZERO, ARENA_R + 30.0, Color(0.96, 0.9, 0.68))
 	draw_circle(Vector2.ZERO, ARENA_R, Color(0.38, 0.68, 0.3))
+	var pvw := view.grow(640.0)
 	for p in patches:
 		var c: Vector2 = p["pos"]
 		var rad: float = p["rad"]
+		if not pvw.has_point(c):
+			continue
 		var col: Color = p["col"]
+		draw_circle(c, rad * 1.07, col.darkened(0.14))
 		draw_circle(c, rad, col)
-		draw_circle(c + Vector2(rad * 0.45, rad * 0.2), rad * 0.7, col)
-		draw_circle(c + Vector2(-rad * 0.4, -rad * 0.3), rad * 0.66, col)
+		draw_circle(c + Vector2(rad * 0.4, rad * 0.25), rad * 0.62, col.lightened(0.06))
+		draw_circle(c + Vector2(-rad * 0.42, -rad * 0.3), rad * 0.5, col)
 	var sp := 80
 	var gx0 := int(floorf(view.position.x / float(sp)))
 	var gx1 := int(ceilf(view.end.x / float(sp)))
 	var gy0 := int(floorf(view.position.y / float(sp)))
 	var gy1 := int(ceilf(view.end.y / float(sp)))
 	var tuft := Color(0.2, 0.45, 0.2, 0.55)
+	var tuft2 := Color(0.48, 0.7, 0.32, 0.5)
 	for gy in range(gy0, gy1 + 1):
 		for gx in range(gx0, gx1 + 1):
+			var h := _hash(gx + 11, gy + 5)
 			var q := Vector2((float(gx) + _hash(gx, gy)) * float(sp), (float(gy) + _hash(gy + 7, gx + 3)) * float(sp))
 			if q.length() < ARENA_R - 20.0:
-				draw_line(q, q + Vector2(-3, -7), tuft, 1.6, true)
-				draw_line(q, q + Vector2(0, -9), tuft, 1.6, true)
-				draw_line(q, q + Vector2(3, -7), tuft, 1.6, true)
-	var vr := view.grow(200.0)
+				var hh := 6.0 + h * 5.0
+				draw_line(q, q + Vector2(-3, -hh * 0.8), tuft, 1.6, true)
+				draw_line(q, q + Vector2(0, -hh), tuft2, 1.5, true)
+				draw_line(q, q + Vector2(3, -hh * 0.8), tuft, 1.6, true)
+				if h > 0.88:
+					var fc: Color = Color(0.95, 0.85, 0.35) if h > 0.95 else Color(0.88, 0.45, 0.6)
+					draw_circle(q + Vector2(0, -hh), 1.8, fc)
+				elif h < 0.06:
+					draw_circle(q + Vector2(1.0, -1.0), 2.2, Color(0.6, 0.58, 0.52, 0.6))
 	for d in decor:
 		var dp: Vector2 = d["pos"]
 		if vr.has_point(dp):
@@ -526,23 +546,25 @@ func _draw_decor(d: Dictionary) -> void:
 	var seeds: Array = d["seeds"]
 	match kind:
 		0:
-			draw_colored_polygon(_blob(p + Vector2(8, 12), s * 0.66, seeds, 0.1), Color(0, 0, 0, 0.16))
+			draw_colored_polygon(_blob(p + Vector2(10, 14), s * 0.68, seeds, 0.1), Color(0, 0, 0, 0.18))
 			var ol := Color(0.1, 0.28, 0.12)
 			for k in range(5):
 				var a := float(seeds[k]) * TAU
-				draw_circle(p + Vector2.from_angle(a) * s * 0.28, s * 0.4 + 3.0, ol)
-			draw_circle(p, s * 0.5 + 3.0, ol)
+				draw_circle(p + Vector2.from_angle(a) * s * 0.3, s * 0.42 + 3.0, ol)
+			draw_circle(p, s * 0.52 + 3.0, ol)
 			for k in range(5):
 				var a2 := float(seeds[k]) * TAU
-				draw_circle(p + Vector2.from_angle(a2) * s * 0.28, s * 0.4, Color(0.2, 0.52, 0.24))
+				draw_circle(p + Vector2.from_angle(a2) * s * 0.3, s * 0.4, Color(0.2, 0.52, 0.24))
 			draw_circle(p, s * 0.5, Color(0.22, 0.56, 0.26))
 			for k in range(4):
 				var a3 := float(seeds[k]) * TAU
-				draw_circle(p + Vector2.from_angle(a3) * s * 0.22 + Vector2(-s * 0.08, -s * 0.1), s * 0.2, Color(0.34, 0.68, 0.34))
+				draw_circle(p + Vector2.from_angle(a3) * s * 0.22 + Vector2(-s * 0.1, -s * 0.12), s * 0.2, Color(0.36, 0.7, 0.35))
+			draw_circle(p + Vector2(-s * 0.16, -s * 0.18), s * 0.16, Color(0.44, 0.78, 0.4))
 		1:
 			draw_colored_polygon(_blob(p + Vector2(6, 9), s * 0.75, seeds, 0.12), Color(0, 0, 0, 0.16))
 			_outlined(_blob(p, s * 0.72, seeds, 0.14), Color(0.62, 0.64, 0.68), Color(0.28, 0.29, 0.33), 3.0)
 			draw_colored_polygon(_blob(p + Vector2(-s * 0.1, -s * 0.12), s * 0.4, seeds, 0.15), Color(0.78, 0.8, 0.84))
+			draw_colored_polygon(_blob(p + Vector2(-s * 0.2, -s * 0.22), s * 0.16, seeds, 0.18), Color(0.2, 0.34, 0.2, 0.85))
 		2:
 			draw_colored_polygon(_blob(p + Vector2(5, 8), s * 0.62, seeds, 0.1), Color(0, 0, 0, 0.14))
 			for k in range(4):
@@ -556,13 +578,34 @@ func _draw_decor(d: Dictionary) -> void:
 				var bp := p + Vector2.from_angle(a3) * s * 0.3
 				draw_circle(bp, 4.0, Color(0.6, 0.1, 0.18))
 				draw_circle(bp, 3.0, Color(0.92, 0.2, 0.3))
-		_:
-			_outlined(_blob(p, s * 0.62, seeds, 0.12), Color(0.94, 0.88, 0.66), Color(0.8, 0.7, 0.45), 3.0)
+		3:
+			_outlined(_blob(p, s * 0.78, seeds, 0.12), Color(0.94, 0.88, 0.66), Color(0.85, 0.78, 0.55), 3.0)
+			_outlined(_blob(p, s * 0.62, seeds, 0.12), Color(0.94, 0.88, 0.66), Color(0.8, 0.7, 0.45), 2.0)
 			draw_colored_polygon(_blob(p, s * 0.55, seeds, 0.12), Color(0.3, 0.62, 0.86))
 			draw_colored_polygon(_blob(p + Vector2(s * 0.05, -s * 0.05), s * 0.38, seeds, 0.14), Color(0.4, 0.72, 0.92))
 			for k in range(2):
 				var rr := s * (0.22 + 0.12 * float(k)) + sin(time * 1.2 + float(k)) * 3.0
 				draw_arc(p, rr, 0.3 + float(k), 1.5 + float(k), 12, Color(1, 1, 1, 0.55), 2.0, true)
+			for k in range(3):
+				var la := float(seeds[k]) * TAU
+				var lp := p + Vector2.from_angle(la) * s * 0.3
+				draw_circle(lp, s * 0.09, Color(0.25, 0.55, 0.25))
+				draw_circle(lp + Vector2(s * 0.03, -s * 0.02), s * 0.05, Color(0.35, 0.65, 0.3))
+		4:
+			for k in range(6):
+				var fa := float(seeds[k % seeds.size()]) * TAU
+				var q := p + Vector2.from_angle(fa) * s * 0.42
+				draw_line(q, q + Vector2(0, -s * 0.32), Color(0.25, 0.5, 0.24, 0.8), 1.5, true)
+				var fc: Color = [Color(0.95, 0.85, 0.35), Color(0.9, 0.45, 0.6), Color(0.6, 0.65, 0.95)][k % 3]
+				draw_circle(q + Vector2(0, -s * 0.32), s * 0.09, fc)
+				draw_circle(q + Vector2(0, -s * 0.32), s * 0.045, Color(1, 1, 0.9))
+		_:
+			for k in range(4):
+				var pa2 := float(seeds[k % seeds.size()]) * TAU
+				var q2 := p + Vector2.from_angle(pa2) * s * 0.3
+				draw_circle(q2 + Vector2(1.5, 2.5), s * 0.16, Color(0, 0, 0, 0.15))
+				draw_circle(q2, s * 0.16, Color(0.62, 0.6, 0.55))
+				draw_circle(q2 + Vector2(-1.5, -2.0), s * 0.08, Color(0.8, 0.78, 0.72))
 
 
 func _draw_food(i: int) -> void:

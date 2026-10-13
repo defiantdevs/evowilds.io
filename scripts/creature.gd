@@ -149,7 +149,7 @@ func _process(delta: float) -> void:
 
 	var spd := Species.speed_base(evo)
 	if not is_player:
-		spd *= 0.78
+		spd *= 0.8
 	if sprinting:
 		spd *= 1.6
 	if swing_t >= 0.0:
@@ -195,13 +195,28 @@ func _player_dir() -> Vector2:
 
 
 func _choose_mode() -> void:
-	mode_t = randf_range(0.9, 2.2)
+	mode_t = randf_range(0.55, 1.5)
 	bot_sprint = false
+	if mode == 2 and target != null and is_instance_valid(target) and target.alive:
+		if position.distance_to(target.position) < 560.0 and randf() < 0.8:
+			bot_sprint = randf() < 0.3
+			return
 	target = null
+	mode = 0
+	var pl = main.player
+	if pl != null and pl.alive and not pl.frozen and evo >= 1:
+		var dp: float = position.distance_to(pl.position)
+		if dp < 400.0 + r * 2.0 and pl.evo <= evo + 1:
+			if randf() < 0.85:
+				mode = 2
+				target = pl
+				bot_sprint = dp < 240.0
+				bot_attack_t = randf_range(0.2, 0.7)
+				return
 	var threat = null
-	var threat_d := 170.0 + r
+	var threat_d := 190.0 + r
 	var prey = null
-	var prey_d := 240.0 + r
+	var prey_d := 260.0 + r
 	for o in main.creatures:
 		if o == self or not o.alive or o.frozen:
 			continue
@@ -212,22 +227,22 @@ func _choose_mode() -> void:
 		elif o.evo <= evo and d < prey_d:
 			prey_d = d
 			prey = o
-	if threat != null and randf() < 0.45:
+	if threat != null and randf() < 0.5:
 		mode = 3
 		target = threat
-		bot_sprint = randf() < 0.35
+		bot_sprint = randf() < 0.4
 		return
-	if prey != null and randf() < 0.55:
+	if prey != null and randf() < 0.6:
 		mode = 2
 		target = prey
+		bot_attack_t = randf_range(0.3, 0.9)
 		return
 	if randf() < 0.7:
-		var fi: int = main.nearest_food(position, 260.0 + r)
+		var fi: int = main.nearest_food(position, 300.0 + r)
 		if fi >= 0:
 			mode = 1
 			wander_dir = (main.food_pos[fi] - position).normalized()
 			return
-	mode = 0
 	wander_dir = Vector2.from_angle(randf() * TAU) if randf() < 0.8 else Vector2.ZERO
 
 
@@ -238,23 +253,32 @@ func _bot_dir(delta: float) -> Vector2:
 	if mode == 2:
 		if target == null or not is_instance_valid(target) or not target.alive:
 			mode = 0
-			return Vector2.ZERO
-		var to_t: Vector2 = target.position - position
-		var dist := to_t.length()
-		heading = lerp_angle(heading, to_t.angle() + aim_err, minf(4.0 * delta, 1.0))
+			target = null
+			return wander_dir * 0.5
+		var lead := clampf(position.distance_to(target.position) / 950.0, 0.0, 0.3)
+		var aim: Vector2 = target.position + target.vel * lead - position
+		var dist := aim.length()
+		heading = lerp_angle(heading, aim.angle() + aim_err, minf(7.0 * delta, 1.0))
 		bot_attack_t -= delta
-		var reach: float = r * float(Species.REACH[evo]) + float(target.r) * 0.5
-		if bot_attack_t <= 0.0 and dist < reach * 1.05:
-			bot_attack_t = randf_range(0.8, 1.9)
-			aim_err = randf_range(-0.4, 0.4)
+		var reach: float = weapon_reach() + float(target.r) * 0.55
+		if bot_attack_t <= 0.0 and dist < reach and absf(angle_difference(heading, aim.angle())) < 0.75:
+			bot_attack_t = randf_range(0.45, 1.3)
+			aim_err = randf_range(-0.32, 0.32)
 			start_swing()
-		if dist > reach * 0.7:
-			return to_t.normalized()
+		if dist > reach * 0.65:
+			bot_sprint = target.is_player or target.evo >= evo
+			return aim.normalized()
+		if dist < (r + float(target.r)) * 0.6:
+			bot_sprint = false
+			return -aim.normalized()
+		bot_sprint = false
 		return Vector2.ZERO
 	if mode == 3:
 		if target == null or not is_instance_valid(target) or not target.alive:
 			mode = 0
-			return Vector2.ZERO
+			target = null
+			return wander_dir * 0.6
+		bot_sprint = true
 		return (position - target.position).normalized()
 	return wander_dir * 0.6
 

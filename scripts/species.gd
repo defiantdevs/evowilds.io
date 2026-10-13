@@ -1,7 +1,7 @@
 extends RefCounted
 
-const COUNT := 19
-const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor"]
+const COUNT := 24
+const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor"]
 const BLURB := [
 	"Club in hand. Everyone starts somewhere.",
 	"Sharpened stick, sharper instincts.",
@@ -22,17 +22,22 @@ const BLURB := [
 	"Flames cling to the blade.",
 	"Spiked crown, spiked temper.",
 	"All kneel before the Emperor.",
+	"A thousand battles, distilled into one calm step.",
+	"The storm kneels before its master.",
+	"Your scythe reaps the strong and the weak alike.",
+	"Starlight forged this crown. Heaven wears it poorly.",
+	"The wilds end here. All orbits lead to you.",
 ]
-const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0]
-const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020")]
-const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010")]
-const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0")]
-const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16]
-const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15]
-const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0]
-const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1]
-const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2]
-const REACH := [1.9, 2.2, 2.8, 2.0, 2.6, 2.1, 2.1, 2.4, 2.4, 2.6, 2.6, 3.0, 2.0, 2.3, 2.8, 3.0, 3.3, 3.3, 3.5]
+const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0]
+const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("2a1a4a")]
+const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff")]
+const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8")]
+const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
+const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 19]
+const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]
+const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2]
+const REACH := [1.9, 2.2, 2.8, 2.0, 2.6, 2.1, 2.1, 2.4, 2.4, 2.6, 2.6, 3.0, 2.0, 2.3, 2.8, 3.0, 3.3, 3.3, 3.5, 2.9, 3.2, 3.4, 3.3, 3.6]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
@@ -158,6 +163,8 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 		var ac: Color = c2
 		ci.draw_circle(Vector2.ZERO, r * (1.5 + 0.1 * pu), Color(ac.r, ac.g, ac.b, 0.12))
 		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 40, Color(ac.r, ac.g, ac.b, 0.5), 2.5, true)
+		if evo >= 21:
+			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 36, Color(ac.r, ac.g, ac.b, 0.35), 1.5, true)
 	var cape: int = CAPE[evo]
 	if cape == 1:
 		var w := sin(t * 4.0) * r * 0.2
@@ -328,6 +335,46 @@ static func _headgear(ci: CanvasItem, r: float, kind: int, t: float, skin: Color
 				ci.draw_colored_polygon(PackedVector2Array([q + pq * 0.08 * r, q + d3 * 0.4 * r, q - pq * 0.08 * r]), c2)
 			ci.draw_circle(Vector2(hx + 0.4 * r, -0.12 * r), r * 0.05, Color(1.0, 0.25, 0.15))
 			ci.draw_circle(Vector2(hx + 0.4 * r, 0.12 * r), r * 0.05, Color(1.0, 0.25, 0.15))
+		17:
+			_head(ci, r, skin, hair, lw)
+			_fill(ci, PackedVector2Array([Vector2(hx + 0.34 * r, -0.26 * r), Vector2(hx - 0.5 * r, -0.16 * r), Vector2(hx - 0.78 * r, 0.0), Vector2(hx - 0.5 * r, 0.16 * r), Vector2(hx + 0.34 * r, 0.26 * r)]), Color(0.92, 0.9, 0.85), OL, lw * 0.6)
+			_fill(ci, _ellipse(hx, 0, 0.74 * r, 0.72 * r, 0.0, 22), c1.darkened(0.18), OL, lw)
+			_fill(ci, _ellipse(hx - 0.02 * r, 0, 0.4 * r, 0.4 * r, 0.0, 20), c1, OL, lw)
+			ci.draw_circle(Vector2(hx + 0.06 * r, 0), r * 0.1, c2)
+		18:
+			_head(ci, r, skin, hair, lw)
+			_helmet(ci, r, Color(0.44, 0.58, 0.78), lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([Vector2(hx, side * 0.4 * r), Vector2(hx - 0.45 * r, side * 1.1 * r), Vector2(hx + 0.15 * r, side * 0.6 * r)]), Color(0.9, 0.95, 1.0), OL, lw * 0.7)
+			for k in range(3):
+				var aa := -1.1 + float(k) * 1.1
+				var q := Vector2(hx + 0.62 * r, 0).rotated(aa)
+				ci.draw_line(q, q + Vector2.from_angle(aa) * r * 0.2, c2, r * 0.06, true)
+		19:
+			_fill(ci, _ellipse(hx - 0.06 * r, 0, 0.66 * r, 0.64 * r, 0.0, 22), Color(0.14, 0.12, 0.18), OL, lw)
+			_fill(ci, _ellipse(hx + 0.14 * r, 0, 0.4 * r, 0.42 * r, 0.0, 18), Color(0.06, 0.05, 0.08), OL, lw * 0.6)
+			ci.draw_circle(Vector2(hx + 0.3 * r, -0.12 * r), r * 0.05, c2)
+			ci.draw_circle(Vector2(hx + 0.3 * r, 0.12 * r), r * 0.05, c2)
+		20:
+			_head(ci, r, skin, hair, lw)
+			ci.draw_arc(Vector2(hx - 0.05 * r, 0), 0.68 * r, 0.0, TAU, 26, Color(1.0, 0.88, 0.4, 0.85), r * 0.09, true)
+			for k in range(6):
+				var a5 := PI + (float(k) - 2.5) * 0.5
+				var d5 := Vector2.from_angle(a5)
+				var q5 := Vector2(hx, 0) + d5 * 0.5 * r
+				var pq5 := Vector2(-d5.y, d5.x)
+				_fill(ci, PackedVector2Array([q5 + pq5 * 0.1 * r, q5 + d5 * 0.55 * r, q5 - pq5 * 0.1 * r]), Color(1.0, 0.84, 0.3), OL, lw * 0.6)
+			ci.draw_circle(Vector2(hx + 0.02 * r, 0), r * 0.09, Color(0.95, 0.95, 1.0))
+			ci.draw_circle(Vector2(hx + 0.42 * r, 0), r * 0.07, Color(0.4, 0.75, 1.0))
+		21:
+			_head(ci, r, skin, hair, lw)
+			_fill(ci, _ellipse(hx, 0, 0.58 * r, 0.56 * r, 0.0, 24), Color(0.1, 0.07, 0.18), OL, lw)
+			for k in range(5):
+				var a6 := t * 1.2 + float(k) * TAU / 5.0
+				ci.draw_circle(Vector2(hx, 0) + Vector2.from_angle(a6) * 0.62 * r, r * 0.05, Color(0.75, 0.5, 1.0, 0.9))
+			ci.draw_arc(Vector2(hx, 0), 0.62 * r, 0.0, TAU, 30, Color(0.65, 0.35, 1.0, 0.5), r * 0.05, true)
+			_fill(ci, PackedVector2Array([Vector2(hx - 0.2 * r, -0.3 * r), Vector2(hx + 0.15 * r, -0.45 * r), Vector2(hx + 0.5 * r, -0.25 * r)]), Color(0.85, 0.7, 1.0), OL, lw * 0.5)
 		_:
 			_head(ci, r, skin, hair, lw)
 			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.5 * r, 0.0, 22), c1.lightened(0.1), OL, lw)
@@ -431,6 +478,35 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 				ci.draw_colored_polygon(_wpoly(pv, ang, r, PackedVector2Array([Vector2(fx0, 0.34), Vector2(fx0 + 0.18, 0.34 - hh), Vector2(fx0 + 0.36, 0.34)])), Color(1.0, 0.55, 0.15, 0.9))
 				ci.draw_colored_polygon(_wpoly(pv, ang, r, PackedVector2Array([Vector2(fx0 + 0.07, 0.34), Vector2(fx0 + 0.18, 0.34 - hh * 0.55), Vector2(fx0 + 0.29, 0.34)])), Color(1.0, 0.9, 0.4, 0.95))
 			_bar(ci, r, pv, ang, 0.93, 1.01, 0.5, 1.0, c2, lw * 0.5)
+		16:
+			_bar(ci, r, pv, ang, -0.4, 2.5, 0.5, 0.11, Color(0.34, 0.3, 0.32), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(2.45, 0.5), Vector2(3.3, 0.36), Vector2(3.0, 0.5), Vector2(3.3, 0.64)])), Color(0.88, 0.94, 1.0), OL, lw * 0.7)
+			for k in range(4):
+				var za := 0.5 + (-0.16 + float(k) * 0.11)
+				var z0 := _wp(pv, ang, r, 2.0 + float(k) * 0.2, za)
+				var z1 := _wp(pv, ang, r, 2.28 + float(k) * 0.2, za + 0.08)
+				ci.draw_line(z0, z1, Color(1.0, 0.92, 0.45, 0.85), r * 0.05, true)
+			_bar(ci, r, pv, ang, 2.35, 2.44, 0.5, 0.66, c2, lw * 0.4)
+		17:
+			_bar(ci, r, pv, ang, -0.6, 3.0, 0.5, 0.1, Color(0.28, 0.22, 0.2), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(3.0, 0.5), Vector2(3.45, 0.2), Vector2(3.1, -0.25), Vector2(2.5, -0.5), Vector2(2.7, -0.15), Vector2(2.85, 0.5)])), Color(0.8, 0.85, 0.92), OL, lw)
+			ci.draw_circle(_wp(pv, ang, r, 2.95, 0.5), r * 0.1, c2)
+		18:
+			_bar(ci, r, pv, ang, -0.5, 2.6, 0.5, 0.11, Color(0.4, 0.3, 0.22), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(2.55, 0.5), Vector2(2.75, 0.16), Vector2(3.35, 0.2), Vector2(3.4, 0.5), Vector2(3.0, 0.5)])), Color(0.95, 0.9, 0.6), OL, lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(2.6, 0.5), Vector2(2.75, 0.84), Vector2(3.35, 0.8), Vector2(3.4, 0.5), Vector2(3.0, 0.5)])), Color(0.95, 0.9, 0.6), OL, lw)
+			_bar(ci, r, pv, ang, 2.5, 2.58, 0.5, 0.6, c2, lw * 0.4)
+		19:
+			_bar(ci, r, pv, ang, 0.3, 0.95, 0.5, 0.15, Color(0.2, 0.1, 0.3), lw)
+			var gblade := _wpoly(pv, ang, r, PackedVector2Array([Vector2(0.95, 0.34), Vector2(3.1, 0.3), Vector2(3.7, 0.5), Vector2(3.1, 0.7), Vector2(0.95, 0.66)]))
+			var pu3 := 0.5 + 0.5 * sin(t * 3.0)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.3, 0.5, 1.6, 0.5, 0.0, 20)), Color(0.6, 0.3, 1.0, 0.14 + 0.08 * pu3))
+			_fill(ci, gblade, Color(0.35, 0.2, 0.55), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.1, 0.5), _wp(pv, ang, r, 3.5, 0.5), Color(0.8, 0.6, 1.0), lw, true)
+			for k in range(4):
+				var sx := 1.4 + float(k) * 0.5
+				ci.draw_circle(_wp(pv, ang, r, sx, 0.5 + (-0.1 + 0.2 * float(k % 2))), r * 0.045, Color(0.85, 0.75, 1.0, 0.9))
+			_bar(ci, r, pv, ang, 0.93, 1.01, 0.5, 1.15, c2, lw * 0.5)
 		_:
 			_bar(ci, r, pv, ang, 0.3, 0.95, 0.5, 0.16, Color(0.5, 0.1, 0.1), lw)
 			var blade := _wpoly(pv, ang, r, PackedVector2Array([Vector2(0.95, 0.34), Vector2(3.0, 0.3), Vector2(3.55, 0.5), Vector2(3.0, 0.7), Vector2(0.95, 0.66)]))
