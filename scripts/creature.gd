@@ -1,0 +1,319 @@
+extends Node2D
+
+const Species = preload("res://scripts/species.gd")
+const SWING_TIME := 0.42
+
+var main
+var is_player := false
+var frozen := false
+var cname := "Creature"
+var evo := 0
+var xp := 0.0
+var r := 22.0
+var vel := Vector2.ZERO
+var heading := 0.0
+var hp := 40.0
+var max_hp := 40.0
+var sprinting := false
+var shield := 0.0
+var alive := true
+var anim_t := 0.0
+var trail_t := 0.0
+var c1 := Color.WHITE
+var c2 := Color.WHITE
+var swing_t := -1.0
+var swing_cd := 0.0
+var swing_hit := false
+var swing_hits: Array = []
+var trail: PackedVector2Array = PackedVector2Array()
+var hit_flash := 0.0
+var since_hit := 99.0
+var mode := 0
+var mode_t := 0.0
+var target = null
+var wander_dir := Vector2.RIGHT
+var bot_attack_t := 1.0
+var bot_sprint := false
+var aim_err := 0.0
+
+
+func _ready() -> void:
+	evo = Species.evo_for_xp(xp)
+	r = Species.radius_for(evo, xp)
+	max_hp = Species.max_hp_for(evo)
+	hp = max_hp
+	_refresh_colors()
+	anim_t = randf() * 10.0
+	wander_dir = Vector2.from_angle(randf() * TAU)
+	heading = randf() * TAU
+	mode_t = randf_range(0.2, 1.2)
+	bot_attack_t = randf_range(0.8, 2.0)
+	z_index = evo
+
+
+func _refresh_colors() -> void:
+	c1 = Species.COL1[evo]
+	c2 = Species.COL2[evo]
+
+
+func tier_floor() -> float:
+	var f: float = Species.XP_AT[evo]
+	return f
+
+
+func add_xp(v: float) -> void:
+	var before := evo
+	xp += v
+	evo = Species.evo_for_xp(xp)
+	if evo != before:
+		_refresh_colors()
+		z_index = evo
+		shield = 2.0
+		max_hp = Species.max_hp_for(evo)
+		hp = max_hp
+		main.on_evolve(self, before)
+
+
+func take_damage(_amount: float, attacker) -> void:
+	if not alive or shield > 0.0:
+		return
+	var away: Vector2 = (position - attacker.position).normalized()
+	main.fx.burst(position - away * r * 0.3, Color(1.0, 0.92, 0.7), 8, 260.0, 0.35)
+	main.devour(attacker, self)
+
+
+func start_swing() -> void:
+	if swing_t >= 0.0 or swing_cd > 0.0 or frozen:
+		return
+	swing_t = 0.0
+	swing_hit = false
+	swing_hits.clear()
+	trail.clear()
+	swing_cd = SWING_TIME + 0.12 + 0.02 * float(evo)
+
+
+func _process(delta: float) -> void:
+	if not alive:
+		return
+	anim_t += delta
+	shield = maxf(shield - delta, 0.0)
+	hit_flash = maxf(hit_flash - delta, 0.0)
+	swing_cd = maxf(swing_cd - delta, 0.0)
+	since_hit += delta
+	r = lerpf(r, Species.radius_for(evo, xp), minf(delta * 4.0, 1.0))
+	if swing_t >= 0.0:
+		swing_t += delta
+		var sp := swing_t / SWING_TIME
+		if sp >= 0.2 and sp <= 0.72:
+			var seg := _weapon_seg()
+			trail.append(seg[1])
+			if trail.size() > 9:
+				trail.remove_at(0)
+
+
+			main.weapon_hit(self, position + (seg[0] as Vector2).rotated(heading), position + (seg[1] as Vector2).rotated(heading))
+		if swing_t >= SWING_TIME:
+			swing_t = -1.0
+			trail.clear()
+	if frozen:
+		queue_redraw()
+		return
+
+	var dir := Vector2.ZERO
+	var want_sprint := false
+	if is_player:
+		dir = _player_dir()
+		want_sprint = Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+		if Input.is_physical_key_pressed(KEY_SPACE) or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+			start_swing()
+		var to_m := get_global_mouse_position() - global_position
+		if to_m.length() > 6.0:
+			heading = lerp_angle(heading, to_m.angle(), minf(16.0 * delta, 1.0))
+		main.eat_food_near(self)
+	else:
+		mode_t -= delta
+		if mode_t <= 0.0:
+			_choose_mode()
+		dir = _bot_dir(delta)
+		want_sprint = bot_sprint
+
+	var floor_xp := tier_floor()
+	sprinting = want_sprint and dir.length() > 0.1
+	if sprinting and is_player:
+		if xp - floor_xp > 0.4:
+			var nxt: float = Species.XP_AT[mini(evo + 1, Species.COUNT - 1)]
+			var span := maxf(nxt - floor_xp, 60.0)
+			xp = maxf(xp - span * 0.03 * delta, floor_xp)
+		else:
+			sprinting = false
+
+	var spd := Species.speed_base(evo)
+	if not is_player:
+		spd *= 0.78
+	if sprinting:
+		spd *= 1.6
+	if swing_t >= 0.0:
+		spd *= 0.7
+	var accel := 1500.0 - 40.0 * float(evo)
+	vel = vel.move_toward(dir * spd, accel * delta)
+	position += vel * delta
+
+	main.push_out(self)
+	var lim: float = main.ARENA_R - r * 0.8
+	if position.length() > lim:
+		position = position.normalized() * lim
+		vel = vel.slide(position.normalized())
+
+	if not is_player and vel.length() > 25.0 and mode != 2:
+		heading = lerp_angle(heading, vel.angle(), minf(6.0 * delta, 1.0))
+
+	if sprinting:
+		trail_t -= delta
+		if trail_t <= 0.0:
+			trail_t = 0.04
+			main.fx.burst(position - Vector2.from_angle(heading) * r * 0.8, Color(0.95, 0.9, 0.7), 1, 40.0, 0.35)
+	queue_redraw()
+
+
+func _player_dir() -> Vector2:
+	var d := Vector2.ZERO
+	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
+		d.x -= 1.0
+	if Input.is_physical_key_pressed(KEY_D) or Input.is_physical_key_pressed(KEY_RIGHT):
+		d.x += 1.0
+	if Input.is_physical_key_pressed(KEY_W) or Input.is_physical_key_pressed(KEY_UP):
+		d.y -= 1.0
+	if Input.is_physical_key_pressed(KEY_S) or Input.is_physical_key_pressed(KEY_DOWN):
+		d.y += 1.0
+	if d != Vector2.ZERO:
+		return d.normalized()
+	var to_m := get_global_mouse_position() - global_position
+	var dist := to_m.length()
+	if dist < r * 0.9:
+		return Vector2.ZERO
+	return to_m.normalized() * clampf(dist / (r * 3.0), 0.3, 1.0)
+
+
+func _choose_mode() -> void:
+	mode_t = randf_range(0.9, 2.2)
+	bot_sprint = false
+	target = null
+	var threat = null
+	var threat_d := 170.0 + r
+	var prey = null
+	var prey_d := 240.0 + r
+	for o in main.creatures:
+		if o == self or not o.alive or o.frozen:
+			continue
+		var d: float = position.distance_to(o.position)
+		if o.evo > evo + 1 and d < threat_d:
+			threat_d = d
+			threat = o
+		elif o.evo <= evo and d < prey_d:
+			prey_d = d
+			prey = o
+	if threat != null and randf() < 0.45:
+		mode = 3
+		target = threat
+		bot_sprint = randf() < 0.35
+		return
+	if prey != null and randf() < 0.55:
+		mode = 2
+		target = prey
+		return
+	if randf() < 0.7:
+		var fi: int = main.nearest_food(position, 260.0 + r)
+		if fi >= 0:
+			mode = 1
+			wander_dir = (main.food_pos[fi] - position).normalized()
+			return
+	mode = 0
+	wander_dir = Vector2.from_angle(randf() * TAU) if randf() < 0.8 else Vector2.ZERO
+
+
+func _bot_dir(delta: float) -> Vector2:
+	if mode == 1:
+		main.eat_food_near(self)
+		return wander_dir
+	if mode == 2:
+		if target == null or not is_instance_valid(target) or not target.alive:
+			mode = 0
+			return Vector2.ZERO
+		var to_t: Vector2 = target.position - position
+		var dist := to_t.length()
+		heading = lerp_angle(heading, to_t.angle() + aim_err, minf(4.0 * delta, 1.0))
+		bot_attack_t -= delta
+		var reach: float = r * float(Species.REACH[evo]) + float(target.r) * 0.5
+		if bot_attack_t <= 0.0 and dist < reach * 1.05:
+			bot_attack_t = randf_range(0.8, 1.9)
+			aim_err = randf_range(-0.4, 0.4)
+			start_swing()
+		if dist > reach * 0.7:
+			return to_t.normalized()
+		return Vector2.ZERO
+	if mode == 3:
+		if target == null or not is_instance_valid(target) or not target.alive:
+			mode = 0
+			return Vector2.ZERO
+		return (position - target.position).normalized()
+	return wander_dir * 0.6
+
+
+func weapon_reach() -> float:
+	return r * float(Species.REACH[evo])
+
+func _weapon_seg() -> Array:
+	var pv := Vector2(0.1 * r, 0.8 * r)
+	var ang := _swing_angle()
+	var reach: float = Species.REACH[evo]
+	var base := pv
+	var tip := pv + Vector2(reach * r, 0.0).rotated(ang)
+	return [base, tip]
+
+
+func _swing_angle() -> float:
+	var ang := 0.12 + sin(anim_t * 3.0) * 0.04
+	if swing_t >= 0.0:
+		var p := clampf(swing_t / SWING_TIME, 0.0, 1.0)
+		if p < 0.2:
+			ang = lerpf(0.12, 1.35, p / 0.2)
+		elif p < 0.7:
+			ang = lerpf(1.35, -1.35, (p - 0.2) / 0.5)
+		else:
+			ang = lerpf(-1.35, 0.12, (p - 0.7) / 0.3)
+	return ang
+
+
+func _draw() -> void:
+	draw_set_transform(Vector2.ZERO, heading, Vector2.ONE)
+	var sa := _swing_angle()
+	if trail.size() > 1:
+		for i in range(1, trail.size()):
+			var f := float(i) / float(trail.size())
+			draw_line(trail[i - 1], trail[i], Color(1, 1, 1, f * 0.7), r * (0.1 + 0.28 * f), true)
+	if sprinting:
+		for i in range(3):
+			var y := float(i - 1) * r * 0.55
+			draw_line(Vector2(-r * (1.3 + float(i) * 0.4), y), Vector2(-r * (2.4 + float(i) * 0.7), y), Color(1, 1, 1, 0.45), 2.0, true)
+	Species.draw_body(self, evo, r, anim_t, c1, c2, sa)
+	if hit_flash > 0.0:
+		draw_circle(Vector2.ZERO, r * 1.0, Color(1, 1, 1, hit_flash * 2.2))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	if shield > 0.0:
+		var a := 0.45 + 0.25 * sin(anim_t * 10.0)
+		draw_arc(Vector2.ZERO, r * 1.6, 0.0, TAU, 48, Color(0.6, 0.9, 1.0, a), 3.0, true)
+	var font := ThemeDB.fallback_font
+	var label_y := -r * 1.35 - 12.0
+	var col := Color(1, 1, 1, 0.9)
+	var pl = main.player
+	if not is_player and pl != null and pl.alive:
+		if evo > pl.evo:
+			col = Color(1.0, 0.5, 0.5, 0.95)
+		elif evo < pl.evo:
+			col = Color(0.6, 1.0, 0.65, 0.95)
+	if is_player:
+		col = Color(1.0, 0.95, 0.5, 1.0)
+	draw_string(font, Vector2(-60, label_y), cname, HORIZONTAL_ALIGNMENT_CENTER, 120, 14, Color(0, 0, 0, 0.6))
+	draw_string(font, Vector2(-60, label_y - 1.0), cname, HORIZONTAL_ALIGNMENT_CENTER, 120, 14, col)
+	if is_player:
+		draw_colored_polygon(PackedVector2Array([Vector2(-6, label_y - 24), Vector2(6, label_y - 24), Vector2(0, label_y - 14)]), Color(1.0, 0.95, 0.5))
