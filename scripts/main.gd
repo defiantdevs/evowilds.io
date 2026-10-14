@@ -350,6 +350,34 @@ func enemy_base(t: int) -> Dictionary:
 	return {}
 
 
+func own_base(t: int) -> Dictionary:
+	if t == 0:
+		return stat_red
+	if t == 1:
+		return stat_blue
+	return {}
+
+
+func enemy_near_base(team_: int, radius: float):
+	# nearest enemy creature (player or bot) hanging around this team's statue
+	var b := own_base(team_)
+	if b.is_empty():
+		return null
+	var bp: Vector2 = b["pos"]
+	var best = null
+	var bd := radius
+	for c in creatures:
+		if not c.alive or c.frozen:
+			continue
+		if c.team == team_ or c.team < 0:
+			continue
+		var d: float = c.position.distance_to(bp)
+		if d < bd:
+			bd = d
+			best = c
+	return best
+
+
 func unit_to_convert(pos: Vector2, team_: int, reach: float):
 	var best = null
 	var bd := reach

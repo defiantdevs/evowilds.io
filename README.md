@@ -26,7 +26,7 @@ Whenever you are defeated you return to the start screen. In Team Deathmatch you
 - Grey golems spawn around the arena and stand still: **small** every 15s, **medium** every 40s, **large** every minute, **extra-large** every 2 minutes.
 - Hit a golem or statue and it joins **your** team, turns your colour, and marches off to chip the enemy statue (small 1, medium 2, large 3, extra-large 5 damage on a size-based cooldown).
 - You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **28** (biggest).
-- First statue destroyed wins. Some bots head straight for the enemy statue to help.
+- First statue destroyed wins. Smaller bots charge the enemy statue; **big bots instead roam the arena and guard their own statue**, attacking anyone who comes near it.
 - No friendly fire — team-mates can't hurt each other.
 
 ## Evolutions (24)

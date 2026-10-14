@@ -2,6 +2,7 @@ extends Node2D
 
 const Species = preload("res://scripts/species.gd")
 const SWING_TIME := 0.42
+const BIG_EVO := 15   # at this evolution a Team Deathmatch bot becomes a base defender
 
 var main
 var is_player := false
@@ -214,6 +215,10 @@ func _player_dir() -> Vector2:
 	return to_m.normalized() * clampf(dist / (r * 3.0), 0.3, 1.0)
 
 
+func is_big() -> bool:
+	return evo >= BIG_EVO
+
+
 func _choose_mode() -> void:
 	mode_t = randf_range(0.55, 1.5)
 	bot_sprint = false
@@ -221,13 +226,23 @@ func _choose_mode() -> void:
 		if position.distance_to(target.position) < 620.0 and randf() < 0.82:
 			bot_sprint = randf() < 0.3
 			return
-	if mode == 4 and team >= 0 and main.mode == "tdm":
+	if mode == 4 and team >= 0 and main.mode == "tdm" and not is_big():
 		# keep charging the enemy statue once committed
 		if randf() < 0.85:
 			bot_sprint = true
 			return
 	target = null
 	mode = 0
+	# Team Deathmatch: big bots roam and guard their own statue instead of
+	# marching on the enemy one. If an enemy turns up at their statue, attack.
+	if main.mode == "tdm" and team >= 0 and is_big():
+		var intruder = main.enemy_near_base(team, 620.0)
+		if intruder != null:
+			mode = 2
+			target = intruder
+			bot_sprint = true
+			bot_attack_t = randf_range(0.1, 0.4)
+			return
 	var aggro := 440.0 + r * 2.0
 	var best = null
 	var best_d := aggro
@@ -272,7 +287,7 @@ func _choose_mode() -> void:
 		bot_sprint = randf() < 0.45
 		return
 	# Team Deathmatch: some bots march on the enemy statue instead of grazing
-	if main.mode == "tdm" and team >= 0 and randf() < 0.42:
+	if main.mode == "tdm" and team >= 0 and not is_big() and randf() < 0.42:
 		mode = 4
 		target = null
 		bot_sprint = true
@@ -322,8 +337,9 @@ func _bot_dir(delta: float) -> Vector2:
 		return (position - target.position).normalized()
 	if mode == 4:
 		var base: Dictionary = main.enemy_base(team)
-		if base.is_empty():
+		if base.is_empty() or is_big():
 			mode = 0
+			target = null
 			return wander_dir * 0.5
 		var bp: Vector2 = base["pos"]
 		var to := bp - position
