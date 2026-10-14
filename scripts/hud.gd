@@ -96,7 +96,7 @@ func _draw() -> void:
 	if not in_top and pl.alive:
 		var rank: int = main.board.find(pl) + 1
 		_text(str(rank) + ".", Vector2(S.x - 232, ly + 6), 14, Color(1, 0.95, 0.5))
-		_text("You", Vector2(S.x - 208, ly + 6), 14, Color(1, 0.95, 0.5))
+		_text(pl.cname, Vector2(S.x - 208, ly + 6), 14, Color(1, 0.95, 0.5))
 		_text(str(int(pl.xp)), Vector2(S.x - 110, ly + 6), 14, Color(1, 0.95, 0.5), 80.0, HORIZONTAL_ALIGNMENT_RIGHT)
 
 	var bw := 560.0
@@ -207,3 +207,4 @@ func _draw() -> void:
 		if main.time - main.death_time > 1.0:
 			var blink := 0.6 + 0.4 * sin(t * 4.0)
 			_center("Press ENTER or click to evolve again", S.y * 0.5 + 64.0, 20, Color(0.7 * 1.5, 1.4, 1.6, blink))
+			_center("Press ESC for the main menu", S.y * 0.5 + 92.0, 15, Color(0.8, 0.88, 0.96, 0.75))

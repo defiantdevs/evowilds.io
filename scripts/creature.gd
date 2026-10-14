@@ -154,8 +154,20 @@ func _process(delta: float) -> void:
 		spd *= 1.6
 	if swing_t >= 0.0:
 		spd *= 0.7
+	# crisper control for the player: quick to build speed, quick to stop,
+	# and extra bite when reversing so direction changes don't slide.
 	var accel := 1500.0 - 40.0 * float(evo)
-	vel = vel.move_toward(dir * spd, accel * delta)
+	if is_player:
+		accel = 3000.0 - 50.0 * float(evo)
+	if dir.length_squared() < 0.000001:
+		var fric := accel
+		if is_player:
+			fric = 2800.0 - 40.0 * float(evo)
+		vel = vel.move_toward(Vector2.ZERO, maxf(fric, 400.0) * delta)
+	else:
+		if is_player and vel.dot(dir) < 0.0:
+			accel *= 1.7
+		vel = vel.move_toward(dir * spd, accel * delta)
 	position += vel * delta
 
 	main.push_out(self)

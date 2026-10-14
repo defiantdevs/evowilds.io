@@ -230,7 +230,7 @@ func _spawn_player() -> void:
 	if shot_path != "":
 		evo = shot_evo
 		pos = Vector2(0, 260) if shot_gallery else pos
-	player = _spawn_creature(true, evo, pos, "You", 0.0)
+	player = _spawn_creature(true, evo, pos, GameState.clean_name(), 0.0)
 	if shot_path != "":
 		player.frozen = true
 		player.shield = 0.0
@@ -448,6 +448,9 @@ func _update_camera(delta: float) -> void:
 
 func _unhandled_input(event: InputEvent) -> void:
 	if not player_dead or time - death_time < 1.0:
+		return
+	if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
+		get_tree().change_scene_to_file("res://scenes/menu.tscn")
 		return
 	var go := false
 	if event is InputEventKey and event.pressed:

@@ -12,8 +12,12 @@ config_version=5
 
 config/name="Evo Wilds"
 config/description="Top-down eat-to-grow arena. 24 humanoid evolutions, one-hit weapon combat."
-run/main_scene="res://scenes/main.tscn"
+run/main_scene="res://scenes/menu.tscn"
 config/features=PackedStringArray("4.7", "Forward Plus")
+
+[autoload]
+
+GameState="*res://scripts/game_state.gd"
 
 [display]
 
