@@ -350,3 +350,33 @@ func _draw() -> void:
 	draw_string(font, Vector2(-60, label_y - 1.0), cname, HORIZONTAL_ALIGNMENT_CENTER, 120, 14, col)
 	if is_player:
 		draw_colored_polygon(PackedVector2Array([Vector2(-6, label_y - 24), Vector2(6, label_y - 24), Vector2(0, label_y - 14)]), Color(1.0, 0.95, 0.5))
+	if alive and main.leader == self:
+		var bob := sin(anim_t * 4.0) * 1.5
+		var hw := clampf(r * 0.34, 9.0, 30.0)
+		_crown(Vector2(0.0, label_y - (34.0 if is_player else 18.0) + bob), hw)
+
+
+func _crown(origin: Vector2, hw: float) -> void:
+	# gold crown for the biggest creature alive
+	var hh := hw * 1.1
+	var gold := Color(1.0, 0.84, 0.25)
+	var edge := Color(0.34, 0.2, 0.02, 0.95)
+	var pts := PackedVector2Array([
+		origin + Vector2(-hw, 0.0),
+		origin + Vector2(-hw, -hh * 0.3),
+		origin + Vector2(-hw * 0.6, -hh),
+		origin + Vector2(-hw * 0.3, -hh * 0.25),
+		origin + Vector2(0.0, -hh * 1.1),
+		origin + Vector2(hw * 0.3, -hh * 0.25),
+		origin + Vector2(hw * 0.6, -hh),
+		origin + Vector2(hw, -hh * 0.3),
+		origin + Vector2(hw, 0.0),
+	])
+	draw_colored_polygon(pts, gold)
+	draw_polyline(pts, edge, 1.6, true)
+	var band := Rect2(origin + Vector2(-hw, 0.0), Vector2(hw * 2.0, hh * 0.34))
+	draw_rect(band, gold)
+	draw_rect(band, edge, false, 1.6)
+	draw_circle(origin + Vector2(-hw * 0.6, -hh), hw * 0.16, Color(0.95, 0.32, 0.36))
+	draw_circle(origin + Vector2(hw * 0.6, -hh), hw * 0.16, Color(0.36, 0.62, 0.95))
+	draw_circle(origin + Vector2(0.0, -hh * 1.1), hw * 0.18, Color(0.6, 0.92, 0.5))

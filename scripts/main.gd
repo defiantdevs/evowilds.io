@@ -28,6 +28,7 @@ var shake := 0.0
 var respawns: Array = []
 var feed: Array = []
 var board: Array = []
+var leader = null  # the biggest creature alive (rank 1); wears the crown
 var board_t := 0.0
 var banner_text := ""
 var banner_ttl := 0.0
@@ -363,6 +364,8 @@ func devour(eater, victim) -> void:
 		shake = 8.0
 	creatures.erase(victim)
 	board.erase(victim)
+	if leader == victim:
+		leader = board[0] if board.size() > 0 else null
 	if victim.is_player:
 		victim.visible = false
 	else:
@@ -425,6 +428,7 @@ func _update_board() -> void:
 	var s := creatures.duplicate()
 	s.sort_custom(func(a, b): return a.xp > b.xp)
 	board = s
+	leader = board[0] if board.size() > 0 else null
 
 
 func _update_camera(delta: float) -> void:

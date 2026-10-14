@@ -33,6 +33,23 @@ func _center(s: String, y: float, size_: int, col: Color) -> void:
 	draw_string(ThemeDB.fallback_font, Vector2(size.x * 0.5 - w * 0.5, y), s, HORIZONTAL_ALIGNMENT_CENTER, w, size_, col)
 
 
+func _mini_crown(p: Vector2, s: float) -> void:
+	# small crown badge for the biggest creature (player or bot)
+	var gold := Color(1.0, 0.86, 0.3)
+	var pts := PackedVector2Array([
+		p + Vector2(-s, 0.0),
+		p + Vector2(-s, -s * 0.7),
+		p + Vector2(-s * 0.5, -s * 0.15),
+		p + Vector2(0.0, -s * 0.95),
+		p + Vector2(s * 0.5, -s * 0.15),
+		p + Vector2(s, -s * 0.7),
+		p + Vector2(s, 0.0),
+	])
+	draw_colored_polygon(pts, gold)
+	draw_polyline(pts, Color(0.3, 0.18, 0.02, 0.9), 1.0, true)
+	draw_rect(Rect2(p + Vector2(-s, -s * 0.05), Vector2(s * 2.0, s * 0.3)), gold)
+
+
 func _draw() -> void:
 	if main == null or main.player == null:
 		return
@@ -71,6 +88,9 @@ func _draw() -> void:
 			draw_rect(Rect2(S.x - 240, ly - 16, 218, 22), Color(1, 1, 1, 0.1))
 		_text(str(i + 1) + ".", Vector2(S.x - 232, ly), 14, Color(0.7, 0.8, 0.9))
 		_text(nm, Vector2(S.x - 208, ly), 14, oc if not is_me else Color(1, 0.95, 0.5))
+		if o == main.leader:
+			var nw: float = ThemeDB.fallback_font.get_string_size(nm, HORIZONTAL_ALIGNMENT_LEFT, -1, 14).x
+			_mini_crown(Vector2(S.x - 208 + nw + 8.0, ly - 3.0), 4.2)
 		_text(str(int(o.xp)), Vector2(S.x - 110, ly), 14, Color(0.85, 0.95, 1.0), 80.0, HORIZONTAL_ALIGNMENT_RIGHT)
 		ly += 24.0
 	if not in_top and pl.alive:
@@ -148,6 +168,8 @@ func _draw() -> void:
 		draw_circle(q, rad, oc2)
 		if danger:
 			draw_arc(q, rad + 2.5, 0.0, TAU, 12, Color(1.0, 0.4, 0.4, 0.7), 1.2, true)
+		if o == main.leader:
+			_mini_crown(q + Vector2(0.0, -rad - 3.0), 3.4)
 	if pl.alive:
 		var pq: Vector2 = mc + pl.position * msc
 		var hd := Vector2.from_angle(pl.heading)
@@ -158,6 +180,8 @@ func _draw() -> void:
 		var tri := PackedVector2Array([pq + hd * 8.0, pq - hd * 4.5 + pp2 * 5.0, pq - hd * 4.5 - pp2 * 5.0])
 		draw_colored_polygon(tri, Color(1.0, 0.95, 0.5))
 		draw_polyline(PackedVector2Array([tri[2], tri[1], tri[0], tri[2]]), Color(0.25, 0.18, 0.05, 0.9), 1.0, true)
+		if main.leader == pl:
+			_mini_crown(pq + Vector2(0.0, -11.0), 4.0)
 	draw_arc(mc, mr + 5.0, 0.0, TAU, 56, Color(0.3, 0.9, 1.0, 0.7), 2.0, true)
 	draw_arc(mc, mr, 0.0, TAU, 56, Color(0.95, 0.88, 0.6, 0.5), 1.5, true)
 
