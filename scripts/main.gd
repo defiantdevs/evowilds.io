@@ -11,6 +11,14 @@ const BOT_COUNT := 28
 const FOOD_XP := [1.5, 4.0, 10.0, 6.0]
 const BOT_NAMES := ["Nyx", "Vorn", "Kelp", "Zephyr", "Marrow", "Skiff", "Ondine", "Brine", "Thresh", "Quill", "Mako", "Ember", "Drift", "Haze", "Rook", "Tangle", "Lumo", "Fathom", "Gale", "Pip", "Sable", "Orrin", "Riptide", "Coral", "Echo", "Murk", "Tide", "Flux", "Jinx", "Onyx"]
 const VIGNETTE := "shader_type canvas_item;\nvoid fragment() {\n\tvec2 uv = UV - 0.5;\n\tfloat v = smoothstep(0.3, 0.95, length(uv * vec2(1.0, 0.85)));\n\tCOLOR = vec4(0.0, 0.05, 0.02, v * 0.42);\n}\n"
+const DM_TIME := 600.0        # Deathmatch: 10:00 countdown
+const BASE_HP := 15000.0      # Team Deathmatch statue health
+const UNIT_SIZES := [
+	{"r": 26.0, "dmg": 1.0, "cd": 0.7, "every": 15.0},    # small
+	{"r": 38.0, "dmg": 2.0, "cd": 0.9, "every": 40.0},    # medium
+	{"r": 52.0, "dmg": 3.0, "cd": 1.1, "every": 60.0},    # large
+	{"r": 70.0, "dmg": 5.0, "cd": 1.5, "every": 120.0},   # extra large
+]
 
 var player
 var creatures: Array = []
@@ -44,9 +52,24 @@ var shot_gallery := false
 var shot_evo := 0
 var shot_time := 3.0
 
+# --- game modes ---------------------------------------------------------
+var mode := "dm"                       # "dm" or "tdm"
+var player_team := -1                  # 0 = Red, 1 = Blue, -1 = none
+var stat_red: Dictionary = {}
+var stat_blue: Dictionary = {}
+var units: Array = []                  # neutral / captured golems & statues
+var unit_timers := [3.0, 12.0, 22.0, 45.0]
+var match_time := 0.0
+var match_over := false
+var match_msg := ""
+var result_t := 0.0
+var leave_t := 0.0
+var leaving := false
+
 
 func _ready() -> void:
 	randomize()
+	var dev_mode := ""
 	for a in OS.get_cmdline_user_args():
 		if a.begins_with("--shot="):
 			shot_path = a.substr(7)
@@ -56,6 +79,15 @@ func _ready() -> void:
 			shot_evo = int(a.substr(6))
 		elif a.begins_with("--wait="):
 			shot_time = float(a.substr(7))
+		elif a.begins_with("--mode="):
+			dev_mode = a.substr(7)
+	mode = dev_mode if dev_mode != "" else ("dm" if shot_path != "" else GameState.mode)
+	if mode == "tdm":
+		player_team = GameState.team
+		if player_team < 0:
+			player_team = randi() % 2
+			GameState.team = player_team
+	_setup_mode()
 	_build_world()
 	_setup_env()
 	cam = Camera2D.new()
@@ -207,11 +239,12 @@ func _add_food(pos: Vector2, kind: int) -> void:
 	food_ph.append(randf() * TAU)
 
 
-func _spawn_creature(is_pl: bool, evo: int, pos: Vector2, nm: String, extra_xp: float = 0.0) -> Node2D:
+func _spawn_creature(is_pl: bool, evo: int, pos: Vector2, nm: String, extra_xp: float = 0.0, team_: int = -1) -> Node2D:
 	var c := Creature.new()
 	c.main = self
 	c.is_player = is_pl
 	c.cname = nm
+	c.team = team_
 	var base: float = Species.XP_AT[evo]
 	c.xp = base + extra_xp
 	c.position = pos
@@ -221,8 +254,20 @@ func _spawn_creature(is_pl: bool, evo: int, pos: Vector2, nm: String, extra_xp: 
 	return c
 
 
+func _team_with_fewer() -> int:
+	var r := 0
+	var b := 0
+	for c in creatures:
+		if c.team == 0:
+			r += 1
+		elif c.team == 1:
+			b += 1
+	return 0 if r <= b else 1
+
+
 func _spawn_player() -> void:
 	player_dead = false
+	leave_t = 0.0
 	if player != null and is_instance_valid(player):
 		player.queue_free()
 	var evo := 0
@@ -230,7 +275,9 @@ func _spawn_player() -> void:
 	if shot_path != "":
 		evo = shot_evo
 		pos = Vector2(0, 260) if shot_gallery else pos
-	player = _spawn_creature(true, evo, pos, GameState.clean_name(), 0.0)
+	if mode == "tdm":
+		pos = Vector2.from_angle(randf() * TAU) * randf_range(400.0, 1100.0)
+	player = _spawn_creature(true, evo, pos, GameState.clean_name(), 0.0, player_team)
 	if shot_path != "":
 		player.frozen = true
 		player.shield = 0.0
@@ -253,7 +300,7 @@ func _spawn_bot(initial: bool) -> void:
 		var a: float = Species.XP_AT[evo]
 		var b: float = Species.XP_AT[evo + 1]
 		span = (b - a) * 0.6
-	var c := _spawn_creature(false, evo, pos, BOT_NAMES[randi() % BOT_NAMES.size()], randf() * span)
+	var c := _spawn_creature(false, evo, pos, BOT_NAMES[randi() % BOT_NAMES.size()], randf() * span, _team_with_fewer() if mode == "tdm" else -1)
 	c.shield = 3.0
 
 
@@ -265,6 +312,137 @@ func _spawn_gallery() -> void:
 		c.frozen = true
 		c.shield = 0.0
 		c.heading = 0.0
+
+
+# --- game modes ---------------------------------------------------------
+
+func _setup_mode() -> void:
+	if mode == "tdm":
+		var off := ARENA_R * 0.5
+		stat_red = {"team": 0, "pos": Vector2(-off, 0.0), "r": 150.0, "hp": BASE_HP, "max_hp": BASE_HP, "flash": 0.0}
+		stat_blue = {"team": 1, "pos": Vector2(off, 0.0), "r": 150.0, "hp": BASE_HP, "max_hp": BASE_HP, "flash": 0.0}
+		match_time = 0.0
+	else:
+		match_time = DM_TIME
+
+
+func team_color(t: int) -> Color:
+	if t == 0:
+		return Color(0.89, 0.27, 0.27)
+	if t == 1:
+		return Color(0.3, 0.52, 0.95)
+	return Color(0.62, 0.62, 0.66)
+
+
+func team_name_of(t: int) -> String:
+	if t == 0:
+		return "Red"
+	if t == 1:
+		return "Blue"
+	return ""
+
+
+func enemy_base(t: int) -> Dictionary:
+	if t == 0:
+		return stat_blue
+	if t == 1:
+		return stat_red
+	return {}
+
+
+func unit_to_convert(pos: Vector2, team_: int, reach: float):
+	var best = null
+	var bd := reach
+	for u in units:
+		if int(u["team"]) == team_:
+			continue
+		var d: float = pos.distance_to(u["pos"])
+		if d < bd + float(u["r"]) * 0.5:
+			bd = d
+			best = u
+	return best
+
+
+func _statue_damage(c) -> float:
+	# 1 at the smallest size up to 28 at the biggest; evolution only matters via size
+	var rr: float = c.r
+	var d := 1.0 + 27.0 * clampf((rr - 22.0) / (95.0 - 22.0), 0.0, 1.0)
+	return clampf(roundf(d), 1.0, 28.0)
+
+
+func _spawn_unit(size: int) -> void:
+	var pos := Vector2.ZERO
+	for tries in range(14):
+		pos = Vector2.from_angle(randf() * TAU) * sqrt(randf()) * (ARENA_R - 340.0)
+		if pos.distance_to(stat_red["pos"]) > 520.0 and pos.distance_to(stat_blue["pos"]) > 520.0 and not _blocked(pos):
+			break
+	units.append({
+		"pos": pos,
+		"size": size,
+		"team": -1,
+		"r": float(UNIT_SIZES[size]["r"]),
+		"atk": 0.0,
+		"flash": 0.0,
+		"ph": randf() * TAU,
+	})
+
+
+func _update_units(delta: float) -> void:
+	for i in range(UNIT_SIZES.size()):
+		unit_timers[i] = float(unit_timers[i]) - delta
+		if float(unit_timers[i]) <= 0.0:
+			unit_timers[i] = float(UNIT_SIZES[i]["every"])
+			_spawn_unit(i)
+	for u in units:
+		if float(u["flash"]) > 0.0:
+			u["flash"] = maxf(float(u["flash"]) - delta, 0.0)
+		var t: int = int(u["team"])
+		if t < 0:
+			continue
+		var base: Dictionary = enemy_base(t)
+		if base.is_empty():
+			continue
+		var to: Vector2 = base["pos"] - Vector2(u["pos"])
+		var dist := to.length()
+		var reach: float = float(base["r"]) + float(u["r"]) * 0.5
+		if dist > reach:
+			u["pos"] = Vector2(u["pos"]) + to.normalized() * (95.0 - 9.0 * float(u["size"])) * delta
+		else:
+			u["atk"] = float(u["atk"]) - delta
+			if float(u["atk"]) <= 0.0:
+				u["atk"] = float(UNIT_SIZES[int(u["size"])]["cd"])
+				base["hp"] = maxf(float(base["hp"]) - float(UNIT_SIZES[int(u["size"])]["dmg"]), 0.0)
+				base["flash"] = 0.25
+				fx.burst(Vector2(base["pos"]), team_color(t), 6, 150.0, 0.4)
+	for b in [stat_red, stat_blue]:
+		if float(b["flash"]) > 0.0:
+			b["flash"] = maxf(float(b["flash"]) - delta, 0.0)
+
+
+func _check_match_end() -> void:
+	if float(stat_red["hp"]) <= 0.0:
+		_end_match("BLUE TEAM WINS")
+	elif float(stat_blue["hp"]) <= 0.0:
+		_end_match("RED TEAM WINS")
+
+
+func _end_match(msg: String) -> void:
+	if match_over:
+		return
+	match_over = true
+	match_msg = msg
+	result_t = 4.5
+	shake = 16.0
+	banner_text = msg
+	banner_ttl = 4.0
+	banner_col = Color(1.0, 0.9, 0.4)
+
+
+func _leave_to_menu() -> void:
+	if leaving:
+		return
+	leaving = true
+	get_tree().change_scene_to_file("res://scenes/menu.tscn")
 
 
 func on_evolve(c, before: int) -> void:
@@ -379,6 +557,8 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 	for o in creatures:
 		if o == attacker or not o.alive or o.frozen:
 			continue
+		if mode == "tdm" and attacker.team >= 0 and o.team == attacker.team:
+			continue
 		if attacker.swing_hits.has(o):
 			continue
 		var closest := Geometry2D.get_closest_point_to_segment(o.position, a, b)
@@ -388,10 +568,57 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 		o.take_damage(0.0, attacker)
 		if not attacker.alive:
 			return
+	if mode != "tdm" or not attacker.alive:
+		return
+	var ateam: int = attacker.team
+	if ateam < 0:
+		return
+	# hitting a neutral (or enemy) golem flips it to your colour
+	for u in units:
+		if int(u["team"]) == ateam or attacker.swing_hits.has(u):
+			continue
+		var up: Vector2 = u["pos"]
+		var cp := Geometry2D.get_closest_point_to_segment(up, a, b)
+		if cp.distance_to(up) <= float(u["r"]):
+			attacker.swing_hits.append(u)
+			u["team"] = ateam
+			u["atk"] = 0.0
+			u["flash"] = 0.3
+			fx.burst(up, team_color(ateam), 14, 220.0, 0.5)
+	# hitting the enemy statue chips its health (1-28 by size)
+	var eb: Dictionary = enemy_base(ateam)
+	if eb.is_empty() or attacker.swing_hits.has(eb):
+		return
+	var ep: Vector2 = eb["pos"]
+	var cpb := Geometry2D.get_closest_point_to_segment(ep, a, b)
+	if cpb.distance_to(ep) <= float(eb["r"]):
+		attacker.swing_hits.append(eb)
+		var dmg := _statue_damage(attacker)
+		eb["hp"] = maxf(float(eb["hp"]) - dmg, 0.0)
+		eb["flash"] = 0.3
+		fx.burst(cpb, team_color(ateam), 18, 260.0, 0.5)
+		if attacker.is_player:
+			shake = maxf(shake, 5.0)
 
 
 func _process(delta: float) -> void:
 	time += delta
+	if match_over:
+		result_t = maxf(result_t - delta, 0.0)
+		if result_t <= 0.0:
+			_leave_to_menu()
+	elif player_dead:
+		leave_t += delta
+		if leave_t > 2.6:
+			_leave_to_menu()
+	elif mode == "tdm":
+		match_time += delta
+		_update_units(delta)
+		_check_match_end()
+	else:
+		match_time = maxf(match_time - delta, 0.0)
+		if match_time <= 0.0:
+			_end_match("TIME UP")
 	var spawn_budget := 6
 	while food_pos.size() < FOOD_TARGET and spawn_budget > 0:
 		_add_food(_random_food_pos(), _random_food_kind())
@@ -440,6 +667,9 @@ func _update_camera(delta: float) -> void:
 	if shot_gallery:
 		target_zoom = 0.4
 		cam.position = Vector2(0, -160)
+	elif shot_path != "" and mode == "tdm":
+		target_zoom = 0.8
+		cam.position = stat_red["pos"] + Vector2(180, -60)
 	var z := lerpf(cam.zoom.x, target_zoom, minf(delta * 2.5, 1.0))
 	cam.zoom = Vector2(z, z)
 	shake = move_toward(shake, 0.0, 45.0 * delta)
@@ -447,22 +677,20 @@ func _update_camera(delta: float) -> void:
 
 
 func _unhandled_input(event: InputEvent) -> void:
-	if not player_dead or time - death_time < 1.0:
-		return
 	if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
-		get_tree().change_scene_to_file("res://scenes/menu.tscn")
+		_leave_to_menu()
+		return
+	if not player_dead and not match_over:
+		return
+	if player_dead and time - death_time < 0.8:
 		return
 	var go := false
 	if event is InputEventKey and event.pressed:
-		go = event.physical_keycode == KEY_ENTER or event.physical_keycode == KEY_SPACE or event.physical_keycode == KEY_R
+		go = true
 	elif event is InputEventMouseButton and event.pressed:
 		go = true
 	if go:
-		kills = 0
-		best_evo = 0
-		_spawn_player()
-		player.position = Vector2.from_angle(randf() * TAU) * randf_range(300.0, 1200.0)
-		cam.position = player.position
+		_leave_to_menu()
 
 
 func _view_rect() -> Rect2:
@@ -527,6 +755,82 @@ func _draw() -> void:
 	for i in range(food_pos.size()):
 		if vr.has_point(food_pos[i]):
 			_draw_food(i)
+	if mode == "tdm":
+		_draw_units(view)
+		if not stat_red.is_empty():
+			_draw_base(stat_red)
+		if not stat_blue.is_empty():
+			_draw_base(stat_blue)
+
+
+func _draw_base(b: Dictionary) -> void:
+	var p: Vector2 = b["pos"]
+	var rr: float = b["r"]
+	var col := team_color(int(b["team"]))
+	var flash: float = b["flash"]
+	if flash > 0.0:
+		col = col.lerp(Color(1, 1, 1), clampf(flash * 2.0, 0.0, 0.55))
+	draw_set_transform(p + Vector2(20, 34), 0.0, Vector2(1.0, 0.34))
+	draw_circle(Vector2.ZERO, rr * 1.05, Color(0, 0, 0, 0.24))
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	# pedestal
+	draw_rect(Rect2(p + Vector2(-rr * 0.8, rr * 0.28), Vector2(rr * 1.6, rr * 0.72)), col.darkened(0.4))
+	draw_rect(Rect2(p + Vector2(-rr * 0.9, rr * 0.28), Vector2(rr * 1.8, rr * 0.18)), col.darkened(0.15))
+	# torso
+	draw_rect(Rect2(p + Vector2(-rr * 0.52, -rr * 0.72), Vector2(rr * 1.04, rr * 1.1)), col)
+	draw_rect(Rect2(p + Vector2(-rr * 0.52, -rr * 0.72), Vector2(rr * 1.04, rr * 1.1)), col.darkened(0.32), false, 4.0)
+	# shoulders / arms
+	draw_circle(p + Vector2(-rr * 0.62, -rr * 0.4), rr * 0.24, col.darkened(0.08))
+	draw_circle(p + Vector2(rr * 0.62, -rr * 0.4), rr * 0.24, col.darkened(0.08))
+	draw_rect(Rect2(p + Vector2(-rr * 0.78, -rr * 0.44), Vector2(rr * 0.22, rr * 0.95)), col.darkened(0.18))
+	draw_rect(Rect2(p + Vector2(rr * 0.56, -rr * 0.44), Vector2(rr * 0.22, rr * 0.95)), col.darkened(0.18))
+	# head
+	draw_circle(p + Vector2(0, -rr * 0.95), rr * 0.36, col.lightened(0.14))
+	draw_circle(p + Vector2(0, -rr * 0.95), rr * 0.36, col.darkened(0.34), false, 4.0)
+	draw_circle(p + Vector2(-rr * 0.13, -rr * 1.0), rr * 0.075, Color(0.05, 0.05, 0.09))
+	draw_circle(p + Vector2(rr * 0.13, -rr * 1.0), rr * 0.075, Color(0.05, 0.05, 0.09))
+	# health bar
+	var bw := rr * 1.9
+	var bx := p.x - bw * 0.5
+	var by := p.y - rr * 1.6
+	draw_rect(Rect2(bx - 3, by - 3, bw + 6, 20), Color(0.02, 0.03, 0.06, 0.85))
+	draw_rect(Rect2(bx, by, bw, 14), Color(0.1, 0.12, 0.16))
+	var frac: float = clampf(float(b["hp"]) / float(b["max_hp"]), 0.0, 1.0)
+	draw_rect(Rect2(bx, by, bw * frac, 14), col)
+	draw_rect(Rect2(bx, by, bw, 14), Color(1, 1, 1, 0.3), false, 1.5)
+	draw_string(ThemeDB.fallback_font, Vector2(bx, by - 8), "%s  %d" % [team_name_of(int(b["team"])).to_upper(), int(b["hp"])], HORIZONTAL_ALIGNMENT_CENTER, bw, 18, Color(1, 1, 1, 0.95))
+
+
+func _draw_units(view: Rect2) -> void:
+	var vr := view.grow(200.0)
+	for u in units:
+		var p: Vector2 = u["pos"]
+		if not vr.has_point(p):
+			continue
+		var rr: float = u["r"]
+		var t: int = int(u["team"])
+		var col := team_color(t)
+		if t < 0:
+			col = Color(0.6, 0.6, 0.64)
+		var flash: float = u["flash"]
+		if flash > 0.0:
+			col = col.lerp(Color(1, 1, 1), clampf(flash * 2.0, 0.0, 0.55))
+		var bob := sin(time * 2.0 + float(u["ph"])) * 2.0
+		draw_set_transform(p + Vector2(6, rr * 0.78), 0.0, Vector2(1.0, 0.38))
+		draw_circle(Vector2.ZERO, rr * 0.95, Color(0, 0, 0, 0.2))
+		draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+		var c := p + Vector2(0, bob)
+		draw_rect(Rect2(c + Vector2(-rr * 0.46, rr * 0.06), Vector2(rr * 0.34, rr * 0.72)), col.darkened(0.32))
+		draw_rect(Rect2(c + Vector2(rr * 0.12, rr * 0.06), Vector2(rr * 0.34, rr * 0.72)), col.darkened(0.32))
+		draw_rect(Rect2(c + Vector2(-rr * 0.6, -rr * 0.55), Vector2(rr * 1.2, rr * 0.85)), col)
+		draw_rect(Rect2(c + Vector2(-rr * 0.6, -rr * 0.55), Vector2(rr * 1.2, rr * 0.85)), col.darkened(0.32), false, 3.0)
+		draw_rect(Rect2(c + Vector2(-rr * 0.92, -rr * 0.46), Vector2(rr * 0.32, rr * 0.72)), col.darkened(0.16))
+		draw_rect(Rect2(c + Vector2(rr * 0.6, -rr * 0.46), Vector2(rr * 0.32, rr * 0.72)), col.darkened(0.16))
+		draw_circle(c + Vector2(0, -rr * 0.82), rr * 0.37, col.lightened(0.16))
+		draw_circle(c + Vector2(0, -rr * 0.82), rr * 0.37, col.darkened(0.34), false, 3.0)
+		if t < 0:
+			draw_circle(c + Vector2(-rr * 0.14, -rr * 0.86), rr * 0.075, Color(0.12, 0.12, 0.15))
+			draw_circle(c + Vector2(rr * 0.14, -rr * 0.86), rr * 0.075, Color(0.12, 0.12, 0.15))
 
 
 func _blob(p: Vector2, rad: float, seeds: Array, jitter: float, rot: float = 0.0) -> PackedVector2Array:

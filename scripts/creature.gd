@@ -6,6 +6,7 @@ const SWING_TIME := 0.42
 var main
 var is_player := false
 var frozen := false
+var team := -1     # 0 = Red, 1 = Blue, -1 = free-for-all
 var cname := "Creature"
 var evo := 0
 var xp := 0.0
@@ -179,6 +180,13 @@ func _process(delta: float) -> void:
 	if not is_player and vel.length() > 25.0 and mode != 2:
 		heading = lerp_angle(heading, vel.angle(), minf(6.0 * delta, 1.0))
 
+	if not is_player and main.mode == "tdm" and team >= 0 and swing_t < 0.0 and swing_cd <= 0.0:
+		# bots flip nearby neutral/enemy golems to their side
+		var u = main.unit_to_convert(position, team, weapon_reach() + r * 0.4)
+		if u != null:
+			heading = (Vector2(u["pos"]) - position).angle()
+			start_swing()
+
 	if sprinting:
 		trail_t -= delta
 		if trail_t <= 0.0:
@@ -213,6 +221,11 @@ func _choose_mode() -> void:
 		if position.distance_to(target.position) < 620.0 and randf() < 0.82:
 			bot_sprint = randf() < 0.3
 			return
+	if mode == 4 and team >= 0 and main.mode == "tdm":
+		# keep charging the enemy statue once committed
+		if randf() < 0.85:
+			bot_sprint = true
+			return
 	target = null
 	mode = 0
 	var aggro := 440.0 + r * 2.0
@@ -221,14 +234,17 @@ func _choose_mode() -> void:
 	# the player is always fair game, even when far bigger than this bot
 	var pl = main.player
 	if pl != null and is_instance_valid(pl) and pl.alive and not pl.frozen:
+		var ally: bool = main.mode == "tdm" and team >= 0 and pl.team == team
 		var dp: float = position.distance_to(pl.position)
-		if dp < aggro + 180.0:
+		if not ally and dp < aggro + 180.0:
 			best = pl
 			best_d = dp
 	var threat = null
 	var threat_d := 210.0 + r
 	for o in main.creatures:
 		if o == self or o.is_player or not o.alive or o.frozen:
+			continue
+		if main.mode == "tdm" and team >= 0 and o.team == team:
 			continue
 		var d: float = position.distance_to(o.position)
 		if o.evo > evo + 1:
@@ -254,6 +270,12 @@ func _choose_mode() -> void:
 		mode = 3
 		target = threat
 		bot_sprint = randf() < 0.45
+		return
+	# Team Deathmatch: some bots march on the enemy statue instead of grazing
+	if main.mode == "tdm" and team >= 0 and randf() < 0.42:
+		mode = 4
+		target = null
+		bot_sprint = true
 		return
 	if randf() < 0.7:
 		var fi: int = main.nearest_food(position, 320.0 + r)
@@ -298,6 +320,25 @@ func _bot_dir(delta: float) -> Vector2:
 			return wander_dir * 0.6
 		bot_sprint = true
 		return (position - target.position).normalized()
+	if mode == 4:
+		var base: Dictionary = main.enemy_base(team)
+		if base.is_empty():
+			mode = 0
+			return wander_dir * 0.5
+		var bp: Vector2 = base["pos"]
+		var to := bp - position
+		var dist := to.length()
+		heading = lerp_angle(heading, to.angle(), minf(7.0 * delta, 1.0))
+		bot_attack_t -= delta
+		var reach: float = weapon_reach() + float(base["r"]) * 0.6
+		if bot_attack_t <= 0.0 and dist < reach:
+			bot_attack_t = randf_range(0.5, 1.1)
+			start_swing()
+		if dist > reach * 0.7:
+			bot_sprint = true
+			return to.normalized()
+		bot_sprint = false
+		return Vector2.ZERO
 	return wander_dir * 0.6
 
 
@@ -331,6 +372,9 @@ func _swing_angle() -> float:
 
 func _draw() -> void:
 	draw_set_transform(Vector2.ZERO, heading, Vector2.ONE)
+	if main.mode == "tdm" and team >= 0:
+		var tc: Color = main.team_color(team)
+		draw_arc(Vector2.ZERO, r * 1.3, 0.0, TAU, 40, Color(tc.r, tc.g, tc.b, 0.9), 3.5, true)
 	var sa := _swing_angle()
 	if trail.size() > 1:
 		for i in range(1, trail.size()):

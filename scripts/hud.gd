@@ -33,6 +33,40 @@ func _center(s: String, y: float, size_: int, col: Color) -> void:
 	draw_string(ThemeDB.fallback_font, Vector2(size.x * 0.5 - w * 0.5, y), s, HORIZONTAL_ALIGNMENT_CENTER, w, size_, col)
 
 
+func _clock(secs: float) -> String:
+	var s := maxi(int(ceil(secs)), 0)
+	return "%d:%02d" % [s / 60, s % 60]
+
+
+func _timer_ui(S: Vector2) -> void:
+	var col := Color(1, 1, 1)
+	if main.mode == "dm" and main.match_time <= 10.0:
+		col = Color(1.0, 0.55, 0.45)
+	draw_style_box(sb, Rect2(S.x * 0.5 - 58, 16, 116, 44))
+	_center(_clock(main.match_time), 47.0, 24, col)
+	if main.mode == "tdm":
+		var tn: String = main.team_name_of(main.player_team)
+		if tn != "":
+			var tcol: Color = main.team_color(main.player_team)
+			_center("YOU ARE " + tn.to_upper(), 76.0, 15, tcol.lightened(0.25))
+		_statue_bar(main.stat_red, S.x * 0.5 - 300.0)
+		_statue_bar(main.stat_blue, S.x * 0.5 + 80.0)
+
+
+func _statue_bar(st: Dictionary, x: float) -> void:
+	if st.is_empty():
+		return
+	var y := 24.0
+	var w := 220.0
+	var col: Color = main.team_color(int(st["team"]))
+	var frac: float = clampf(float(st["hp"]) / float(st["max_hp"]), 0.0, 1.0)
+	draw_rect(Rect2(x - 3, y - 3, w + 6, 26), Color(0.02, 0.05, 0.1, 0.8))
+	draw_rect(Rect2(x, y, w, 20), Color(0.1, 0.12, 0.16))
+	draw_rect(Rect2(x, y, w * frac, 20), col)
+	draw_rect(Rect2(x, y, w, 20), Color(1, 1, 1, 0.3), false, 1.5)
+	_text("%s  %d / %d" % [main.team_name_of(int(st["team"])).to_upper(), int(st["hp"]), int(st["max_hp"])], Vector2(x, y - 6), 14, Color(1, 1, 1, 0.95), w)
+
+
 func _mini_crown(p: Vector2, s: float) -> void:
 	# small crown badge for the biggest creature (player or bot)
 	var gold := Color(1.0, 0.86, 0.3)
@@ -58,6 +92,8 @@ func _draw() -> void:
 	var evo: int = pl.evo
 	var c1: Color = Species.COL1[evo]
 	var c2: Color = Species.COL2[evo]
+
+	_timer_ui(S)
 
 	draw_style_box(sb, Rect2(16, 16, 230, 74))
 	_text("SCORE", Vector2(30, 38), 12, Color(0.6, 0.8, 0.9, 0.8))
@@ -196,15 +232,31 @@ func _draw() -> void:
 		var ha := clampf((9.0 - main.time) / 2.0, 0.0, 1.0)
 		_center("EVO WILDS", S.y * 0.5 - 120.0, 54, Color(0.5 * 1.5, 1.3, 1.5, ha))
 		_center("Move with WASD or the mouse   -   Swing with SPACE or click   -   Sprint with SHIFT (costs XP)", S.y * 0.5 - 80.0, 18, Color(0.9, 0.97, 1.0, ha))
-		_center("Eat food and defeat rivals to level up. Evolve through 24 tiers!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+		if main.mode == "tdm":
+			_center("Team Deathmatch: hit a grey golem to recruit it, then smash the enemy statue!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+		else:
+			_center("Eat food and defeat rivals to level up. Evolve through 24 tiers!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 
 	if main.player_dead:
 		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0, 0.04, 0.6))
-		_center("DEVOURED", S.y * 0.5 - 70.0, 64, Color(1.9, 0.35, 0.4))
-		_center("by " + str(main.killer_name), S.y * 0.5 - 28.0, 22, Color(1, 0.8, 0.8))
+		_center("DEVOURED", S.y * 0.5 - 86.0, 64, Color(1.9, 0.35, 0.4))
+		_center("by " + str(main.killer_name), S.y * 0.5 - 44.0, 22, Color(1, 0.8, 0.8))
 		var reached: String = Species.NAMES[main.best_evo]
-		_center("Best form: %s     Score: %d     Defeated: %d" % [reached, main.final_score, main.kills], S.y * 0.5 + 16.0, 18, Color(0.9, 0.97, 1.0))
-		if main.time - main.death_time > 1.0:
+		_center("Best form: %s     Score: %d     Defeated: %d" % [reached, main.final_score, main.kills], S.y * 0.5 - 6.0, 18, Color(0.9, 0.97, 1.0))
+		if main.mode == "tdm" and main.player_team >= 0:
+			_center("Back to the start screen to rejoin the " + main.team_name_of(main.player_team) + " team", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
+		else:
+			_center("Back to the start screen...", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
+		if main.time - main.death_time > 0.8:
 			var blink := 0.6 + 0.4 * sin(t * 4.0)
-			_center("Press ENTER or click to evolve again", S.y * 0.5 + 64.0, 20, Color(0.7 * 1.5, 1.4, 1.6, blink))
-			_center("Press ESC for the main menu", S.y * 0.5 + 92.0, 15, Color(0.8, 0.88, 0.96, 0.75))
+			_center("Returning to the menu...   (click or press any key to skip)", S.y * 0.5 + 70.0, 18, Color(1.1, 1.3, 1.5, blink))
+
+	if main.match_over:
+		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0.0, 0.04, 0.55))
+		var mcol := Color(1.95, 1.55, 0.5)
+		if main.match_msg.begins_with("BLUE"):
+			mcol = Color(0.55, 0.95, 1.6)
+		elif main.match_msg.begins_with("RED"):
+			mcol = Color(1.6, 0.6, 0.6)
+		_center(main.match_msg, S.y * 0.5 - 24.0, 56, mcol)
+		_center("Returning to the menu...", S.y * 0.5 + 44.0, 18, Color(0.85, 0.92, 1.0, 0.9))

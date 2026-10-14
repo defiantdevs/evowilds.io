@@ -5,6 +5,7 @@ const Species = preload("res://scripts/species.gd")
 
 var name_edit: LineEdit
 var play_btn: Button
+var buttons_box: VBoxContainer
 var t := 0.0
 var mascot_evo := 0
 var shot_path := ""
@@ -20,6 +21,9 @@ func _ready() -> void:
 			shot_path = a.substr(7)
 		elif a.begins_with("--wait="):
 			shot_time = float(a.substr(7))
+		elif a.begins_with("--team="):  # dev: pretend we are mid-match on a team
+			GameState.mode = "tdm"
+			GameState.team = int(a.substr(7))
 	_build_ui()
 	# dev/test hook: jump straight into a game with a given name
 	for a in OS.get_cmdline_user_args():
@@ -57,36 +61,82 @@ func _build_ui() -> void:
 	sbf.border_color = Color(0.55, 0.92, 1.0, 0.95)
 	name_edit.add_theme_stylebox_override("focus", sbf)
 	add_child(name_edit)
-	name_edit.text_submitted.connect(func(_s): _play())
+	name_edit.text_submitted.connect(func(_s): _submit())
 	if GameState.player_name.strip_edges() != "" and GameState.player_name != "You":
 		name_edit.text = GameState.player_name
 		name_edit.caret_column = name_edit.text.length()
 
-	play_btn = Button.new()
-	play_btn.text = "PLAY"
-	_center_node(play_btn, 240.0, 98.0, 56.0)
-	play_btn.add_theme_font_size_override("font_size", 26)
-	play_btn.add_theme_color_override("font_color", Color(1, 1, 1))
-	play_btn.add_theme_color_override("font_hover_color", Color(1, 1, 1))
-	var bs := StyleBoxFlat.new()
-	bs.bg_color = Color(0.17, 0.52, 0.29, 0.97)
-	bs.set_corner_radius_all(12)
-	bs.border_color = Color(0.5, 0.95, 0.62, 0.8)
-	bs.set_border_width_all(2)
-	play_btn.add_theme_stylebox_override("normal", bs)
-	var bh: StyleBoxFlat = bs.duplicate()
-	bh.bg_color = Color(0.24, 0.68, 0.38, 1.0)
-	play_btn.add_theme_stylebox_override("hover", bh)
-	var bp: StyleBoxFlat = bs.duplicate()
-	bp.bg_color = Color(0.12, 0.4, 0.22, 1.0)
-	play_btn.add_theme_stylebox_override("pressed", bp)
-	var bf: StyleBoxFlat = bs.duplicate()
-	bf.border_color = Color(0.75, 1.0, 0.8, 0.95)
-	play_btn.add_theme_stylebox_override("focus", bf)
-	play_btn.pressed.connect(_play)
-	add_child(play_btn)
+	_build_buttons()
 
-	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 176, Color(0.72, 0.85, 0.95, 0.7), 1000)
+	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 250, Color(0.72, 0.85, 0.95, 0.7), 1000)
+
+
+func _build_buttons() -> void:
+	if buttons_box != null and is_instance_valid(buttons_box):
+		buttons_box.queue_free()
+	buttons_box = VBoxContainer.new()
+	buttons_box.add_theme_constant_override("separation", 10)
+	buttons_box.anchor_left = 0.5
+	buttons_box.anchor_right = 0.5
+	buttons_box.anchor_top = 0.5
+	buttons_box.anchor_bottom = 0.5
+	buttons_box.offset_left = -150.0
+	buttons_box.offset_right = 150.0
+	buttons_box.offset_top = 110.0
+	buttons_box.offset_bottom = 110.0 + 122.0
+	add_child(buttons_box)
+	if GameState.mode == "tdm" and GameState.team >= 0:
+		# already on a team: rejoin it, or leave with Quit match
+		var tc := _team_color(GameState.team)
+		var rj := _mk_button("REJOIN " + GameState.team_name().to_upper() + " TEAM", tc)
+		rj.pressed.connect(_play)
+		buttons_box.add_child(rj)
+		var qm := _mk_button("QUIT MATCH", Color(0.3, 0.33, 0.4))
+		qm.pressed.connect(_quit_match)
+		buttons_box.add_child(qm)
+		play_btn = rj
+	else:
+		var dm := _mk_button("DEATHMATCH", Color(0.17, 0.52, 0.29))
+		dm.pressed.connect(func(): _start("dm"))
+		buttons_box.add_child(dm)
+		var tdm := _mk_button("TEAM DEATHMATCH", Color(0.2, 0.34, 0.62))
+		tdm.pressed.connect(func(): _start("tdm"))
+		buttons_box.add_child(tdm)
+		play_btn = dm
+
+
+func _mk_button(txt: String, base: Color) -> Button:
+	var b := Button.new()
+	b.text = txt
+	b.custom_minimum_size = Vector2(300, 56)
+	b.add_theme_font_size_override("font_size", 23)
+	b.add_theme_color_override("font_color", Color(1, 1, 1))
+	b.add_theme_color_override("font_hover_color", Color(1, 1, 1))
+	b.add_theme_color_override("font_pressed_color", Color(1, 1, 1))
+	var s := StyleBoxFlat.new()
+	s.bg_color = base
+	s.set_corner_radius_all(12)
+	s.border_color = base.lightened(0.4)
+	s.set_border_width_all(2)
+	b.add_theme_stylebox_override("normal", s)
+	var h: StyleBoxFlat = s.duplicate()
+	h.bg_color = base.lightened(0.14)
+	b.add_theme_stylebox_override("hover", h)
+	var p: StyleBoxFlat = s.duplicate()
+	p.bg_color = base.darkened(0.22)
+	b.add_theme_stylebox_override("pressed", p)
+	var f: StyleBoxFlat = s.duplicate()
+	f.border_color = Color(1, 1, 1, 0.9)
+	b.add_theme_stylebox_override("focus", f)
+	return b
+
+
+func _team_color(team_: int) -> Color:
+	if team_ == 0:
+		return Color(0.72, 0.2, 0.2)
+	if team_ == 1:
+		return Color(0.2, 0.36, 0.72)
+	return Color(0.5, 0.5, 0.55)
 
 
 func _mk_label(text: String, fs: int, top: float, col: Color, w: float) -> Label:
@@ -129,9 +179,43 @@ func _process(delta: float) -> void:
 		get_tree().quit()
 
 
-func _play() -> void:
+func _set_name() -> void:
 	var nm := name_edit.text.strip_edges()
 	GameState.player_name = nm if nm != "" else "You"
+
+
+func _submit() -> void:
+	if GameState.mode == "tdm" and GameState.team >= 0:
+		_play()
+	else:
+		_start("dm")
+
+
+func _start(m: String) -> void:
+	_set_name()
+	GameState.mode = m
+	if m == "tdm":
+		if GameState.team < 0:
+			GameState.team = randi() % 2
+	else:
+		GameState.team = -1
+	get_tree().change_scene_to_file("res://scenes/main.tscn")
+
+
+func _quit_match() -> void:
+	GameState.team = -1
+	GameState.mode = "dm"
+	get_tree().reload_current_scene()
+
+
+func _play() -> void:
+	_set_name()
+	if GameState.mode == "tdm" and GameState.team >= 0:
+		# rejoin the match on the same team
+		pass
+	else:
+		GameState.mode = "dm"
+		GameState.team = -1
 	get_tree().change_scene_to_file("res://scenes/main.tscn")
 
 

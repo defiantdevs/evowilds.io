@@ -8,20 +8,34 @@ Latest build: **[evo-wilds.zip](https://github.com/defiantdevs/evowilds.io/relea
 Unzip it, open the folder in Godot 4.7+, and press F5.
 
 ## Start screen
-Pick your name on the title screen and press **PLAY** — your name is what rivals see in the arena and on the leaderboard.
+Pick your name on the title screen, then choose a mode:
+
+- **DEATHMATCH** — free-for-all. A 10:00 timer counts down; when it hits zero the match ends.
+- **TEAM DEATHMATCH** — Red vs Blue. A timer counts **up** from 0:00 and there is no time limit.
+
+Whenever you are defeated you return to the start screen. In Team Deathmatch your team is remembered, so the screen shows **REJOIN &lt;colour&gt; TEAM** and **QUIT MATCH** — rejoin to keep playing for the same side, or quit to clear your team and pick again.
 
 ## Controls
 - **Move:** WASD / arrow keys (or steer with the mouse)
 - **Swing:** SPACE or left-click — the blade is the hitbox, one hit kills at any tier
 - **Sprint:** SHIFT or right-click (drains XP)
-- **Respawn:** ENTER or click after being defeated
-- **Main menu:** ESC on the defeat screen
+- **Back to start screen:** ESC (or click / any key on the defeat and match-over screens)
+
+## Team Deathmatch rules
+- Two base statues — one **Red**, one **Blue** — each with **15,000 HP**.
+- Grey golems spawn around the arena and stand still: **small** every 15s, **medium** every 40s, **large** every minute, **extra-large** every 2 minutes.
+- Hit a golem or statue and it joins **your** team, turns your colour, and marches off to chip the enemy statue (small 1, medium 2, large 3, extra-large 5 damage on a size-based cooldown).
+- You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **28** (biggest).
+- First statue destroyed wins. Some bots head straight for the enemy statue to help.
+- No friendly fire — team-mates can't hurt each other.
 
 ## Evolutions (24)
 Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor
 
 ## Features
-- Title screen where you choose your name
+- Title screen where you choose your name and pick a mode (Deathmatch or Team Deathmatch)
+- Deathmatch: 10-minute countdown; Team Deathmatch: count-up timer, Red vs Blue statues
+- Captureable grey golems that switch sides when hit and march on the enemy statue
 - 28 AI bots with hunting/fleeing/wandering instincts — they notice you and gang up when you get close, but they react slowly and miss often
 - Leaderboard, minimap, kill feed, tier progress bar
 - Berries, apples, gold and loot drops; trees, rocks, ponds, meadows, flowers
@@ -31,4 +45,4 @@ Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking �
 ## Run
 Open this folder in Godot 4.7+ and press F5, or `godot --path .`
 
-Files: `scripts/species.gd` (the 24 tier designs), `creature.gd` (movement, swing, bot AI), `main.gd` (world, food, combat), `hud.gd`, `fx.gd`.
+Files: `scripts/species.gd` (the 24 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`.
