@@ -37,7 +37,10 @@ const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2]
-const REACH := [1.9, 2.2, 2.8, 2.0, 2.6, 2.1, 2.1, 2.4, 2.4, 2.6, 2.6, 3.0, 2.0, 2.3, 2.8, 3.0, 3.3, 3.3, 3.5, 2.9, 3.2, 3.4, 3.3, 3.6]
+# How far each drawn weapon kind reaches, in units of body radius, measured
+# from the body centre to the very tip of the blade. The kill test is built
+# from these so the kill area always matches the drawn blade exactly.
+const WEAPON_TIP := [2.27, 2.35, 2.95, 1.95, 2.45, 2.1, 2.45, 2.65, 2.95, 2.24, 2.4, 2.85, 2.5, 3.3, 3.3, 3.55, 3.3, 3.45, 3.4, 3.7]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
@@ -48,6 +51,10 @@ static func radius_base(i: int) -> float:
 
 static func speed_base(i: int) -> float:
 	return 270.0 - 3.5 * float(i)
+
+
+static func blade_tip(e: int) -> float:
+	return WEAPON_TIP[WEAPON[e]]
 
 
 static func max_hp_for(i: int) -> float:

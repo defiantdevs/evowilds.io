@@ -198,47 +198,46 @@ func _choose_mode() -> void:
 	mode_t = randf_range(0.55, 1.5)
 	bot_sprint = false
 	if mode == 2 and target != null and is_instance_valid(target) and target.alive:
-		if position.distance_to(target.position) < 560.0 and randf() < 0.8:
+		if position.distance_to(target.position) < 620.0 and randf() < 0.82:
 			bot_sprint = randf() < 0.3
 			return
 	target = null
 	mode = 0
-	var pl = main.player
-	if pl != null and pl.alive and not pl.frozen and evo >= 1:
-		var dp: float = position.distance_to(pl.position)
-		if dp < 400.0 + r * 2.0 and pl.evo <= evo + 1:
-			if randf() < 0.85:
-				mode = 2
-				target = pl
-				bot_sprint = dp < 240.0
-				bot_attack_t = randf_range(0.2, 0.7)
-				return
+	var aggro := 440.0 + r * 2.0
+	var best = null
+	var best_d := aggro
 	var threat = null
-	var threat_d := 190.0 + r
-	var prey = null
-	var prey_d := 260.0 + r
+	var threat_d := 210.0 + r
 	for o in main.creatures:
 		if o == self or not o.alive or o.frozen:
 			continue
 		var d: float = position.distance_to(o.position)
-		if o.evo > evo + 1 and d < threat_d:
-			threat_d = d
-			threat = o
-		elif o.evo <= evo and d < prey_d:
-			prey_d = d
-			prey = o
-	if threat != null and randf() < 0.5:
+		if o.evo > evo + 1:
+			if d < threat_d:
+				threat_d = d
+				threat = o
+		elif d < best_d:
+			best_d = d
+			best = o
+	if best != null:
+		var chance := 0.88 if best.is_player else 0.72
+		if best.evo >= evo:
+			chance -= 0.12
+		elif best.evo < evo - 2:
+			chance += 0.08
+		if randf() < chance:
+			mode = 2
+			target = best
+			bot_sprint = best_d < 280.0
+			bot_attack_t = randf_range(0.2, 0.7)
+			return
+	if threat != null and randf() < 0.55:
 		mode = 3
 		target = threat
-		bot_sprint = randf() < 0.4
-		return
-	if prey != null and randf() < 0.6:
-		mode = 2
-		target = prey
-		bot_attack_t = randf_range(0.3, 0.9)
+		bot_sprint = randf() < 0.45
 		return
 	if randf() < 0.7:
-		var fi: int = main.nearest_food(position, 300.0 + r)
+		var fi: int = main.nearest_food(position, 320.0 + r)
 		if fi >= 0:
 			mode = 1
 			wander_dir = (main.food_pos[fi] - position).normalized()
@@ -284,14 +283,17 @@ func _bot_dir(delta: float) -> Vector2:
 
 
 func weapon_reach() -> float:
-	return r * float(Species.REACH[evo])
+	# distance from the body centre to the drawn blade tip
+	var pv := Vector2(0.0, 0.8 * r)
+	return Species._wp(pv, 0.0, r, Species.blade_tip(evo), 0.5).length()
 
 func _weapon_seg() -> Array:
-	var pv := Vector2(0.1 * r, 0.8 * r)
+	# the kill segment IS the drawn blade: same pivot, angle and length
+	var pv := Vector2(0.0, 0.8 * r)
 	var ang := _swing_angle()
-	var reach: float = Species.REACH[evo]
-	var base := pv
-	var tip := pv + Vector2(reach * r, 0.0).rotated(ang)
+	var tx: float = Species.blade_tip(evo)
+	var base: Vector2 = Species._wp(pv, ang, r, 0.95, 0.5)
+	var tip: Vector2 = Species._wp(pv, ang, r, tx, 0.5)
 	return [base, tip]
 
 

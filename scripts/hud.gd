@@ -115,19 +115,51 @@ func _draw() -> void:
 	var sx := (S.x - sw) * 0.5
 	_text("SPACE / CLICK: swing (one hit kills!)      SHIFT / RIGHT-CLICK: sprint (costs XP)", Vector2(sx - 160, by + 34), 12, Color(0.8, 0.9, 1.0, 0.75), sw + 320.0, HORIZONTAL_ALIGNMENT_CENTER)
 
-	var mc := Vector2(S.x - 96, S.y - 96)
-	var mr := 76.0
-	draw_circle(mc, mr, Color(0.02, 0.06, 0.12, 0.72))
-	draw_arc(mc, mr, 0.0, TAU, 48, Color(0.3, 0.9, 1.2, 0.7), 2.0, true)
+	var mc := Vector2(S.x - 100, S.y - 100)
+	var mr := 80.0
+	var msc: float = mr / main.ARENA_R
+	draw_circle(mc + Vector2(3, 4), mr + 5.0, Color(0, 0, 0, 0.32))
+	draw_circle(mc, mr + 5.0, Color(0.05, 0.09, 0.15, 0.92))
+	draw_circle(mc, mr + 2.0, Color(0.24, 0.6, 0.8, 0.5))
+	draw_circle(mc, mr, Color(0.13, 0.32, 0.24))
+	for p in main.patches:
+		var pp: Vector2 = p["pos"]
+		var pr: float = p["rad"]
+		var pc: Color = p["col"]
+		draw_circle(mc + pp * msc, pr * msc, Color(pc.r * 0.55, pc.g * 0.7, pc.b * 0.55, 0.4))
+	draw_arc(mc, mr * 0.5, 0.0, TAU, 32, Color(1, 1, 1, 0.08), 1.0, true)
+	draw_line(mc + Vector2(-mr, 0), mc + Vector2(mr, 0), Color(1, 1, 1, 0.07), 1.0, true)
+	draw_line(mc + Vector2(0, -mr), mc + Vector2(0, mr), Color(1, 1, 1, 0.07), 1.0, true)
+	var step_f: int = maxi(1, int(round(float(main.food_pos.size()) / 200.0)))
+	for i in range(0, main.food_pos.size(), step_f):
+		draw_circle(mc + main.food_pos[i] * msc, 1.0, Color(0.95, 0.85, 0.4, 0.45))
 	for o in main.creatures:
-		var q: Vector2 = mc + (o.position / main.ARENA_R) * mr
+		if o == pl:
+			continue
+		var q: Vector2 = mc + o.position * msc
 		var oc2: Color = Species.COL2[o.evo]
-		draw_circle(q, 1.8 + float(o.evo) * 0.7, Species.glow(oc2, 1.3) if o != pl else Color(2, 2, 2))
+		var rad := clampf(1.6 + float(o.evo) * 0.5, 1.6, 6.0)
+		var danger: bool = o.evo >= pl.evo + 3
+		if danger:
+			oc2 = Color(1.0, 0.32, 0.32)
+		elif o.evo <= pl.evo - 3:
+			oc2 = Color(0.55, 1.0, 0.6)
+		draw_circle(q, rad + 1.0, Color(0.02, 0.04, 0.08, 0.85))
+		draw_circle(q, rad, oc2)
+		if danger:
+			draw_arc(q, rad + 2.5, 0.0, TAU, 12, Color(1.0, 0.4, 0.4, 0.7), 1.2, true)
 	if pl.alive:
-		var pq: Vector2 = mc + (pl.position / main.ARENA_R) * mr
+		var pq: Vector2 = mc + pl.position * msc
 		var hd := Vector2.from_angle(pl.heading)
-		var pp := Vector2(-hd.y, hd.x)
-		draw_colored_polygon(PackedVector2Array([pq + hd * 7.0, pq - hd * 4.0 + pp * 4.0, pq - hd * 4.0 - pp * 4.0]), Color(2, 2, 2))
+		var pp2 := Vector2(-hd.y, hd.x)
+		var pulse := 0.5 + 0.5 * sin(t * 3.0)
+		draw_circle(pq, 4.5 + pulse * 2.5, Color(1.0, 0.95, 0.5, 0.18 + 0.18 * pulse))
+		draw_circle(pq, 5.0, Color(0.04, 0.04, 0.07, 0.85))
+		var tri := PackedVector2Array([pq + hd * 8.0, pq - hd * 4.5 + pp2 * 5.0, pq - hd * 4.5 - pp2 * 5.0])
+		draw_colored_polygon(tri, Color(1.0, 0.95, 0.5))
+		draw_polyline(PackedVector2Array([tri[2], tri[1], tri[0], tri[2]]), Color(0.25, 0.18, 0.05, 0.9), 1.0, true)
+	draw_arc(mc, mr + 5.0, 0.0, TAU, 56, Color(0.3, 0.9, 1.0, 0.7), 2.0, true)
+	draw_arc(mc, mr, 0.0, TAU, 56, Color(0.95, 0.88, 0.6, 0.5), 1.5, true)
 
 	if main.banner_ttl > 0.0:
 		var ba := clampf(main.banner_ttl, 0.0, 1.0)
