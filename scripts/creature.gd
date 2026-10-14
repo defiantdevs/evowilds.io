@@ -206,10 +206,17 @@ func _choose_mode() -> void:
 	var aggro := 440.0 + r * 2.0
 	var best = null
 	var best_d := aggro
+	# the player is always fair game, even when far bigger than this bot
+	var pl = main.player
+	if pl != null and is_instance_valid(pl) and pl.alive and not pl.frozen:
+		var dp: float = position.distance_to(pl.position)
+		if dp < aggro + 180.0:
+			best = pl
+			best_d = dp
 	var threat = null
 	var threat_d := 210.0 + r
 	for o in main.creatures:
-		if o == self or not o.alive or o.frozen:
+		if o == self or o.is_player or not o.alive or o.frozen:
 			continue
 		var d: float = position.distance_to(o.position)
 		if o.evo > evo + 1:
@@ -220,8 +227,8 @@ func _choose_mode() -> void:
 			best_d = d
 			best = o
 	if best != null:
-		var chance := 0.88 if best.is_player else 0.72
-		if best.evo >= evo:
+		var chance := 0.9 if best.is_player else 0.72
+		if best.evo >= evo and not best.is_player:
 			chance -= 0.12
 		elif best.evo < evo - 2:
 			chance += 0.08
