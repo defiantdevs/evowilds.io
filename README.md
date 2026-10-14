@@ -2,6 +2,11 @@
 
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 24 humanoid tiers — from Caveman to Cosmos Emperor.
 
+## Download
+Latest build: **[evo-wilds.zip](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip)** — all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+
+Unzip it, open the folder in Godot 4.7+, and press F5.
+
 ## Controls
 - **Move:** WASD / arrow keys (or steer with the mouse)
 - **Swing:** SPACE or left-click — the blade is the hitbox, one hit kills at any tier
