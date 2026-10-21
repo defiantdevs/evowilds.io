@@ -265,9 +265,11 @@ func _team_with_fewer() -> int:
 	return 0 if r <= b else 1
 
 
-func _spawn_player() -> void:
+func _spawn_player(reset_clock: bool = true) -> void:
 	player_dead = false
 	leave_t = 0.0
+	kills = 0
+	best_evo = 0
 	if player != null and is_instance_valid(player):
 		player.queue_free()
 	var evo := 0
@@ -281,7 +283,8 @@ func _spawn_player() -> void:
 	if shot_path != "":
 		player.frozen = true
 		player.shield = 0.0
-	time = 0.0 if not shot_gallery else time
+	if reset_clock and not shot_gallery:
+		time = 0.0
 
 
 func _random_bot_evo() -> int:
@@ -635,18 +638,21 @@ func _process(delta: float) -> void:
 		result_t = maxf(result_t - delta, 0.0)
 		if result_t <= 0.0:
 			_leave_to_menu()
-	elif player_dead:
-		leave_t += delta
-		if leave_t > 2.6:
-			_leave_to_menu()
-	elif mode == "tdm":
-		match_time += delta
-		_update_units(delta)
-		_check_match_end()
 	else:
-		match_time = maxf(match_time - delta, 0.0)
-		if match_time <= 0.0:
-			_end_match("TIME UP")
+		# The match keeps running while the player is dead: the clock ticks,
+		# golems march and statues keep taking damage.
+		if mode == "tdm":
+			match_time += delta
+			_update_units(delta)
+			_check_match_end()
+		else:
+			match_time = maxf(match_time - delta, 0.0)
+			if match_time <= 0.0:
+				_end_match("TIME UP")
+		if not match_over and player_dead:
+			leave_t += delta
+			if leave_t > 2.2:
+				_spawn_player(false)
 	var spawn_budget := 6
 	while food_pos.size() < FOOD_TARGET and spawn_budget > 0:
 		_add_food(_random_food_pos(), _random_food_kind())
@@ -708,9 +714,20 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
 		_leave_to_menu()
 		return
-	if not player_dead and not match_over:
+	if match_over:
+		if result_t > 3.7:
+			return
+		var go2 := false
+		if event is InputEventKey and event.pressed:
+			go2 = true
+		elif event is InputEventMouseButton and event.pressed:
+			go2 = true
+		if go2:
+			_leave_to_menu()
 		return
-	if player_dead and time - death_time < 0.8:
+	if not player_dead:
+		return
+	if time - death_time < 0.8:
 		return
 	var go := false
 	if event is InputEventKey and event.pressed:
@@ -718,7 +735,7 @@ func _unhandled_input(event: InputEvent) -> void:
 	elif event is InputEventMouseButton and event.pressed:
 		go = true
 	if go:
-		_leave_to_menu()
+		_spawn_player(false)
 
 
 func _view_rect() -> Rect2:

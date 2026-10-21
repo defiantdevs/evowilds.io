@@ -235,7 +235,7 @@ func _draw() -> void:
 		if main.mode == "tdm":
 			_center("Team Deathmatch: hit a grey golem to recruit it, then smash the enemy statue!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 		else:
-			_center("Eat food and defeat rivals to level up. Evolve through 24 tiers!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+			_center("Eat food and defeat rivals to level up. Evolve through %d tiers!" % Species.COUNT, S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 
 	if main.player_dead:
 		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0, 0.04, 0.6))
@@ -244,12 +244,12 @@ func _draw() -> void:
 		var reached: String = Species.NAMES[main.best_evo]
 		_center("Best form: %s     Score: %d     Defeated: %d" % [reached, main.final_score, main.kills], S.y * 0.5 - 6.0, 18, Color(0.9, 0.97, 1.0))
 		if main.mode == "tdm" and main.player_team >= 0:
-			_center("Back to the start screen to rejoin the " + main.team_name_of(main.player_team) + " team", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
+			_center("Respawning on the " + main.team_name_of(main.player_team) + " team", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
 		else:
-			_center("Back to the start screen...", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
+			_center("The match keeps going...", S.y * 0.5 + 26.0, 16, Color(0.85, 0.92, 1.0, 0.9))
 		if main.time - main.death_time > 0.8:
 			var blink := 0.6 + 0.4 * sin(t * 4.0)
-			_center("Returning to the menu...   (click or press any key to skip)", S.y * 0.5 + 70.0, 18, Color(1.1, 1.3, 1.5, blink))
+			_center("Respawning...   (click or press any key to respawn now)", S.y * 0.5 + 70.0, 18, Color(1.1, 1.3, 1.5, blink))
 
 	if main.match_over:
 		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0.0, 0.04, 0.55))

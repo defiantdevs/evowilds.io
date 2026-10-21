@@ -1,7 +1,7 @@
 extends RefCounted
 
-const COUNT := 24
-const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor"]
+const COUNT := 28
+const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God"]
 const BLURB := [
 	"Club in hand. Everyone starts somewhere.",
 	"Sharpened stick, sharper instincts.",
@@ -27,16 +27,20 @@ const BLURB := [
 	"Your scythe reaps the strong and the weak alike.",
 	"Starlight forged this crown. Heaven wears it poorly.",
 	"The wilds end here. All orbits lead to you.",
+	"The stars bend knee to your banner.",
+	"A walking absence. Even light hesitates.",
+	"Six wings, one purpose: never fall.",
+	"Every world, every age, every ending. Yours.",
 ]
-const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0]
-const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("2a1a4a")]
-const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff")]
-const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8")]
-const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21]
-const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 19]
-const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0]
-const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2]
+const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0, 8610.0, 9290.0, 9990.0, 10720.0]
+const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("2a1a4a"), Color("2e1f5e"), Color("120e1c"), Color("efe6cc"), Color("f2c84a")]
+const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("b58cff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff")]
+const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2")]
+const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 21]
+const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 19, 19, 18, 17, 19]
+const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
+const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
 # How far each drawn weapon kind reaches, in units of body radius, measured
 # from the body centre to the very tip of the blade. The kill test is built
 # from these so the kill area always matches the drawn blade exactly.
@@ -172,6 +176,12 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 40, Color(ac.r, ac.g, ac.b, 0.5), 2.5, true)
 		if evo >= 21:
 			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 36, Color(ac.r, ac.g, ac.b, 0.35), 1.5, true)
+		if evo >= COUNT - 4:
+			for k in range(4):
+				var oa := t * 1.4 + TAU * float(k) / 4.0
+				var op := Vector2.from_angle(oa) * r * 1.9
+				ci.draw_circle(op, r * 0.11, Color(ac.r, ac.g, ac.b, 0.8))
+				ci.draw_circle(op, r * 0.05, Color(1, 1, 1, 0.9))
 	var cape: int = CAPE[evo]
 	if cape == 1:
 		var w := sin(t * 4.0) * r * 0.2
