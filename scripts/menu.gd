@@ -6,6 +6,7 @@ const Species = preload("res://scripts/species.gd")
 var name_edit: LineEdit
 var play_btn: Button
 var buttons_box: VBoxContainer
+var secret_label: Label
 var t := 0.0
 var mascot_evo := 0
 var shot_path := ""
@@ -40,6 +41,9 @@ func _build_ui() -> void:
 
 	_mk_label("YOUR NAME", 14, 26, Color(0.62, 0.8, 0.92, 0.9), 400)
 
+	secret_label = _mk_label("", 15, -200, Color(0.55, 1.0, 0.85, 0.95), 700)
+	secret_label.text = ""
+
 	name_edit = LineEdit.new()
 	name_edit.placeholder_text = "Enter a name"
 	name_edit.max_length = 14
@@ -62,13 +66,28 @@ func _build_ui() -> void:
 	name_edit.add_theme_stylebox_override("focus", sbf)
 	add_child(name_edit)
 	name_edit.text_submitted.connect(func(_s): _submit())
+	name_edit.text_changed.connect(_on_name_changed)
 	if GameState.player_name.strip_edges() != "" and GameState.player_name != "You":
 		name_edit.text = GameState.player_name
 		name_edit.caret_column = name_edit.text.length()
 
 	_build_buttons()
 
-	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 250, Color(0.72, 0.85, 0.95, 0.7), 1000)
+	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 300, Color(0.72, 0.85, 0.95, 0.7), 1000)
+
+
+func _on_name_changed(t: String) -> void:
+	# A secret name on this screen opens up the Test Range.
+	if not GameState.secret_unlocked and GameState.is_secret(t):
+		_unlock_secret()
+
+
+func _unlock_secret() -> void:
+	GameState.secret_unlocked = true
+	_build_buttons()
+	if secret_label != null and is_instance_valid(secret_label):
+		secret_label.text = "TEST RANGE UNLOCKED"
+		secret_label.add_theme_color_override("font_color", Color(0.55, 1.0, 0.85, 0.95))
 
 
 func _build_buttons() -> void:
@@ -82,8 +101,6 @@ func _build_buttons() -> void:
 	buttons_box.anchor_bottom = 0.5
 	buttons_box.offset_left = -150.0
 	buttons_box.offset_right = 150.0
-	buttons_box.offset_top = 110.0
-	buttons_box.offset_bottom = 110.0 + 122.0
 	add_child(buttons_box)
 	if GameState.mode == "tdm" and GameState.team >= 0:
 		# already on a team: rejoin it, or leave with Quit match
@@ -103,6 +120,13 @@ func _build_buttons() -> void:
 		tdm.pressed.connect(func(): _start("tdm"))
 		buttons_box.add_child(tdm)
 		play_btn = dm
+		if GameState.secret_unlocked:
+			# the secret name on the name field opens the Test Range
+			var tr := _mk_button("TEST RANGE", Color(0.12, 0.5, 0.46))
+			tr.pressed.connect(func(): _start("test"))
+			buttons_box.add_child(tr)
+	buttons_box.offset_top = 96.0 if GameState.secret_unlocked else 110.0
+	buttons_box.offset_bottom = buttons_box.offset_top + 122.0
 
 
 func _mk_button(txt: String, base: Color) -> Button:
@@ -181,14 +205,20 @@ func _process(delta: float) -> void:
 
 func _set_name() -> void:
 	var nm := name_edit.text.strip_edges()
+	if GameState.is_secret(nm):
+		_unlock_secret()
 	GameState.player_name = nm if nm != "" else "You"
 
 
 func _submit() -> void:
 	if GameState.mode == "tdm" and GameState.team >= 0:
 		_play()
-	else:
-		_start("dm")
+		return
+	if not GameState.secret_unlocked and GameState.is_secret(name_edit.text):
+		# the code opens the Test Range instead of starting a match
+		_unlock_secret()
+		return
+	_start("dm")
 
 
 func _start(m: String) -> void:

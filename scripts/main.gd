@@ -4,6 +4,7 @@ const Species = preload("res://scripts/species.gd")
 const Creature = preload("res://scripts/creature.gd")
 const Fx = preload("res://scripts/fx.gd")
 const Hud = preload("res://scripts/hud.gd")
+const TestPanel = preload("res://scripts/test_panel.gd")
 
 const ARENA_R := 3000.0
 const FOOD_TARGET := 620
@@ -31,6 +32,7 @@ var obstacles: Array = []
 var cam: Camera2D
 var fx
 var hud
+var test_picker = null   # the Test Range's tier picker (test mode only)
 var time := 0.0
 var shake := 0.0
 var respawns: Array = []
@@ -119,6 +121,13 @@ func _ready() -> void:
 	hud = Hud.new()
 	hud.main = self
 	layer2.add_child(hud)
+	if mode == "test":
+		var layer3 := CanvasLayer.new()
+		layer3.layer = 7
+		add_child(layer3)
+		test_picker = TestPanel.new()
+		test_picker.main = self
+		layer3.add_child(test_picker)
 	cam.position = player.position
 	cam.zoom = Vector2(0.9, 0.9)
 
@@ -268,23 +277,41 @@ func _team_with_fewer() -> int:
 func _spawn_player(reset_clock: bool = true) -> void:
 	player_dead = false
 	leave_t = 0.0
-	kills = 0
-	best_evo = 0
+	if mode != "test":
+		kills = 0
+		best_evo = 0
 	if player != null and is_instance_valid(player):
+		creatures.erase(player)
+		board.erase(player)
+		if leader == player:
+			leader = null
 		player.queue_free()
 	var evo := 0
 	var pos := Vector2.from_angle(randf() * TAU) * randf_range(200.0, 900.0)
 	if shot_path != "":
 		evo = shot_evo
 		pos = Vector2(0, 260) if shot_gallery else pos
-	if mode == "tdm":
+	if mode == "test":
+		evo = shot_evo if shot_path != "" else clampi(GameState.test_tier, 0, Species.COUNT - 1)
+		pos = Vector2.ZERO
+	elif mode == "tdm":
 		pos = Vector2.from_angle(randf() * TAU) * randf_range(400.0, 1100.0)
 	player = _spawn_creature(true, evo, pos, GameState.clean_name(), 0.0, player_team)
+	if mode == "test":
+		# the tier you pick is the tier you keep, and nothing can kill you
+		player.locked_tier = evo
+		player.shield = 0.0
 	if shot_path != "":
 		player.frozen = true
 		player.shield = 0.0
-	if reset_clock and not shot_gallery:
+	if reset_clock and not shot_gallery and mode != "test":
 		time = 0.0
+
+
+func set_test_tier(evo: int) -> void:
+	# Test Range: become any of the 28 evolutions, right now.
+	GameState.test_tier = clampi(evo, 0, Species.COUNT - 1)
+	_spawn_player(false)
 
 
 func _random_bot_evo() -> int:
@@ -298,13 +325,18 @@ func _spawn_bot(initial: bool) -> void:
 		pos = Vector2.from_angle(randf() * TAU) * sqrt(randf()) * (ARENA_R - 200.0)
 		if player == null or pos.distance_to(player.position) > 700.0:
 			break
+	if mode == "test":
+		# Test Range: one of every shape, and close enough to come running
+		evo = randi() % Species.COUNT
+		if player != null and is_instance_valid(player):
+			pos = player.position + Vector2.from_angle(randf() * TAU) * randf_range(450.0, 1200.0)
 	var span := 80.0
 	if evo < Species.COUNT - 1:
 		var a: float = Species.XP_AT[evo]
 		var b: float = Species.XP_AT[evo + 1]
 		span = (b - a) * 0.6
 	var c := _spawn_creature(false, evo, pos, BOT_NAMES[randi() % BOT_NAMES.size()], randf() * span, _team_with_fewer() if mode == "tdm" else -1)
-	c.shield = 3.0
+	c.shield = 0.0 if mode == "test" else 3.0
 
 
 func _spawn_gallery() -> void:
@@ -324,6 +356,9 @@ func _setup_mode() -> void:
 		var off := ARENA_R * 0.5
 		stat_red = {"team": 0, "pos": Vector2(-off, 0.0), "r": 150.0, "hp": BASE_HP, "max_hp": BASE_HP, "flash": 0.0}
 		stat_blue = {"team": 1, "pos": Vector2(off, 0.0), "r": 150.0, "hp": BASE_HP, "max_hp": BASE_HP, "flash": 0.0}
+		match_time = 0.0
+	elif mode == "test":
+		# the Test Range never ends: no clock, no statues, no scoreboard rules
 		match_time = 0.0
 	else:
 		match_time = DM_TIME
@@ -666,7 +701,7 @@ func _process(delta: float) -> void:
 			match_time += delta
 			_update_units(delta)
 			_check_match_end()
-		else:
+		elif mode != "test":
 			match_time = maxf(match_time - delta, 0.0)
 			if match_time <= 0.0:
 				_end_match("TIME UP")
@@ -735,6 +770,25 @@ func _unhandled_input(event: InputEvent) -> void:
 	if event is InputEventKey and event.pressed and event.physical_keycode == KEY_ESCAPE:
 		_leave_to_menu()
 		return
+	if mode == "test" and event is InputEventKey and event.pressed and not event.echo:
+		# Test Range: jump straight to any of the 28 tiers
+		var kc: int = event.keycode
+		if kc >= KEY_1 and kc <= KEY_9:
+			set_test_tier(kc - KEY_1)
+			return
+		if kc == KEY_0:
+			set_test_tier(9)
+			return
+		if kc == KEY_BRACKETLEFT:
+			set_test_tier(GameState.test_tier - 1)
+			return
+		if kc == KEY_BRACKETRIGHT:
+			set_test_tier(GameState.test_tier + 1)
+			return
+		if kc == KEY_TAB:
+			if test_picker != null and is_instance_valid(test_picker):
+				test_picker.visible = not test_picker.visible
+			return
 	if match_over:
 		if result_t > 3.7:
 			return

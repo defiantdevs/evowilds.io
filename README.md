@@ -3,9 +3,17 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 28 humanoid tiers — from Caveman to Omniverse God.
 
 ## Download
-Current build: **v1.10** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.10/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.11** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.11/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
 Unzip it, open the folder in Godot 4.7+, and press F5.
+
+## What's new in v1.11
+- **Secret Test Range.** Type the code name **`godmode`** into the name box on the start screen and a third button appears: **TEST RANGE**.
+  - A picker on the left lists all **28 evolutions** — click one, or press **1-9** / **0** / **[** / **]** to become that tier instantly.
+  - The tier you pick is pinned: you do not outgrow it while you test.
+  - Every bot in the arena **runs straight at you and never swings**, so you can walk them into your own blade and see exactly what your weapon kills.
+  - **You cannot die in here** — try the same swing as many times as you like.
+  - No clock, no scoreboard rules: the Test Range runs until you press **ESC** (or **TAB** to hide the picker).
 
 ## What's new in v1.10
 - **The killing ground is the weapon itself.** Every weapon carries a table of its own drawn parts — blade, guard, head, tines — and the swing's hit test is built from those parts, so a swing kills exactly what the visible blade touches. No reach bonus, no graze padding, and nothing behind you.
@@ -16,6 +24,7 @@ Pick your name on the title screen, then choose a mode:
 
 - **DEATHMATCH** — free-for-all. A 10:00 timer counts down; when it hits zero the match ends.
 - **TEAM DEATHMATCH** — Red vs Blue. A timer counts **up** from 0:00 and there is no time limit.
+- **TEST RANGE** — the secret one. Type `godmode` as your name to unlock it.
 
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
@@ -37,7 +46,8 @@ When you are defeated the match **keeps running** — the clock ticks on, golems
 Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor → Astral Sovereign → Void Titan → Eternal Seraph → Omniverse God
 
 ## Features
-- Title screen where you choose your name and pick a mode (Deathmatch or Team Deathmatch)
+- Title screen where you choose your name and pick a mode (Deathmatch, Team Deathmatch, or the secret Test Range)
+- A hidden Test Range for testing any of the 28 tiers: pick a tier, and the bots come running at you without ever swinging
 - Deathmatch: 10-minute countdown; Team Deathmatch: count-up timer, Red vs Blue statues
 - Captureable grey golems that switch sides when hit and march on the enemy statue
 - 28 AI bots with hunting/fleeing/wandering instincts — they notice you and gang up when you get close, but they react slowly and miss often
@@ -50,4 +60,4 @@ Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking �
 ## Run
 Open this folder in Godot 4.7+ and press F5, or `godot --path .`
 
-Files: `scripts/species.gd` (the 28 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`.
+Files: `scripts/species.gd` (the 28 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`, `test_panel.gd` (the Test Range tier picker).

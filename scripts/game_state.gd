@@ -1,9 +1,14 @@
 extends Node
 # Tiny global that carries settings between the menu and the game.
 
+# Type this in as your name on the start screen to unlock the Test Range.
+const SECRET_NAME := "godmode"
+
 var player_name := "You"
-var mode := "dm"   # "dm" = Deathmatch, "tdm" = Team Deathmatch
+var mode := "dm"   # "dm" = Deathmatch, "tdm" = Team Deathmatch, "test" = Test Range
 var team := -1     # 0 = Red, 1 = Blue, -1 = none
+var secret_unlocked := false   # the Test Range stays unlocked once found
+var test_tier := 0             # which evolution you are trying in the Test Range
 
 
 func clean_name() -> String:
@@ -13,6 +18,10 @@ func clean_name() -> String:
 	if n == "":
 		n = "You"
 	return n
+
+
+func is_secret(n: String) -> bool:
+	return n.strip_edges().to_lower() == SECRET_NAME
 
 
 func team_name() -> String:

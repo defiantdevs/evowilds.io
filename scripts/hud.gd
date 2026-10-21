@@ -39,6 +39,10 @@ func _clock(secs: float) -> String:
 
 
 func _timer_ui(S: Vector2) -> void:
+	if main.mode == "test":
+		draw_style_box(sb, Rect2(S.x * 0.5 - 88, 16, 176, 44))
+		_center("TEST RANGE", 47.0, 22, Color(0.55, 1.0, 0.85))
+		return
 	var col := Color(1, 1, 1)
 	if main.mode == "dm" and main.match_time <= 10.0:
 		col = Color(1.0, 0.55, 0.45)
@@ -231,11 +235,15 @@ func _draw() -> void:
 	if main.time < 9.0 and not main.player_dead and main.shot_path == "":
 		var ha := clampf((9.0 - main.time) / 2.0, 0.0, 1.0)
 		_center("EVO WILDS", S.y * 0.5 - 120.0, 54, Color(0.5 * 1.5, 1.3, 1.5, ha))
-		_center("Move with WASD or the mouse   -   Swing with SPACE or click   -   Sprint with SHIFT (costs XP)", S.y * 0.5 - 80.0, 18, Color(0.9, 0.97, 1.0, ha))
-		if main.mode == "tdm":
-			_center("Team Deathmatch: hit a grey golem to recruit it, then smash the enemy statue!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+		if main.mode == "test":
+			_center("Test Range: bots run into you and never swing. Pick a tier on the left, or press 1-9 / 0.", S.y * 0.5 - 80.0, 18, Color(0.9, 0.97, 1.0, ha))
+			_center("You cannot die here - try the same swing as many times as you like.", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 		else:
-			_center("Eat food and defeat rivals to level up. Evolve through %d tiers!" % Species.COUNT, S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+			_center("Move with WASD or the mouse   -   Swing with SPACE or click   -   Sprint with SHIFT (costs XP)", S.y * 0.5 - 80.0, 18, Color(0.9, 0.97, 1.0, ha))
+			if main.mode == "tdm":
+				_center("Team Deathmatch: hit a grey golem to recruit it, then smash the enemy statue!", S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
+			else:
+				_center("Eat food and defeat rivals to level up. Evolve through %d tiers!" % Species.COUNT, S.y * 0.5 - 52.0, 16, Color(0.7, 0.9, 1.0, ha * 0.9))
 
 	if main.player_dead:
 		draw_rect(Rect2(Vector2.ZERO, S), Color(0.02, 0, 0.04, 0.6))

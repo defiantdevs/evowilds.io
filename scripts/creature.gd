@@ -37,6 +37,7 @@ var wander_dir := Vector2.RIGHT
 var bot_attack_t := 1.0
 var bot_sprint := false
 var aim_err := 0.0
+var locked_tier := -1   # Test Range: the tier is pinned, so it never drifts
 
 
 func _ready() -> void:
@@ -64,6 +65,9 @@ func tier_floor() -> float:
 
 
 func add_xp(v: float) -> void:
+	if locked_tier >= 0:
+		# Test Range: the tier you picked is the tier you keep
+		return
 	var before := evo
 	xp += v
 	evo = Species.evo_for_xp(xp)
@@ -78,6 +82,10 @@ func add_xp(v: float) -> void:
 
 func take_damage(_amount: float, attacker) -> void:
 	if not alive or shield > 0.0:
+		return
+	if is_player and main.mode == "test":
+		# Test Range: you cannot be killed, so you can try the same swing
+		# as many times as you like.
 		return
 	var away: Vector2 = (position - attacker.position).normalized()
 	main.fx.burst(position - away * r * 0.3, Color(1.0, 0.92, 0.7), 8, 260.0, 0.35)
@@ -147,7 +155,9 @@ func _process(delta: float) -> void:
 	var floor_xp := tier_floor()
 	sprinting = want_sprint and dir.length() > 0.1
 	if sprinting and is_player:
-		if xp - floor_xp > 0.4:
+		if main.mode == "test":
+			pass   # Test Range: sprinting is free
+		elif xp - floor_xp > 0.4:
 			var nxt: float = Species.XP_AT[mini(evo + 1, Species.COUNT - 1)]
 			var span := maxf(nxt - floor_xp, 60.0)
 			xp = maxf(xp - span * 0.03 * delta, floor_xp)
@@ -227,6 +237,18 @@ func is_big() -> bool:
 func _choose_mode() -> void:
 	mode_t = randf_range(0.85, 2.2)
 	bot_sprint = false
+	if main.mode == "test":
+		# Test Range: every bot runs straight at you and never swings, so you
+		# can walk them into your own blade and see exactly what it kills.
+		var tp = main.player
+		if tp != null and is_instance_valid(tp) and tp.alive:
+			mode = 5
+			target = tp
+			bot_sprint = false
+			return
+		mode = 0
+		target = null
+		return
 	if mode == 2 and target != null and is_instance_valid(target) and target.alive:
 		if position.distance_to(target.position) < 500.0 and randf() < 0.62:
 			bot_sprint = randf() < 0.22
@@ -340,6 +362,16 @@ func _bot_dir(delta: float) -> Vector2:
 			return wander_dir * 0.6
 		bot_sprint = true
 		return (position - target.position).normalized()
+	if mode == 5:
+		# Test Range: run at the player, swing never
+		if target == null or not is_instance_valid(target) or not target.alive:
+			mode = 0
+			target = null
+			return wander_dir * 0.6
+		var tp: Vector2 = target.position - position
+		heading = lerp_angle(heading, tp.angle(), minf(6.0 * delta, 1.0))
+		bot_sprint = false
+		return tp.normalized()
 	if mode == 4:
 		var base: Dictionary = main.enemy_base(team)
 		if base.is_empty() or is_big():
