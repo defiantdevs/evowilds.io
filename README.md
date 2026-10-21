@@ -17,7 +17,7 @@ When you are defeated the match **keeps running** — the clock ticks on, golems
 
 ## Controls
 - **Move:** WASD / arrow keys (or steer with the mouse)
-- **Swing:** SPACE or left-click — the blade plus its reach is the hitbox, one hit kills at any tier
+- **Swing:** SPACE or left-click — the killing ground is the weapon itself: the drawn blade, and the whole arc it sweeps through. One hit kills at any tier.
 - **Sprint:** SHIFT or right-click (drains XP)
 - **Back to start screen:** ESC (or click / any key on the match-over screen)
 

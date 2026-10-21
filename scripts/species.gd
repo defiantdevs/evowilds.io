@@ -41,15 +41,39 @@ const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
-# How far each drawn weapon kind reaches, in units of body radius, measured
-# from the body centre to the very tip of the blade. The kill test is built
-# from these so the kill area always matches the drawn blade exactly.
-const WEAPON_TIP := [2.27, 2.35, 2.95, 1.95, 2.45, 2.1, 2.45, 2.65, 2.95, 2.24, 2.4, 2.85, 2.5, 3.3, 3.3, 3.55, 3.3, 3.45, 3.4, 3.7]
-# The area where a swing kills. The weapons stay exactly as drawn, but the
-# killing ground is roomier than the blade: it runs REACH_BONUS further past
-# the tip and grazes targets KILL_PAD times wider than they are.
-const REACH_BONUS := 0.45
-const KILL_PAD := 1.35
+# The weapon's own shape, part by part. Each part is
+# [x0, y0, x1, y1, half_width] in weapon frame units: x runs along the
+# weapon, y across it, and the centre line sits at y = 0.5. The killing
+# ground is built from these parts, so what kills you is the blade you can
+# actually see.
+const WEAPON_PARTS := [
+	[[0.5, 0.5, 1.6, 0.5, 0.10], [1.43, 0.5, 2.27, 0.5, 0.30]],           # 0 club
+	[[1.8, 0.5, 2.35, 0.5, 0.10]],                                         # 1 dagger
+	[[1.95, 0.5, 2.05, 0.5, 0.10], [2.2, 0.5, 2.95, 0.5, 0.15]],            # 2 sword
+	[[0.5, 0.5, 1.5, 0.5, 0.06], [1.3, 0.5, 1.95, 0.5, 0.45]],             # 3 axe
+	[[1.72, 0.5, 1.72, 0.5, 0.35], [1.7, 0.2, 2.45, 0.2, 0.06],
+		[1.7, 0.5, 2.45, 0.5, 0.06], [1.7, 0.8, 2.45, 0.8, 0.06]],         # 4 trident
+	[[0.5, 0.5, 1.6, 0.5, 0.06], [1.35, 0.5, 2.1, 0.5, 0.55]],             # 5 mace
+	[[0.96, 0.5, 0.96, 0.5, 0.375], [0.95, 0.5, 2.45, 0.5, 0.10]],          # 6 cleaver
+	[[0.97, 0.5, 0.97, 0.5, 0.14], [0.95, 0.5, 2.65, 0.5, 0.08]],          # 7 saber
+	[[0.5, 0.5, 2.1, 0.5, 0.05], [2.1, 0.1, 2.8, 0.1, 0.06],
+		[2.1, 0.9, 2.8, 0.9, 0.06], [2.1, 0.1, 2.1, 0.9, 0.06],
+		[2.1, 0.5, 2.95, 0.5, 0.06]],                                      # 8 pitchfork
+	[[0.5, 0.5, 1.6, 0.5, 0.07], [1.4, 0.5, 2.4, 0.5, 0.50]],              # 9 mace ball
+	[[0.5, 0.5, 1.9, 0.5, 0.07], [1.75, 0.5, 2.4, 0.5, 0.50]],             # 10 greatsword
+	[[0.5, 0.5, 2.4, 0.5, 0.05], [2.25, 0.5, 2.85, 0.5, 0.30]],           # 11 orb staff
+	[[0.5, 0.5, 2.3, 0.5, 0.05], [2.1, 0.5, 2.5, 0.1, 0.07],
+		[1.55, -0.6, 2.2, -0.35, 0.07]],                                   # 12 scythe
+	[[0.97, 0.5, 0.97, 0.5, 0.50], [0.95, 0.5, 3.3, 0.5, 0.16]],           # 13 big sword
+	[[0.97, 0.5, 0.97, 0.5, 0.50], [0.95, 0.5, 3.3, 0.5, 0.16]],           # 14 flame sword
+	[[2.59, 0.5, 2.59, 0.5, 0.31], [2.6, 0.5, 3.55, 0.5, 0.20]],           # 15 emperor blade
+	[[2.4, 0.5, 2.4, 0.5, 0.33], [2.45, 0.5, 3.3, 0.5, 0.14]],            # 16 rapier
+	[[0.5, 0.5, 3.0, 0.5, 0.05], [2.85, 0.5, 3.45, 0.2, 0.08],
+		[2.6, -0.45, 3.1, -0.25, 0.08]],                                 # 17 warlord blade
+	[[2.54, 0.5, 2.54, 0.5, 0.30], [2.6, 0.5, 3.3, 0.2, 0.08],
+		[2.6, 0.5, 3.3, 0.8, 0.08]],                                      # 18 twin blade
+	[[0.97, 0.5, 0.97, 0.5, 0.575], [0.95, 0.5, 3.7, 0.5, 0.20]],          # 19 god blade
+]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
@@ -62,8 +86,9 @@ static func speed_base(i: int) -> float:
 	return 270.0 - 3.5 * float(i)
 
 
-static func blade_tip(e: int) -> float:
-	return WEAPON_TIP[WEAPON[e]]
+static func weapon_parts(e: int) -> Array:
+	# the drawn shape of this weapon, part by part
+	return WEAPON_PARTS[WEAPON[e]]
 
 
 static func max_hp_for(i: int) -> float:
@@ -500,6 +525,12 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 				ci.draw_colored_polygon(_wpoly(pv, ang, r, PackedVector2Array([Vector2(fx0, 0.34), Vector2(fx0 + 0.18, 0.34 - hh), Vector2(fx0 + 0.36, 0.34)])), Color(1.0, 0.55, 0.15, 0.9))
 				ci.draw_colored_polygon(_wpoly(pv, ang, r, PackedVector2Array([Vector2(fx0 + 0.07, 0.34), Vector2(fx0 + 0.18, 0.34 - hh * 0.55), Vector2(fx0 + 0.29, 0.34)])), Color(1.0, 0.9, 0.4, 0.95))
 			_bar(ci, r, pv, ang, 0.93, 1.01, 0.5, 1.0, c2, lw * 0.5)
+		15:
+			_bar(ci, r, pv, ang, -0.5, 2.6, 0.5, 0.11, Color(0.24, 0.18, 0.16), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(2.6, 0.3), Vector2(3.25, 0.32), Vector2(3.55, 0.5), Vector2(3.25, 0.68), Vector2(2.6, 0.7)])), Color(0.72, 0.78, 0.9), OL, lw)
+			_bar(ci, r, pv, ang, 2.55, 2.63, 0.5, 0.62, c2, lw * 0.4)
+			ci.draw_circle(_wp(pv, ang, r, 2.62, 0.5), r * 0.11, gold)
+			ci.draw_line(_wp(pv, ang, r, 2.72, 0.5), _wp(pv, ang, r, 3.4, 0.5), Color(1.0, 0.92, 0.6), lw * 0.8, true)
 		16:
 			_bar(ci, r, pv, ang, -0.4, 2.5, 0.5, 0.11, Color(0.34, 0.3, 0.32), lw)
 			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([Vector2(2.45, 0.5), Vector2(3.3, 0.36), Vector2(3.0, 0.5), Vector2(3.3, 0.64)])), Color(0.88, 0.94, 1.0), OL, lw * 0.7)

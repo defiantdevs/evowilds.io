@@ -584,7 +584,11 @@ func devour(eater, victim) -> void:
 	eater.add_xp(gain)
 
 
-func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
+func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float) -> void:
+	# The killing ground is the weapon itself: the drawn blade, part by part,
+	# and the slice of the arc it swept through on this frame. Nothing kills
+	# outside the weapon.
+	var pivot: Vector2 = attacker.position + Vector2(0.0, 0.8 * attacker.r).rotated(attacker.heading)
 	for o in creatures:
 		if o == attacker or not o.alive or o.frozen:
 			continue
@@ -592,8 +596,7 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 			continue
 		if attacker.swing_hits.has(o):
 			continue
-		var closest := Geometry2D.get_closest_point_to_segment(o.position, a, b)
-		if closest.distance_to(o.position) > o.r * Species.KILL_PAD:
+		if not _zone_hits(o.position, o.r, pivot, attacker.heading, bands, s_lo, s_hi):
 			continue
 		attacker.swing_hits.append(o)
 		o.take_damage(0.0, attacker)
@@ -609,8 +612,7 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 		if int(u["team"]) == ateam or attacker.swing_hits.has(u):
 			continue
 		var up: Vector2 = u["pos"]
-		var cp := Geometry2D.get_closest_point_to_segment(up, a, b)
-		if cp.distance_to(up) <= float(u["r"]) * Species.KILL_PAD:
+		if _zone_hits(up, float(u["r"]), pivot, attacker.heading, bands, s_lo, s_hi):
 			attacker.swing_hits.append(u)
 			u["team"] = ateam
 			u["atk"] = 0.0
@@ -621,15 +623,34 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 	if eb.is_empty() or attacker.swing_hits.has(eb):
 		return
 	var ep: Vector2 = eb["pos"]
-	var cpb := Geometry2D.get_closest_point_to_segment(ep, a, b)
-	if cpb.distance_to(ep) <= float(eb["r"]):
+	if _zone_hits(ep, float(eb["r"]), pivot, attacker.heading, bands, s_lo, s_hi):
 		attacker.swing_hits.append(eb)
 		var dmg := _statue_damage(attacker)
 		eb["hp"] = maxf(float(eb["hp"]) - dmg, 0.0)
 		eb["flash"] = 0.3
-		fx.burst(cpb, team_color(ateam), 18, 260.0, 0.5)
+		fx.burst(ep, team_color(ateam), 18, 260.0, 0.5)
 		if attacker.is_player:
 			shake = maxf(shake, 5.0)
+
+
+func _zone_hits(p: Vector2, target_r: float, pivot: Vector2, heading: float, bands: Array, s_lo: float, s_hi: float) -> bool:
+	# Does a body of that size at p overlap the weapon? Each part of the
+	# weapon owns a band of radii and a slice of the arc it just swept.
+	var v: Vector2 = (p - pivot).rotated(-heading)
+	var d := v.length()
+	if d < 0.001:
+		return true
+	var va := v.angle()
+	for b in bands:
+		var tol: float = target_r + float(b[4])
+		if d < float(b[1]) - tol or d > float(b[2]) + tol:
+			continue
+		var rel: float = angle_difference(va, (b[0] as Vector2).angle())
+		var eps := asin(clampf(tol / d, 0.0, 1.0))
+		var h: float = float(b[3])
+		if rel >= s_lo - h - eps and rel <= s_hi + h + eps:
+			return true
+	return false
 
 
 func _process(delta: float) -> void:

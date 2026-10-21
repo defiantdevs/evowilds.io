@@ -104,16 +104,21 @@ func _process(delta: float) -> void:
 	since_hit += delta
 	r = lerpf(r, Species.radius_for(evo, xp), minf(delta * 4.0, 1.0))
 	if swing_t >= 0.0:
+		# the blade's angle last frame, so we can work out the slice of the
+		# weapon's own arc that this swing just swept through
+		var prev_ang: float = _swing_angle()
 		swing_t += delta
 		var sp := swing_t / SWING_TIME
 		if sp >= 0.2 and sp <= 0.72:
-			var seg := _weapon_seg()
-			trail.append(seg[1])
+			var ang: float = _swing_angle()
+			trail.append(_weapon_tip(ang))
 			if trail.size() > 9:
 				trail.remove_at(0)
 
-
-			main.weapon_hit(self, position + (seg[0] as Vector2).rotated(heading), position + (seg[1] as Vector2).rotated(heading))
+			# The killing ground is the weapon itself: the drawn blade, and
+			# the slice of the arc it swept through on this frame.
+			var shift: float = prev_ang - ang
+			main.weapon_hit_zone(self, _weapon_bands(ang), minf(0.0, shift), maxf(0.0, shift))
 		if swing_t >= SWING_TIME:
 			swing_t = -1.0
 			trail.clear()
@@ -315,7 +320,7 @@ func _bot_dir(delta: float) -> Vector2:
 		var dist := aim.length()
 		heading = lerp_angle(heading, aim.angle() + aim_err, minf(4.0 * delta, 1.0))
 		bot_attack_t -= delta
-		var reach: float = weapon_reach() + float(target.r) * Species.KILL_PAD
+		var reach: float = weapon_reach() + float(target.r)
 		if bot_attack_t <= 0.0 and dist < reach and absf(angle_difference(heading, aim.angle())) < 0.65:
 			bot_attack_t = randf_range(0.75, 1.7)
 			aim_err = randf_range(-0.5, 0.5)
@@ -359,19 +364,51 @@ func _bot_dir(delta: float) -> Vector2:
 
 
 func weapon_reach() -> float:
-	# distance from the body centre to the far edge of the killing ground
-	var pv := Vector2(0.0, 0.8 * r)
-	return Species._wp(pv, 0.0, r, Species.blade_tip(evo) * (1.0 + Species.REACH_BONUS), 0.5).length()
+	# how far the drawn weapon reaches out from the body
+	var best := 0.0
+	for p in Species.weapon_parts(evo):
+		var e0 := Vector2(float(p[0]), float(p[1]))
+		var e1 := Vector2(float(p[2]), float(p[3]))
+		best = maxf(best, maxf(e0.length(), e1.length()) + float(p[4]))
+	return best * r
 
-func _weapon_seg() -> Array:
-	# the killing ground: the drawn blade, running a little further past the
-	# tip so a swing connects with what it looks like it should
+
+func _weapon_tip(ang: float) -> Vector2:
+	# the far end of the drawn weapon, for the swing trail
 	var pv := Vector2(0.0, 0.8 * r)
-	var ang := _swing_angle()
-	var tx: float = Species.blade_tip(evo) * (1.0 + Species.REACH_BONUS)
-	var base: Vector2 = Species._wp(pv, ang, r, 0.95, 0.5)
-	var tip: Vector2 = Species._wp(pv, ang, r, tx, 0.5)
-	return [base, tip]
+	var best_x := -999.0
+	var best := Vector2.ZERO
+	for p in Species.weapon_parts(evo):
+		var e0 := Vector2(float(p[0]) * r, float(p[1]) * r)
+		var e1 := Vector2(float(p[2]) * r, float(p[3]) * r)
+		if e0.x > best_x:
+			best_x = e0.x
+			best = e0
+		if e1.x > best_x:
+			best_x = e1.x
+			best = e1
+	return pv + (best - pv).rotated(ang)
+
+
+func _weapon_bands(ang: float) -> Array:
+	# The weapon's parts, measured from the pivot it swings around. Each band
+	# is [middle, near_radius, far_radius, half_spread, half_width].
+	var pv := Vector2(0.0, 0.8 * r)
+	var bands: Array = []
+	for p in Species.weapon_parts(evo):
+		var a := Vector2(float(p[0]) * r, float(p[1]) * r) - pv
+		var b := Vector2(float(p[2]) * r, float(p[3]) * r) - pv
+		var ra := a.length()
+		var rb := b.length()
+		var h: float = absf(angle_difference(a.angle(), b.angle())) * 0.5
+		bands.append([
+			((a + b) * 0.5).rotated(ang),
+			minf(ra, rb),
+			maxf(ra, rb),
+			h,
+			float(p[4]) * r,
+		])
+	return bands
 
 
 func _swing_angle() -> float:
