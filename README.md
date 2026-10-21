@@ -3,9 +3,13 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 28 humanoid tiers — from Caveman to Omniverse God.
 
 ## Download
-Latest build: **[evo-wilds.zip](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip)** — all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.10** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.10/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
 Unzip it, open the folder in Godot 4.7+, and press F5.
+
+## What's new in v1.10
+- **The killing ground is the weapon itself.** Every weapon carries a table of its own drawn parts — blade, guard, head, tines — and the swing's hit test is built from those parts, so a swing kills exactly what the visible blade touches. No reach bonus, no graze padding, and nothing behind you.
+- The Emperor finally has a visible broadsword (it had no weapon art at all before).
 
 ## Start screen
 Pick your name on the title screen, then choose a mode:
@@ -38,6 +42,7 @@ Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking �
 - Captureable grey golems that switch sides when hit and march on the enemy statue
 - 28 AI bots with hunting/fleeing/wandering instincts — they notice you and gang up when you get close, but they react slowly and miss often
 - Leaderboard, minimap, kill feed, tier progress bar
+- One-hit swings where the kill zone is the drawn weapon — every tier's blade, guard and head is modelled, so the arc you see is the arc that kills
 - Berries, apples, gold and loot drops; trees, rocks, ponds, meadows, flowers
 - Camera zooms out as you grow
 - Responsive movement — crisp turning and stopping, no ice-skating
