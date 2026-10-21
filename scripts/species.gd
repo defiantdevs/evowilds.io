@@ -41,6 +41,9 @@ const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
+# Weapon length multiplier: stretches every weapon (and its kill reach, which
+# is derived from the same transform) further out from the body.
+const WLEN := 1.6
 # How far each drawn weapon kind reaches, in units of body radius, measured
 # from the body centre to the very tip of the blade. The kill test is built
 # from these so the kill area always matches the drawn blade exactly.
@@ -115,13 +118,13 @@ static func _fill(ci: CanvasItem, pts: PackedVector2Array, fill: Color, line: Co
 
 
 static func _wp(pv: Vector2, ang: float, r: float, x: float, y: float) -> Vector2:
-	return pv + (Vector2(x * r, y * r) - pv).rotated(ang)
+	return pv + (Vector2(x * r * WLEN, y * r) - pv).rotated(ang)
 
 
 static func _wpoly(pv: Vector2, ang: float, r: float, units: PackedVector2Array) -> PackedVector2Array:
 	var out := PackedVector2Array()
 	for uv in units:
-		out.append(pv + (uv * r - pv).rotated(ang))
+		out.append(pv + (Vector2(uv.x * r * WLEN, uv.y * r) - pv).rotated(ang))
 	return out
 
 

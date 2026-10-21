@@ -220,11 +220,11 @@ func is_big() -> bool:
 
 
 func _choose_mode() -> void:
-	mode_t = randf_range(0.55, 1.5)
+	mode_t = randf_range(0.85, 2.2)
 	bot_sprint = false
 	if mode == 2 and target != null and is_instance_valid(target) and target.alive:
-		if position.distance_to(target.position) < 620.0 and randf() < 0.82:
-			bot_sprint = randf() < 0.3
+		if position.distance_to(target.position) < 500.0 and randf() < 0.62:
+			bot_sprint = randf() < 0.22
 			return
 	if mode == 4 and team >= 0 and main.mode == "tdm" and not is_big():
 		# keep charging the enemy statue once committed
@@ -240,10 +240,10 @@ func _choose_mode() -> void:
 		if intruder != null:
 			mode = 2
 			target = intruder
-			bot_sprint = true
-			bot_attack_t = randf_range(0.1, 0.4)
+			bot_sprint = randf() < 0.7
+			bot_attack_t = randf_range(0.25, 0.7)
 			return
-	var aggro := 440.0 + r * 2.0
+	var aggro := 300.0 + r * 1.5
 	var best = null
 	var best_d := aggro
 	# the player is always fair game, even when far bigger than this bot
@@ -251,11 +251,11 @@ func _choose_mode() -> void:
 	if pl != null and is_instance_valid(pl) and pl.alive and not pl.frozen:
 		var ally: bool = main.mode == "tdm" and team >= 0 and pl.team == team
 		var dp: float = position.distance_to(pl.position)
-		if not ally and dp < aggro + 180.0:
+		if not ally and dp < aggro + 110.0:
 			best = pl
 			best_d = dp
 	var threat = null
-	var threat_d := 210.0 + r
+	var threat_d := 165.0 + r * 0.8
 	for o in main.creatures:
 		if o == self or o.is_player or not o.alive or o.frozen:
 			continue
@@ -270,21 +270,21 @@ func _choose_mode() -> void:
 			best_d = d
 			best = o
 	if best != null:
-		var chance := 0.9 if best.is_player else 0.72
+		var chance := 0.82 if best.is_player else 0.6
 		if best.evo >= evo and not best.is_player:
-			chance -= 0.12
+			chance -= 0.16
 		elif best.evo < evo - 2:
-			chance += 0.08
+			chance += 0.05
 		if randf() < chance:
 			mode = 2
 			target = best
-			bot_sprint = best_d < 280.0
-			bot_attack_t = randf_range(0.2, 0.7)
+			bot_sprint = best_d < 380.0 and randf() < 0.4
+			bot_attack_t = randf_range(0.4, 1.1)
 			return
-	if threat != null and randf() < 0.55:
+	if threat != null and randf() < 0.4:
 		mode = 3
 		target = threat
-		bot_sprint = randf() < 0.45
+		bot_sprint = randf() < 0.3
 		return
 	# Team Deathmatch: some bots march on the enemy statue instead of grazing
 	if main.mode == "tdm" and team >= 0 and not is_big() and randf() < 0.42:
@@ -310,18 +310,18 @@ func _bot_dir(delta: float) -> Vector2:
 			mode = 0
 			target = null
 			return wander_dir * 0.5
-		var lead := clampf(position.distance_to(target.position) / 950.0, 0.0, 0.3)
+		var lead := clampf(position.distance_to(target.position) / 1400.0, 0.0, 0.15)
 		var aim: Vector2 = target.position + target.vel * lead - position
 		var dist := aim.length()
-		heading = lerp_angle(heading, aim.angle() + aim_err, minf(7.0 * delta, 1.0))
+		heading = lerp_angle(heading, aim.angle() + aim_err, minf(4.0 * delta, 1.0))
 		bot_attack_t -= delta
 		var reach: float = weapon_reach() + float(target.r) * 0.55
-		if bot_attack_t <= 0.0 and dist < reach and absf(angle_difference(heading, aim.angle())) < 0.75:
-			bot_attack_t = randf_range(0.45, 1.3)
-			aim_err = randf_range(-0.32, 0.32)
+		if bot_attack_t <= 0.0 and dist < reach and absf(angle_difference(heading, aim.angle())) < 0.65:
+			bot_attack_t = randf_range(0.75, 1.7)
+			aim_err = randf_range(-0.5, 0.5)
 			start_swing()
 		if dist > reach * 0.65:
-			bot_sprint = target.is_player or target.evo >= evo
+			bot_sprint = bot_sprint and dist > 260.0
 			return aim.normalized()
 		if dist < (r + float(target.r)) * 0.6:
 			bot_sprint = false
