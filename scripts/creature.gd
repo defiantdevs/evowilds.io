@@ -315,7 +315,7 @@ func _bot_dir(delta: float) -> Vector2:
 		var dist := aim.length()
 		heading = lerp_angle(heading, aim.angle() + aim_err, minf(4.0 * delta, 1.0))
 		bot_attack_t -= delta
-		var reach: float = weapon_reach() + float(target.r) * 0.55
+		var reach: float = weapon_reach() + float(target.r) * Species.KILL_PAD
 		if bot_attack_t <= 0.0 and dist < reach and absf(angle_difference(heading, aim.angle())) < 0.65:
 			bot_attack_t = randf_range(0.75, 1.7)
 			aim_err = randf_range(-0.5, 0.5)
@@ -359,15 +359,16 @@ func _bot_dir(delta: float) -> Vector2:
 
 
 func weapon_reach() -> float:
-	# distance from the body centre to the drawn blade tip
+	# distance from the body centre to the far edge of the killing ground
 	var pv := Vector2(0.0, 0.8 * r)
-	return Species._wp(pv, 0.0, r, Species.blade_tip(evo), 0.5).length()
+	return Species._wp(pv, 0.0, r, Species.blade_tip(evo) * (1.0 + Species.REACH_BONUS), 0.5).length()
 
 func _weapon_seg() -> Array:
-	# the kill segment IS the drawn blade: same pivot, angle and length
+	# the killing ground: the drawn blade, running a little further past the
+	# tip so a swing connects with what it looks like it should
 	var pv := Vector2(0.0, 0.8 * r)
 	var ang := _swing_angle()
-	var tx: float = Species.blade_tip(evo)
+	var tx: float = Species.blade_tip(evo) * (1.0 + Species.REACH_BONUS)
 	var base: Vector2 = Species._wp(pv, ang, r, 0.95, 0.5)
 	var tip: Vector2 = Species._wp(pv, ang, r, tx, 0.5)
 	return [base, tip]

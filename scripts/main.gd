@@ -593,7 +593,7 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 		if attacker.swing_hits.has(o):
 			continue
 		var closest := Geometry2D.get_closest_point_to_segment(o.position, a, b)
-		if closest.distance_to(o.position) > o.r:
+		if closest.distance_to(o.position) > o.r * Species.KILL_PAD:
 			continue
 		attacker.swing_hits.append(o)
 		o.take_damage(0.0, attacker)
@@ -610,7 +610,7 @@ func weapon_hit(attacker, a: Vector2, b: Vector2) -> void:
 			continue
 		var up: Vector2 = u["pos"]
 		var cp := Geometry2D.get_closest_point_to_segment(up, a, b)
-		if cp.distance_to(up) <= float(u["r"]):
+		if cp.distance_to(up) <= float(u["r"]) * Species.KILL_PAD:
 			attacker.swing_hits.append(u)
 			u["team"] = ateam
 			u["atk"] = 0.0

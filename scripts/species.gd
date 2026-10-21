@@ -41,13 +41,15 @@ const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
-# Weapon length multiplier: stretches every weapon (and its kill reach, which
-# is derived from the same transform) further out from the body.
-const WLEN := 1.6
 # How far each drawn weapon kind reaches, in units of body radius, measured
 # from the body centre to the very tip of the blade. The kill test is built
 # from these so the kill area always matches the drawn blade exactly.
 const WEAPON_TIP := [2.27, 2.35, 2.95, 1.95, 2.45, 2.1, 2.45, 2.65, 2.95, 2.24, 2.4, 2.85, 2.5, 3.3, 3.3, 3.55, 3.3, 3.45, 3.4, 3.7]
+# The area where a swing kills. The weapons stay exactly as drawn, but the
+# killing ground is roomier than the blade: it runs REACH_BONUS further past
+# the tip and grazes targets KILL_PAD times wider than they are.
+const REACH_BONUS := 0.45
+const KILL_PAD := 1.35
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
@@ -118,13 +120,13 @@ static func _fill(ci: CanvasItem, pts: PackedVector2Array, fill: Color, line: Co
 
 
 static func _wp(pv: Vector2, ang: float, r: float, x: float, y: float) -> Vector2:
-	return pv + (Vector2(x * r * WLEN, y * r) - pv).rotated(ang)
+	return pv + (Vector2(x * r, y * r) - pv).rotated(ang)
 
 
 static func _wpoly(pv: Vector2, ang: float, r: float, units: PackedVector2Array) -> PackedVector2Array:
 	var out := PackedVector2Array()
 	for uv in units:
-		out.append(pv + (Vector2(uv.x * r * WLEN, uv.y * r) - pv).rotated(ang))
+		out.append(pv + (uv * r - pv).rotated(ang))
 	return out
 
 
