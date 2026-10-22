@@ -638,7 +638,7 @@ func devour(eater, victim) -> void:
 	if not victim.alive:
 		return
 	victim.alive = false
-	var gain: float = victim.xp * 0.4 + 10.0 * float(victim.evo + 1)
+	var gain: float = victim.xp * 0.25 + 7.0 * float(victim.evo + 1)
 	gain *= 1.0 + 0.12 * float(maxi(victim.evo - eater.evo, 0))
 	var vc: Color = Species.COL2[victim.evo]
 	fx.burst(victim.position, Species.glow(vc, 1.8), 36, 360.0, 0.8)
@@ -673,11 +673,11 @@ func devour(eater, victim) -> void:
 	eater.add_xp(gain)
 
 
-func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float) -> void:
+func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vector2 = Vector2(0.0, 0.8)) -> void:
 	# The killing ground is the weapon itself: the drawn blade, part by part,
 	# and the slice of the arc it swept through on this frame. Nothing kills
 	# outside the weapon.
-	var pivot: Vector2 = attacker.position + Vector2(0.0, 0.8 * attacker.r).rotated(attacker.heading)
+	var pivot: Vector2 = attacker.position + (grip * attacker.r).rotated(attacker.heading)
 	for o in creatures:
 		if o == attacker or not o.alive or o.frozen:
 			continue

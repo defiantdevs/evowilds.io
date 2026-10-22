@@ -125,7 +125,7 @@ func _ready() -> void:
 		var b := Button.new()
 		b.text = "%02d %s" % [i + 1, Species.NAMES[i]]
 		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(120, 24)
+		b.custom_minimum_size = Vector2(136, 24)
 		b.add_theme_font_size_override("font_size", 12)
 		b.pressed.connect(func(): _pick(i))
 		grid.add_child(b)

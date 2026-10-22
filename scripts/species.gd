@@ -1,8 +1,9 @@
 extends RefCounted
 
-const COUNT := 33
+const COUNT := 43
 const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God",
-	"Eclipse Monarch", "Chrono Warden", "Genesis Prime", "Aether Regent", "Author of Worlds"]
+	"Eclipse Monarch", "Chrono Warden", "Genesis Prime", "Aether Regent", "Author of Worlds",
+	"Sunforged", "Storm Herald", "Abyss Sovereign", "Crimson Colossus", "Shard Prophet", "Elder Warden", "Void Empress", "Dragon Ascendant", "Primordial", "The Infinite"]
 const BLURB := [
 	"Club in hand. Everyone starts somewhere.",
 	"Sharpened stick, sharper instincts.",
@@ -37,27 +38,48 @@ const BLURB := [
 	"The first green thing, and the last thing left standing.",
 	"Reality is a rumour you started and never denied.",
 	"Every world in the wilds is a line you have already written.",
+	"A star fell into a forge and refused to cool.",
+	"The sky answers whenever it raises a hand.",
+	"Something with too many eyes has decided you float.",
+	"It does not duel. It demolishes.",
+	"Every possible future is a splinter in its hand.",
+	"It remembers when this arena was a forest.",
+	"She keeps whole civilisations in her pockets.",
+	"The last thing many worlds ever saw. Twice.",
+	"It was here before the word 'here'.",
+	"You have finally found the edge of the map. It is holding them.",
 ]
-const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0, 8610.0, 9290.0, 9990.0, 10720.0, 11480.0, 12270.0, 13090.0, 13940.0, 14820.0]
+const XP_AT := [0.0, 50.0, 176.0, 364.0, 612.0, 913.0, 1267.0, 1674.0, 2128.0, 2630.0, 3181.0, 3775.0, 4415.0, 5099.0, 5827.0, 6597.0, 7411.0, 8266.0, 9160.0, 10096.0, 11077.0, 12103.0, 13183.0, 14317.0, 15498.0, 16722.0, 17982.0, 19296.0, 20664.0, 22086.0, 23562.0, 25092.0, 26676.0, 28576.0, 30626.0, 32826.0, 35176.0, 37676.0, 40326.0, 43126.0, 46076.0, 49176.0, 52426.0]
 const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a"),
-	Color("141018"), Color("43301a"), Color("143a28"), Color("3a1440"), Color("f7f4ec")]
+	Color("141018"), Color("43301a"), Color("143a28"), Color("3a1440"), Color("f7f4ec"),
+	Color("7a2a08"), Color("1b2a5a"), Color("07222a"), Color("5a0a0a"), Color("3f4a5e"), Color("2f3d18"), Color("1a0a24"), Color("6a1010"), Color("120a2e"), Color("f4eaff")]
 const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("9fd8ff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff"),
-	Color("eef2ff"), Color("6ff0dc"), Color("b6ff6a"), Color("ff9ae4"), Color("8fe4ff")]
+	Color("eef2ff"), Color("6ff0dc"), Color("b6ff6a"), Color("ff9ae4"), Color("8fe4ff"),
+	Color("ffc24a"), Color("7fe9ff"), Color("3affd0"), Color("ff6a3a"), Color("c9f4ff"), Color("a8f05a"), Color("d46aff"), Color("ffd25a"), Color("8affe0"), Color("ffd36a")]
 const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2"),
-	Color("c9c2d8"), Color("d8c9a8"), Color("a8d8b0"), Color("f0d0e8"), Color("ffffff")]
+	Color("c9c2d8"), Color("d8c9a8"), Color("a8d8b0"), Color("f0d0e8"), Color("ffffff"),
+	Color("e8b06a"), Color("cfd8f0"), Color("8fd8cf"), Color("d89a86"), Color("e6eef8"), Color("b8a878"), Color("c8b8e0"), Color("e0a070"), Color("9fb8d8"), Color("ffffff")]
 const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 22,
-	23, 24, 25, 26, 27]
+	23, 24, 25, 26, 27,
+	28, 29, 30, 31, 32, 33, 34, 35, 36, 37]
 const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 20, 21, 18, 23, 22,
-	24, 25, 26, 27, 28]
+	24, 25, 26, 27, 28,
+	29, 30, 31, 32, 33, 34, 35, 36, 37, 38]
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0,
-	0, 0, 0, 0, 0]
+	0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1]
+	1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2,
-	2, 2, 2, 2, 2]
+	2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
 # 1 = feathered wings (Eternal Seraph only)
 const WINGS := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
-	0, 0, 0, 0, 0]
+	0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+# 1 = carries a blade in each hand
+const DUAL := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 # The weapon's own shape, part by part. Each part is
 # [x0, y0, x1, y1, half_width] in weapon frame units: x runs along the
 # weapon, y across it, and the centre line sits at y = 0.5. The killing
@@ -122,17 +144,54 @@ const WEAPON_PARTS := [
 	[[0.3, 0.5, 3.7, 0.5, 0.05],
 		[1.6, 0.5, 3.5, 0.5, 0.42],
 		[3.6, 0.5, 4.15, 0.5, 0.10]],                                      # 28 quill of creation
+	[[0.35, 0.5, 1.0, 0.5, 0.065],
+		[1.0, 0.5, 2.5, 0.5, 0.24], [2.4, 0.5, 3.55, 0.5, 0.13]],          # 29 sun cleaver
+	[[0.4, 0.5, 2.2, 0.5, 0.045],
+		[2.1, 0.5, 3.3, 0.5, 0.18], [3.2, 0.5, 3.75, 0.5, 0.07]],          # 30 storm glaive
+	[[0.4, 0.5, 3.05, 0.5, 0.04],
+		[3.0, 0.08, 3.0, 0.92, 0.06],
+		[3.0, 0.08, 3.72, 0.08, 0.055], [3.0, 0.5, 3.85, 0.5, 0.055],
+		[3.0, 0.92, 3.72, 0.92, 0.055]],                                    # 31 abyss trident
+	[[0.35, 0.5, 2.55, 0.5, 0.05],
+		[2.35, 0.5, 3.4, 0.25, 0.16], [2.35, 0.5, 3.4, 0.75, 0.16]],        # 32 colossus axe
+	[[0.35, 0.5, 0.95, 0.5, 0.05],
+		[0.95, 0.44, 0.95, 0.56, 0.06],
+		[0.95, 0.5, 3.3, 0.5, 0.11], [2.6, 0.5, 3.45, 0.5, 0.1]],           # 33 shard blade
+	[[0.35, 0.5, 2.1, 0.5, 0.045],
+		[2.05, 0.5, 3.42, 0.5, 0.17],
+		[1.55, 0.18, 1.95, 0.18, 0.09]],                                    # 34 bough blade
+	[[0.3, 0.5, 3.1, 0.5, 0.04],
+		[3.0, 0.5, 3.7, 0.34, 0.14], [3.4, 0.24, 3.85, 0.4, 0.09]],         # 35 void scythe
+	[[0.35, 0.5, 1.0, 0.5, 0.06],
+		[0.95, 0.18, 0.95, 0.82, 0.08],
+		[0.98, 0.5, 3.35, 0.5, 0.13], [3.3, 0.5, 3.62, 0.5, 0.05]],         # 36 dragon fang
+	[[0.35, 0.5, 0.9, 0.5, 0.06],
+		[1.5, 0.5, 1.5, 0.5, 0.42],
+		[1.9, 0.5, 3.2, 0.5, 0.12], [3.15, 0.5, 3.55, 0.5, 0.06]],          # 37 primordial blade
+	[[0.35, 0.5, 0.95, 0.5, 0.05],
+		[0.95, 0.14, 0.95, 0.86, 0.09],
+		[0.95, 0.5, 3.5, 0.5, 0.1], [3.4, 0.5, 3.9, 0.5, 0.06]],            # 38 infinite blade
 ]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
 
 static func radius_base(i: int) -> float:
-	return 22.0 + 2.6 * float(i)
+	var base := 22.0 + 2.6 * float(i)
+	if i > 32:
+		# the last ten grow faster than the rest: every one is a step up
+		base += 0.9 * float(i - 32)
+	return base
 
 
 static func speed_base(i: int) -> float:
+	if i > 32:
+		return 158.0 - 1.1 * float(i - 32)
 	return 270.0 - 3.5 * float(i)
+
+
+static func is_dual(e: int) -> bool:
+	return DUAL[clampi(e, 0, COUNT - 1)] > 0
 
 
 static func weapon_parts(e: int) -> Array:
@@ -301,7 +360,8 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 	_feet(ci, r, t, Color(0.32, 0.22, 0.16), lw)
 	var armored := evo >= 5
 	var sh: int = SHIELD[evo]
-	var two_hand: bool = WEAPON[evo] >= 13
+	var dual: bool = DUAL[evo] > 0
+	var two_hand: bool = WEAPON[evo] >= 13 and not dual
 	var lh := Vector2(0.7 * r, -0.55 * r)
 	if two_hand:
 		lh = _wp(pv, swing, r, 1.0, 0.2)
@@ -331,6 +391,15 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 	_weapon(ci, r, WEAPON[evo], pv, swing, t, c1, c2, lw)
 	ci.draw_circle(hand, r * 0.17 + lw * 0.6, OL)
 	ci.draw_circle(hand, r * 0.17, skin if not armored else Color(0.55, 0.58, 0.65))
+	if dual:
+		# the second blade: the same weapon, turned half a circle around the
+		# body, so the pair covers both sides at once
+		var pv2 := -pv
+		var hand2 := _wp(pv2, swing + PI, r, 0.8, 0.5)
+		_arm(ci, r, pv2, hand2, c1, skin if not armored else Color(0.55, 0.58, 0.65), lw)
+		_weapon(ci, r, WEAPON[evo], pv2, swing + PI, t, c1, c2, lw)
+		ci.draw_circle(hand2, r * 0.17 + lw * 0.6, OL)
+		ci.draw_circle(hand2, r * 0.17, skin if not armored else Color(0.55, 0.58, 0.65))
 
 
 static func _shield(ci: CanvasItem, r: float, kind: int, c1: Color, c2: Color, lw: float) -> void:
@@ -581,6 +650,135 @@ static func _headgear(ci: CanvasItem, r: float, kind: int, t: float, skin: Color
 			ci.draw_circle(Vector2(hx + 0.2 * r, 0.16 * r), r * 0.07, Color(0.3, 0.72, 0.9))
 			ci.draw_arc(Vector2(hx, 0), 0.7 * r, 0.0, TAU, 40, Color(1.0, 0.9, 0.5, 0.9), r * 0.07, true)
 			ci.draw_arc(Vector2(hx, 0), 0.88 * r, 0.0, TAU, 44, Color(0.6, 0.9, 1.0, 0.5), r * 0.04, true)
+
+		28:
+			# sunforged: a burning sun disc behind the face
+			var sf := 0.5 + 0.5 * sin(t * 2.4)
+			_head(ci, r, skin, hair, lw)
+			ci.draw_circle(Vector2(hx, 0), r * (1.02 + 0.05 * sf), Color(1.0, 0.72, 0.2, 0.32))
+			for k in range(12):
+				var a12 := TAU * float(k) / 12.0 + t * 0.25
+				var d12 := Vector2.from_angle(a12)
+				var q12 := Vector2(hx, 0) + d12 * 0.95 * r
+				var pq12 := Vector2(-d12.y, d12.x)
+				_fill(ci, PackedVector2Array([q12 + pq12 * 0.09 * r, q12 + d12 * 0.44 * r, q12 - pq12 * 0.09 * r]), Color(1.0, 0.78 + 0.2 * sf, 0.25), OL, lw * 0.5)
+			_fill(ci, _ellipse(hx, 0, 0.52 * r, 0.5 * r, 0.0, 24), Color(1.0, 0.93, 0.7), OL, lw)
+			ci.draw_line(Vector2(hx + 0.12 * r, -0.16 * r), Vector2(hx + 0.44 * r, -0.1 * r), Color(0.55, 0.16, 0.03), r * 0.08, true)
+			ci.draw_line(Vector2(hx + 0.12 * r, 0.16 * r), Vector2(hx + 0.44 * r, 0.1 * r), Color(0.55, 0.16, 0.03), r * 0.08, true)
+		29:
+			# storm: twin lightning bolts for horns
+			_head(ci, r, skin, hair, lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([
+					Vector2(hx - 0.35 * r, side * 0.35 * r),
+					Vector2(hx - 0.62 * r, side * 1.05 * r),
+					Vector2(hx - 0.42 * r, side * 0.95 * r),
+					Vector2(hx - 0.78 * r, side * 1.62 * r),
+					Vector2(hx - 0.2 * r, side * 0.95 * r),
+					Vector2(hx - 0.4 * r, side * 0.85 * r)]), Color(0.75, 0.95, 1.0), OL, lw * 0.7)
+			ci.draw_arc(Vector2(hx, 0), 0.62 * r, -0.9, 0.9, 16, c2, r * 0.09, true)
+			ci.draw_circle(Vector2(hx + 0.28 * r, -0.14 * r), r * 0.07, Color(0.85, 1.0, 1.0))
+			ci.draw_circle(Vector2(hx + 0.28 * r, 0.14 * r), r * 0.07, Color(0.85, 1.0, 1.0))
+		30:
+			# abyss: a mask with too many eyes and trailing tendrils
+			_fill(ci, _ellipse(hx, 0, 0.58 * r, 0.56 * r, 0.0, 24), Color(0.05, 0.18, 0.2), OL, lw)
+			for k in range(3):
+				var ey := (float(k) - 1.0) * 0.24 * r
+				ci.draw_circle(Vector2(hx + 0.3 * r, ey), r * 0.075, Color(0.4, 1.0, 0.85))
+				ci.draw_circle(Vector2(hx + 0.32 * r, ey), r * 0.035, Color(1, 1, 1))
+			for k in range(4):
+				var tx := hx - 0.5 * r + float(k) * 0.12 * r
+				var wob := sin(t * 3.0 + float(k)) * 0.12 * r
+				ci.draw_line(Vector2(tx, 0.42 * r), Vector2(tx - 0.15 * r, (1.1 + 0.1 * float(k)) * r + wob), Color(0.3, 0.95, 0.8, 0.85), r * 0.06, true)
+		31:
+			# colossus: a brute helm with two swept horns and a slit visor
+			_fill(ci, _ellipse(hx, 0, 0.58 * r, 0.56 * r, 0.0, 24), Color(0.35, 0.08, 0.08), OL, lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([
+					Vector2(hx + 0.0, side * 0.42 * r),
+					Vector2(hx - 0.45 * r, side * 0.9 * r),
+					Vector2(hx - 1.15 * r, side * 1.02 * r),
+					Vector2(hx - 0.72 * r, side * 0.6 * r),
+					Vector2(hx - 0.1 * r, side * 0.24 * r)]), Color(0.92, 0.86, 0.7), OL, lw * 0.8)
+			ci.draw_rect(Rect2(hx + 0.1 * r, -0.1 * r, 0.44 * r, 0.2 * r), Color(0.05, 0.02, 0.02))
+			ci.draw_rect(Rect2(hx + 0.14 * r, -0.05 * r, 0.36 * r, 0.1 * r), Color(1.0, 0.35, 0.15))
+		32:
+			# shard: crystals orbiting a calm face
+			_head(ci, r, skin, hair, lw)
+			for k in range(6):
+				var a13 := t * 0.6 + TAU * float(k) / 6.0
+				var d13 := Vector2.from_angle(a13)
+				var q13 := Vector2(hx, 0) + d13 * 0.95 * r
+				var pq13 := Vector2(-d13.y, d13.x)
+				_fill(ci, PackedVector2Array([q13 + d13 * 0.26 * r, q13 + pq13 * 0.11 * r, q13 - d13 * 0.12 * r, q13 - pq13 * 0.11 * r]), Color(0.85, 0.97, 1.0, 0.95), OL, lw * 0.6)
+			ci.draw_line(Vector2(hx + 0.15 * r, -0.12 * r), Vector2(hx + 0.45 * r, -0.08 * r), Color(0.25, 0.5, 0.7), r * 0.07, true)
+			ci.draw_line(Vector2(hx + 0.15 * r, 0.12 * r), Vector2(hx + 0.45 * r, 0.08 * r), Color(0.25, 0.5, 0.7), r * 0.07, true)
+		33:
+			# elder: antlers grown out of the crown of the head
+			_head(ci, r, skin, hair, lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				var root := Vector2(hx - 0.1 * r, side * 0.35 * r)
+				var tip := Vector2(hx - 0.55 * r, side * 1.15 * r)
+				ci.draw_line(root, tip, Color(0.45, 0.33, 0.18), r * 0.09, true)
+				for k in range(3):
+					var f3 := 0.35 + 0.28 * float(k)
+					var base := root.lerp(tip, f3)
+					ci.draw_line(base, base + Vector2(-0.3 * r, side * 0.3 * r), Color(0.5, 0.37, 0.2), r * 0.055, true)
+					_fill(ci, _ellipse(base.x - 0.34 * r, base.y + side * 0.34 * r, 0.12 * r, 0.06 * r, side * 0.6, 8), Color(0.45, 0.8, 0.3), OL, lw * 0.4)
+		34:
+			# void: spikes around a dark orb where the face should be
+			_head(ci, r, skin, hair, lw)
+			ci.draw_circle(Vector2(hx, 0), r * 0.3, Color(0.06, 0.02, 0.1))
+			ci.draw_arc(Vector2(hx, 0), r * 0.3, 0.0, TAU, 24, c2, r * 0.06, true)
+			ci.draw_circle(Vector2(hx - 0.1 * r, -0.1 * r), r * 0.06, Color(1, 1, 1, 0.85))
+			for k in range(7):
+				var a14 := PI + (float(k) - 3.0) * 0.42
+				var d14 := Vector2.from_angle(a14)
+				var q14 := Vector2(hx, 0) + d14 * 0.55 * r
+				var pq14 := Vector2(-d14.y, d14.x)
+				_fill(ci, PackedVector2Array([q14 + pq14 * 0.06 * r, q14 + d14 * 0.42 * r, q14 - pq14 * 0.06 * r]), c2, OL, lw * 0.5)
+		35:
+			# dragon: a skull helm with a snout, fangs and swept horns
+			_fill(ci, _ellipse(hx, 0, 0.56 * r, 0.54 * r, 0.0, 24), Color(0.88, 0.84, 0.72), OL, lw)
+			_fill(ci, PackedVector2Array([
+				Vector2(hx + 0.3 * r, -0.34 * r), Vector2(hx + 0.95 * r, -0.16 * r),
+				Vector2(hx + 1.0 * r, 0.02 * r), Vector2(hx + 0.3 * r, 0.3 * r)]), Color(0.8, 0.76, 0.64), OL, lw * 0.8)
+			for k in range(3):
+				var fy := (float(k) - 1.0) * 0.16 * r
+				_fill(ci, PackedVector2Array([Vector2(hx + 0.78 * r, fy - 0.05 * r), Vector2(hx + 0.9 * r, fy), Vector2(hx + 0.78 * r, fy + 0.05 * r)]), Color(1, 1, 0.95), OL, lw * 0.4)
+			ci.draw_circle(Vector2(hx + 0.45 * r, -0.14 * r), r * 0.07, Color(1.0, 0.35, 0.1))
+			ci.draw_circle(Vector2(hx + 0.45 * r, 0.14 * r), r * 0.07, Color(1.0, 0.35, 0.1))
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([
+					Vector2(hx + 0.1 * r, side * 0.4 * r), Vector2(hx - 0.3 * r, side * 0.95 * r),
+					Vector2(hx - 0.95 * r, side * 1.1 * r), Vector2(hx - 0.5 * r, side * 0.7 * r),
+					Vector2(hx - 0.05 * r, side * 0.3 * r)]), Color(0.95, 0.9, 0.78), OL, lw * 0.7)
+		36:
+			# primordial: one great eye above the head, ringed in light
+			_head(ci, r, skin, hair, lw)
+			var ga := Vector2(hx - 0.05 * r, 0)
+			ci.draw_circle(ga, r * 0.62, Color(0.05, 0.02, 0.12, 0.8))
+			ci.draw_arc(ga, r * 0.62, 0.0, TAU, 32, c2, r * 0.07, true)
+			_fill(ci, _ellipse(ga.x, ga.y, r * 0.44, r * 0.26, 0.0, 20), Color(0.9, 1.0, 0.95), OL, lw * 0.7)
+			ci.draw_circle(ga + Vector2(0.06 * r, 0), r * 0.17, c1.darkened(0.2))
+			ci.draw_circle(ga + Vector2(0.06 * r, 0), r * 0.1, Color(0.02, 0.02, 0.05))
+			ci.draw_circle(ga + Vector2(0.12 * r, -0.06 * r), r * 0.04, Color(1, 1, 1, 0.9))
+		37:
+			# the infinite: two interlocking rings over a calm, blank face
+			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.52 * r, 0.0, 24), Color(1, 1, 1), OL, lw)
+			ci.draw_line(Vector2(hx + 0.16 * r, -0.1 * r), Vector2(hx + 0.42 * r, -0.06 * r), Color(0.25, 0.3, 0.45), r * 0.06, true)
+			ci.draw_line(Vector2(hx + 0.16 * r, 0.1 * r), Vector2(hx + 0.42 * r, 0.06 * r), Color(0.25, 0.3, 0.45), r * 0.06, true)
+			for k in range(2):
+				var cy0 := (float(k) - 0.5) * 0.46 * r
+				var spin := t * 0.5 * (1.0 if k == 0 else -1.0)
+				ci.draw_arc(Vector2(hx, cy0), r * 0.4, 0.0, TAU, 26, c2, r * 0.07, true)
+				for j in range(3):
+					var a15 := spin + TAU * float(j) / 3.0
+					ci.draw_circle(Vector2(hx, cy0) + Vector2.from_angle(a15) * r * 0.4, r * 0.05, Color(1, 1, 1, 0.9))
 		_:
 			_head(ci, r, skin, hair, lw)
 			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.5 * r, 0.0, 22), c1.lightened(0.1), OL, lw)
@@ -856,6 +1054,117 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 			ci.draw_circle(_wp(pv, ang, r, 3.72, 0.5), r * 0.09, Color(1.0, 0.97, 0.8))
 			ci.draw_circle(_wp(pv, ang, r, 0.34, 0.5), r * 0.13, Color(0.75, 0.95, 1.0))
 			ci.draw_circle(_wp(pv, ang, r, 0.34, 0.5), r * 0.07, Color(1, 1, 1))
+
+		29:
+			# sun cleaver: a wide molten blade on a short haft
+			var sf9 := 0.5 + 0.5 * sin(t * 4.0)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.3, 0.5, 1.35, 0.55, 0.0, 20)), Color(1.0, 0.6, 0.1, 0.11 + 0.06 * sf9))
+			_bar(ci, r, pv, ang, 0.35, 1.0, 0.5, 0.13, Color(0.5, 0.3, 0.12), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(1.0, 0.5), Vector2(1.35, 0.14), Vector2(2.6, 0.18),
+				Vector2(3.55, 0.5), Vector2(2.55, 0.66), Vector2(1.35, 0.86)])), Color(1.0, 0.62, 0.16), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.1, 0.5), _wp(pv, ang, r, 3.3, 0.5), Color(1.0, 0.93, 0.6), lw, true)
+		30:
+			# storm glaive: a jagged lightning blade on a silver shaft
+			_bar(ci, r, pv, ang, 0.4, 2.2, 0.5, 0.085, Color(0.55, 0.62, 0.75), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.1, 0.5), Vector2(2.45, 0.16), Vector2(2.75, 0.36),
+				Vector2(3.1, 0.1), Vector2(3.42, 0.38), Vector2(3.78, 0.5),
+				Vector2(3.2, 0.6), Vector2(2.8, 0.8), Vector2(2.1, 0.5)])), Color(0.78, 0.95, 1.0), OL, lw)
+			ci.draw_polyline(_wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.3, 0.5), Vector2(2.75, 0.44), Vector2(3.1, 0.52), Vector2(3.55, 0.5)])), c2, lw * 0.8, true)
+		31:
+			# abyss trident: three prongs on a dark haft
+			_bar(ci, r, pv, ang, 0.4, 3.05, 0.5, 0.075, Color(0.1, 0.3, 0.32), lw)
+			var t0 := _wp(pv, ang, r, 3.0, 0.08)
+			var t1 := _wp(pv, ang, r, 3.0, 0.92)
+			ci.draw_line(t0, t1, OL, r * 0.12 + lw, true)
+			ci.draw_line(t0, t1, c2, r * 0.12, true)
+			for k in range(3):
+				var py := 0.08 + 0.42 * float(k)
+				_bar(ci, r, pv, ang, 2.95, 3.72, py, 0.055, Color(0.6, 0.95, 0.9), lw)
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(3.68, py - 0.07), Vector2(3.98, py), Vector2(3.68, py + 0.07)])), Color(0.8, 1.0, 0.95), OL, lw * 0.4)
+		32:
+			# colossus axe: a double-bit axe head on a thick haft
+			_bar(ci, r, pv, ang, 0.35, 2.55, 0.5, 0.1, Color(0.3, 0.12, 0.1), lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(2.35, 0.5), Vector2(2.72, 0.5 + side * 0.42), Vector2(3.45, 0.5 + side * 0.32),
+					Vector2(3.18, 0.5)])), Color(0.85, 0.82, 0.8), OL, lw * 0.9)
+				ci.draw_line(_wp(pv, ang, r, 2.7, 0.5 + side * 0.36), _wp(pv, ang, r, 3.35, 0.5 + side * 0.3), Color(1.0, 0.35, 0.15), lw * 0.9, true)
+			ci.draw_circle(_wp(pv, ang, r, 2.5, 0.5), r * 0.13, c2)
+		33:
+			# shard blade: a split crystal greatsword
+			_bar(ci, r, pv, ang, 0.35, 0.95, 0.5, 0.1, Color(0.25, 0.32, 0.42), lw)
+			var g0 := _wp(pv, ang, r, 0.95, 0.36)
+			var g1 := _wp(pv, ang, r, 0.95, 0.64)
+			var g2 := _wp(pv, ang, r, 1.2, 0.5)
+			_fill(ci, PackedVector2Array([g0, g2, g1]), c2.darkened(0.2), OL, lw * 0.7)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.44), Vector2(1.9, 0.3), Vector2(2.9, 0.4),
+				Vector2(3.3, 0.5), Vector2(2.85, 0.58), Vector2(1.9, 0.64), Vector2(0.95, 0.56)])), Color(0.82, 0.95, 1.0), OL, lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.6, 0.5), Vector2(3.05, 0.34), Vector2(3.45, 0.5), Vector2(3.05, 0.66)])), Color(0.95, 1.0, 1.0), OL, lw * 0.8)
+			ci.draw_line(_wp(pv, ang, r, 1.05, 0.46), _wp(pv, ang, r, 3.2, 0.47), Color(1, 1, 1, 0.95), lw * 0.9, true)
+		34:
+			# bough blade: a living branch with a leaf-shaped blade
+			_bar(ci, r, pv, ang, 0.35, 2.1, 0.5, 0.09, Color(0.4, 0.28, 0.16), lw)
+			_fill(ci, _wpoly(pv, ang, r, _ellipse(1.75, 0.18, 0.24, 0.08, -0.5, 10)), Color(0.5, 0.85, 0.35), OL, lw * 0.6)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.05, 0.5), Vector2(2.45, 0.2), Vector2(3.1, 0.26),
+				Vector2(3.55, 0.5), Vector2(3.1, 0.74), Vector2(2.45, 0.8)])), Color(0.55, 0.9, 0.4), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 2.15, 0.5), _wp(pv, ang, r, 3.42, 0.5), Color(0.9, 1.0, 0.7), lw, true)
+		35:
+			# void scythe: a long dark haft ending in a hooked crescent
+			_bar(ci, r, pv, ang, 0.3, 3.1, 0.5, 0.06, Color(0.16, 0.1, 0.2), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(3.0, 0.5), Vector2(3.3, 0.18), Vector2(3.72, 0.16),
+				Vector2(3.88, 0.38), Vector2(3.45, 0.58), Vector2(3.1, 0.62)])), Color(0.35, 0.15, 0.45), OL, lw)
+			ci.draw_arc(_wp(pv, ang, r, 3.45, 0.38), r * 0.38, 2.2, 5.2, 18, c2, lw * 0.9, true)
+			ci.draw_circle(_wp(pv, ang, r, 3.55, 0.36), r * 0.07, Color(1, 1, 1, 0.85))
+		36:
+			# dragon fang: a serrated greatsword with fanged guards
+			_bar(ci, r, pv, ang, 0.35, 1.0, 0.5, 0.11, Color(0.35, 0.1, 0.08), lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(0.95, 0.5), Vector2(1.25, 0.5 + side * 0.34), Vector2(1.45, 0.5 + side * 0.16),
+					Vector2(1.15, 0.5)])), Color(0.95, 0.88, 0.7), OL, lw * 0.6)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.98, 0.44), Vector2(2.2, 0.34), Vector2(3.3, 0.44),
+				Vector2(3.62, 0.5), Vector2(3.25, 0.58), Vector2(2.2, 0.66), Vector2(0.98, 0.56)])), Color(0.85, 0.2, 0.15), OL, lw)
+			for k in range(4):
+				var sx := 1.5 + float(k) * 0.5
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(sx, 0.38), Vector2(sx + 0.16, 0.28), Vector2(sx + 0.18, 0.4)])), Color(1.0, 0.75, 0.2), OL, lw * 0.4)
+			ci.draw_line(_wp(pv, ang, r, 1.05, 0.5), _wp(pv, ang, r, 3.5, 0.5), Color(1.0, 0.55, 0.2, 0.9), lw, true)
+		37:
+			# primordial blade: a void orb floats inside the blade
+			var pf9 := 0.5 + 0.5 * sin(t * 2.6)
+			_bar(ci, r, pv, ang, 0.35, 0.9, 0.5, 0.1, Color(0.18, 0.14, 0.3), lw)
+			_fill(ci, _wpoly(pv, ang, r, _ellipse(1.5, 0.5, 0.42, 0.42, 0.0, 20)), Color(0.05, 0.02, 0.12), OL, lw)
+			ci.draw_arc(_wp(pv, ang, r, 1.5, 0.5), r * 0.34, 0.0, TAU, 22, c2, lw * 0.8, true)
+			ci.draw_circle(_wp(pv, ang, r, 1.5, 0.5), r * (0.12 + 0.03 * pf9), Color(0.7, 1.0, 0.9, 0.9))
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(1.9, 0.44), Vector2(2.9, 0.36), Vector2(3.55, 0.5),
+				Vector2(2.9, 0.62), Vector2(1.9, 0.56)])), Color(0.35, 0.3, 0.6), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.95, 0.5), _wp(pv, ang, r, 3.42, 0.5), Color(0.6, 1.0, 0.9), lw * 0.8, true)
+		38:
+			# the infinite blade: twin crescents and a split tip
+			var pi9 := 0.5 + 0.5 * sin(t * 3.0)
+			_bar(ci, r, pv, ang, 0.35, 0.95, 0.5, 0.09, Color(0.9, 0.85, 0.6), lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(0.95, 0.5), Vector2(1.25, 0.5 + side * 0.36), Vector2(1.72, 0.5 + side * 0.22),
+					Vector2(1.4, 0.5)])), Color(1.0, 0.95, 0.8), OL, lw * 0.6)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.44), Vector2(2.2, 0.4), Vector2(3.15, 0.44),
+				Vector2(3.6, 0.36), Vector2(3.95, 0.5), Vector2(3.6, 0.64),
+				Vector2(3.15, 0.56), Vector2(2.2, 0.6), Vector2(0.95, 0.56)])), Color(1.0, 0.99, 0.94), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.05, 0.5), _wp(pv, ang, r, 3.85, 0.5), Color(1.0, 0.84, 0.35, 0.75 + 0.25 * pi9), lw * 1.1, true)
 		_:
 			_bar(ci, r, pv, ang, 0.3, 0.95, 0.5, 0.16, Color(0.5, 0.1, 0.1), lw)
 			var blade := _wpoly(pv, ang, r, PackedVector2Array([Vector2(0.95, 0.34), Vector2(3.0, 0.3), Vector2(3.55, 0.5), Vector2(3.0, 0.7), Vector2(0.95, 0.66)]))

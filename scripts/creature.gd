@@ -28,6 +28,7 @@ var swing_cd := 0.0
 var swing_hit := false
 var swing_hits: Array = []
 var trail: PackedVector2Array = PackedVector2Array()
+var trail2: PackedVector2Array = PackedVector2Array()
 var hit_flash := 0.0
 var since_hit := 99.0
 var mode := 0
@@ -99,6 +100,7 @@ func start_swing() -> void:
 	swing_hit = false
 	swing_hits.clear()
 	trail.clear()
+	trail2.clear()
 	swing_cd = SWING_TIME + 0.12 + 0.02 * float(evo)
 
 
@@ -122,14 +124,23 @@ func _process(delta: float) -> void:
 			trail.append(_weapon_tip(ang))
 			if trail.size() > 9:
 				trail.remove_at(0)
+			if dual_wield():
+				trail2.append(_weapon_tip(ang, 1))
+				if trail2.size() > 9:
+					trail2.remove_at(0)
 
 			# The killing ground is the weapon itself: the drawn blade, and
 			# the slice of the arc it swept through on this frame.
 			var shift: float = prev_ang - ang
 			main.weapon_hit_zone(self, _weapon_bands(ang), minf(0.0, shift), maxf(0.0, shift))
+			if dual_wield():
+				# the other blade turns the other way, half a circle around
+				var shift2: float = -shift
+				main.weapon_hit_zone(self, _weapon_bands(ang, 1), minf(0.0, shift2), maxf(0.0, shift2), Vector2(0.0, -0.8))
 		if swing_t >= SWING_TIME:
 			swing_t = -1.0
 			trail.clear()
+			trail2.clear()
 	if frozen:
 		queue_redraw()
 		return
@@ -422,9 +433,16 @@ func weapon_reach() -> float:
 	return best * r
 
 
-func _weapon_tip(ang: float) -> Vector2:
+func dual_wield() -> bool:
+	return Species.is_dual(evo)
+
+
+func _weapon_tip(ang: float, side: int = 0) -> Vector2:
 	# the far end of the drawn weapon, for the swing trail
 	var pv := Vector2(0.0, 0.8 * r)
+	if side == 1:
+		pv = -pv
+		ang += PI
 	var best_x := -999.0
 	var best := Vector2.ZERO
 	for p in Species.weapon_parts(evo):
@@ -439,10 +457,13 @@ func _weapon_tip(ang: float) -> Vector2:
 	return pv + (best - pv).rotated(ang)
 
 
-func _weapon_bands(ang: float) -> Array:
+func _weapon_bands(ang: float, side: int = 0) -> Array:
 	# The weapon's parts, measured from the pivot it swings around. Each band
 	# is [middle, near_radius, far_radius, half_spread, half_width].
 	var pv := Vector2(0.0, 0.8 * r)
+	if side == 1:
+		pv = -pv
+		ang += PI
 	var bands: Array = []
 	for p in Species.weapon_parts(evo):
 		var a := Vector2(float(p[0]) * r, float(p[1]) * r) - pv
@@ -461,15 +482,28 @@ func _weapon_bands(ang: float) -> Array:
 
 
 func _swing_angle() -> float:
-	var ang := 0.12 + sin(anim_t * 3.0) * 0.04
+	var rest := 0.12
+	var wind := 1.35
+	var end := -1.35
+	if dual_wield():
+		# two blades, one each side: they rest out at the sides and the pair
+		# turns a full 160 degrees through the swing
+		rest = 1.30
+		wind = 1.48
+		end = -1.32
+	var ang := rest + sin(anim_t * 3.0) * 0.04
 	if swing_t >= 0.0:
 		var p := clampf(swing_t / SWING_TIME, 0.0, 1.0)
 		if p < 0.2:
-			ang = lerpf(0.12, 1.35, p / 0.2)
-		elif p < 0.7:
-			ang = lerpf(1.35, -1.35, (p - 0.2) / 0.5)
+			ang = lerpf(rest, wind, p / 0.2)
+		elif p < 0.72:
+			var k := (p - 0.2) / 0.52
+			if dual_wield():
+				# ease in, then a hard 160 degree cut, then a slow-out
+				k = k * k * (3.0 - 2.0 * k)
+			ang = lerpf(wind, end, k)
 		else:
-			ang = lerpf(-1.35, 0.12, (p - 0.7) / 0.3)
+			ang = lerpf(end, rest, (p - 0.72) / 0.28)
 	return ang
 
 
@@ -479,10 +513,11 @@ func _draw() -> void:
 		var tc: Color = main.team_color(team)
 		draw_arc(Vector2.ZERO, r * 1.3, 0.0, TAU, 40, Color(tc.r, tc.g, tc.b, 0.9), 3.5, true)
 	var sa := _swing_angle()
-	if trail.size() > 1:
-		for i in range(1, trail.size()):
-			var f := float(i) / float(trail.size())
-			draw_line(trail[i - 1], trail[i], Color(1, 1, 1, f * 0.7), r * (0.1 + 0.28 * f), true)
+	for tr in [trail, trail2]:
+		if tr.size() > 1:
+			for i in range(1, tr.size()):
+				var f := float(i) / float(tr.size())
+				draw_line(tr[i - 1], tr[i], Color(1, 1, 1, f * 0.7), r * (0.1 + 0.28 * f), true)
 	if sprinting:
 		for i in range(3):
 			var y := float(i - 1) * r * 0.55

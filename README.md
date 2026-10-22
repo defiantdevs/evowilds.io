@@ -1,11 +1,29 @@
 # Evo Wilds (Godot 4.7)
 
-A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 33 humanoid tiers — from Caveman to Author of Worlds.
+A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 43 humanoid tiers — from Caveman to The Infinite.
 
 ## Download
 Current build: **v1.16** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.16/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
 Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.16**, you are still running an older download.
+
+## What's new in v1.17
+- **Ten new tiers above Author of Worlds: the game now has 43.** Every one is bigger than the last, and every one fights with **a weapon in each hand**:
+  - **34 Sunforged** — a burning sun disc for a face, twin **sun cleavers**: wide molten blades on short hafts.
+  - **35 Storm Herald** — lightning-bolt horns, twin **storm glaives**: jagged lightning blades on silver shafts.
+  - **36 Abyss Sovereign** — a mask with too many eyes, twin **abyss tridents**, three glowing prongs on each.
+  - **37 Crimson Colossus** — a horned brute helm, twin **colossus axes** with a heavy bit on both sides.
+  - **38 Shard Prophet** — crystals orbiting its head, twin **shard blades** with split crystal tips.
+  - **39 Elder Warden** — antlers and leaves, twin **bough blades**: living branches ending in a great leaf.
+  - **40 Void Empress** — a dark orb where the face should be, twin **void scythes** with hooked crescents.
+  - **41 Dragon Ascendant** — a dragon skull helm, twin **dragon fangs**: serrated greatswords with fanged guards.
+  - **42 Primordial** — one great eye, twin **primordial blades** with a void orb floating inside each.
+  - **43 The Infinite** — two interlocking rings of light over a blank face, twin **infinite blades** with double crescents and a split tip.
+- **A blade on each side.** From tier 34 up the second weapon is a real second weapon: its own arm, its own swing trail, and its own killing ground built from the same drawn parts. It is not a wider hitbox bolted onto the first one.
+- **The pair turns a full 160°.** At rest the blades sit out on your left and right. Swing and the pair rotates through 160 degrees — one blade sweeping down one side, the other down the other — so a single swing now covers both sides of you at once.
+- **Levelling is properly hard now.** Every evolution costs more than it did (tier 2 goes from 28 XP to 50, Author of Worlds from 14,820 to 26,676), ten more gates sit above that up to **52,426** for The Infinite, and a kill now feeds you a quarter of the victim's XP instead of two-fifths. Climbing the whole ladder is a long fight again.
+- The Test Range picker lists all 43 tiers, five to a row, and still fits on one screen — and it still folds away with **M**.
+- Every new weapon's kill zone is still exactly the weapon: the cleaver's wide blade, the trident's prongs, the axe's bits, the scythe's hook and the void orb in the primordial blade are what kills, and nothing behind the blades is.
 
 ## What's new in v1.16
 - **The Test Range box folds away.** Click the **–** in its top-right corner (or press **M**) and the whole tier list collapses into a slim title bar in the bottom-left corner that still shows the tier you are playing. Click **+** (or press **M** again) and the full picker comes back exactly where it was, centred down the left edge.
@@ -57,7 +75,7 @@ Pick your name on the title screen, then choose a mode:
 
 - **DEATHMATCH** — free-for-all. A 10:00 timer counts down; when it hits zero the match ends.
 - **TEAM DEATHMATCH** — Red vs Blue. A timer counts **up** from 0:00 and there is no time limit.
-- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it. Pick any of the 33 tiers, set the number of charging bots from 1 to **25**, and swing away: no clock, no food, no loot orbs, and you cannot die.
+- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it. Pick any of the 43 tiers, set the number of charging bots from 1 to **25**, and swing away: no clock, no food, no loot orbs, and you cannot die.
 
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
@@ -71,16 +89,16 @@ When you are defeated the match **keeps running** — the clock ticks on, golems
 - Two base statues — one **Red**, one **Blue** — each with **15,000 HP**.
 - Grey golems spawn around the arena and stand still: **small** every 15s, **medium** every 40s, **large** every minute, **extra-large** every 2 minutes.
 - Hit a golem or statue and it joins **your** team, turns your colour, and marches off to chip the enemy statue (small 1, medium 2, large 3, extra-large 5 damage on a size-based cooldown).
-- You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **33** (biggest).
+- You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **43** (biggest).
 - First statue destroyed wins. Smaller bots charge the enemy statue; **big bots instead roam the arena and guard their own statue**, attacking anyone who comes near it.
 - No friendly fire — team-mates can't hurt each other.
 
-## Evolutions (33)
-Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor → Astral Sovereign → Void Titan → Eternal Seraph → Omniverse God → Eclipse Monarch → Chrono Warden → Genesis Prime → Aether Regent → Author of Worlds
+## Evolutions (43)
+Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor → Astral Sovereign → Void Titan → Eternal Seraph → Omniverse God → Eclipse Monarch → Chrono Warden → Genesis Prime → Aether Regent → Author of Worlds → Sunforged → Storm Herald → Abyss Sovereign → Crimson Colossus → Shard Prophet → Elder Warden → Void Empress → Dragon Ascendant → Primordial → The Infinite
 
 ## Features
 - Title screen where you choose your name and pick a mode (Deathmatch, Team Deathmatch, or the secret Test Range)
-- A hidden Test Range for testing any of the 33 tiers: pick a tier, and the bots come running at you without ever swinging
+- A hidden Test Range for testing any of the 43 tiers: pick a tier, and the bots come running at you without ever swinging
 - Deathmatch: 10-minute countdown; Team Deathmatch: count-up timer, Red vs Blue statues
 - Captureable grey golems that switch sides when hit and march on the enemy statue
 - 28 AI bots with hunting/fleeing/wandering instincts — they notice you and gang up when you get close, but they react slowly and miss often
@@ -93,4 +111,4 @@ Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking �
 ## Run
 Open this folder in Godot 4.7+ and press F5, or `godot --path .`
 
-Files: `scripts/species.gd` (the 33 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`, `test_panel.gd` (the Test Range tier picker).
+Files: `scripts/species.gd` (the 43 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`, `test_panel.gd` (the Test Range tier picker).
