@@ -1,5 +1,5 @@
 extends Control
-# The Test Range's control panel: pick any of the 28 evolutions, and choose
+# The Test Range's control panel: pick any of the evolutions, and choose
 # how many bots come charging at you.
 
 const Species = preload("res://scripts/species.gd")
@@ -88,9 +88,9 @@ func _ready() -> void:
 	cap.add_theme_color_override("font_color", Color(0.65, 0.8, 0.9, 0.6))
 	row.add_child(cap)
 
-	# --- the 28 tiers -------------------------------------------------
+	# --- every tier ---------------------------------------------------
 	var grid := GridContainer.new()
-	grid.columns = 4
+	grid.columns = 5
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
 	col.add_child(grid)
@@ -99,7 +99,7 @@ func _ready() -> void:
 		var b := Button.new()
 		b.text = "%02d %s" % [i + 1, Species.NAMES[i]]
 		b.focus_mode = Control.FOCUS_NONE
-		b.custom_minimum_size = Vector2(118, 24)
+		b.custom_minimum_size = Vector2(120, 24)
 		b.add_theme_font_size_override("font_size", 12)
 		b.pressed.connect(func(): _pick(i))
 		grid.add_child(b)

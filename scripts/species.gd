@@ -1,7 +1,8 @@
 extends RefCounted
 
-const COUNT := 28
-const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God"]
+const COUNT := 33
+const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God",
+	"Eclipse Monarch", "Chrono Warden", "Genesis Prime", "Aether Regent", "Author of Worlds"]
 const BLURB := [
 	"Club in hand. Everyone starts somewhere.",
 	"Sharpened stick, sharper instincts.",
@@ -31,18 +32,32 @@ const BLURB := [
 	"A walking absence. Even light hesitates.",
 	"Six wings, one purpose: never fall.",
 	"Every world, every age, every ending. Yours.",
+	"Day and night fight over which one gets to be your shadow.",
+	"Every second you ever wasted has been counted, and billed.",
+	"The first green thing, and the last thing left standing.",
+	"Reality is a rumour you started and never denied.",
+	"Every world in the wilds is a line you have already written.",
 ]
-const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0, 8610.0, 9290.0, 9990.0, 10720.0]
-const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a")]
-const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("9fd8ff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff")]
-const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2")]
-const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 22]
-const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 20, 21, 18, 23, 22]
-const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
-const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
-const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
+const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0, 8610.0, 9290.0, 9990.0, 10720.0, 11480.0, 12270.0, 13090.0, 13940.0, 14820.0]
+const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a"),
+	Color("141018"), Color("43301a"), Color("143a28"), Color("3a1440"), Color("f7f4ec")]
+const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("9fd8ff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff"),
+	Color("eef2ff"), Color("6ff0dc"), Color("b6ff6a"), Color("ff9ae4"), Color("8fe4ff")]
+const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2"),
+	Color("c9c2d8"), Color("d8c9a8"), Color("a8d8b0"), Color("f0d0e8"), Color("ffffff")]
+const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 22,
+	23, 24, 25, 26, 27]
+const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 20, 21, 18, 23, 22,
+	24, 25, 26, 27, 28]
+const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0,
+	0, 0, 0, 0, 0]
+const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1]
+const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2,
+	2, 2, 2, 2, 2]
 # 1 = feathered wings (Eternal Seraph only)
-const WINGS := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
+const WINGS := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
+	0, 0, 0, 0, 0]
 # The weapon's own shape, part by part. Each part is
 # [x0, y0, x1, y1, half_width] in weapon frame units: x runs along the
 # weapon, y across it, and the centre line sits at y = 0.5. The killing
@@ -91,6 +106,22 @@ const WEAPON_PARTS := [
 	[[0.32, 0.5, 0.95, 0.5, 0.06],
 		[0.95, 0.16, 0.95, 0.84, 0.075],
 		[0.98, 0.5, 3.25, 0.5, 0.175], [3.25, 0.5, 3.6, 0.5, 0.05]],        # 23 holy sword
+	[[0.3, 0.5, 1.0, 0.5, 0.08],
+		[0.97, 0.06, 0.97, 0.94, 0.08],
+		[0.97, 0.5, 2.9, 0.5, 0.14], [2.85, 0.5, 3.9, 0.5, 0.07]],          # 24 eclipse blade
+	[[0.45, 0.5, 3.0, 0.5, 0.05],
+		[3.0, 0.5, 3.45, 0.5, 0.06],
+		[2.55, 0.5, 3.3, 0.18, 0.13], [2.55, 0.5, 3.2, 0.8, 0.11],
+		[1.9, 0.5, 1.9, 0.5, 0.16]],                                       # 25 chrono halberd
+	[[0.45, 0.5, 3.1, 0.5, 0.045],
+		[3.0, 0.5, 4.0, 0.5, 0.16],
+		[2.55, 0.5, 3.0, 0.18, 0.09], [2.55, 0.5, 3.0, 0.82, 0.09]],        # 26 genesis spear
+	[[0.35, 0.5, 0.95, 0.5, 0.07],
+		[0.95, 0.5, 1.5, 0.18, 0.10], [0.95, 0.5, 1.5, 0.82, 0.10],
+		[1.0, 0.5, 2.6, 0.5, 0.17], [2.5, 0.5, 3.75, 0.5, 0.10]],           # 27 aether warblade
+	[[0.3, 0.5, 3.7, 0.5, 0.05],
+		[1.6, 0.5, 3.5, 0.5, 0.42],
+		[3.6, 0.5, 4.15, 0.5, 0.10]],                                      # 28 quill of creation
 ]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
@@ -252,12 +283,12 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 		if evo == COUNT - 1:
 			# the last one in the game wears a second ring of light, turning
 			# the other way, so it never reads as just another purple emperor
-			ci.draw_arc(Vector2.ZERO, r * (2.25 + 0.12 * pu), 0.0, TAU, 52, Color(1.0, 0.95, 0.6, 0.45), 2.5, true)
+			ci.draw_arc(Vector2.ZERO, r * (2.25 + 0.12 * pu), 0.0, TAU, 52, Color(ac.r, ac.g, ac.b, 0.5), 2.5, true)
 			for k in range(6):
 				var oa2 := -t * 1.9 + TAU * float(k) / 6.0
 				var op2 := Vector2.from_angle(oa2) * r * 2.3
 				ci.draw_circle(op2, r * 0.085, Color(1, 1, 1, 0.9))
-				ci.draw_circle(op2, r * 0.04, Color(1.0, 0.88, 0.4))
+				ci.draw_circle(op2, r * 0.04, Color(ac.r, ac.g, ac.b))
 	if WINGS[evo] > 0:
 		_wings(ci, r, t, lw)
 	var cape: int = CAPE[evo]
@@ -483,6 +514,73 @@ static func _headgear(ci: CanvasItem, r: float, kind: int, t: float, skin: Color
 				_fill(ci, PackedVector2Array([q7 + pq7 * 0.07 * r, q7 + d7 * 0.32 * r, q7 - pq7 * 0.07 * r]), Color(1.0, 0.9, 0.45), OL, lw * 0.5)
 			ci.draw_circle(Vector2(hx + 0.3 * r, 0), r * 0.15, Color(1, 1, 0.92))
 			ci.draw_circle(Vector2(hx + 0.34 * r, 0), r * 0.08, Color(1.0, 0.84, 0.2))
+		23:
+			# eclipse: a black sun with a white rim, and a pale face inside it
+			_fill(ci, _ellipse(hx, 0, 0.68 * r, 0.66 * r, 0.0, 26), Color(0.05, 0.04, 0.08), OL, lw)
+			ci.draw_arc(Vector2(hx, 0), 0.72 * r, 0.0, TAU, 44, Color(0.95, 0.97, 1.0, 0.95), r * 0.09, true)
+			ci.draw_arc(Vector2(hx, 0), 0.96 * r, 0.0, TAU, 48, Color(1, 1, 1, 0.32), r * 0.05, true)
+			for k in range(8):
+				var a9 := t * 0.5 + TAU * float(k) / 8.0
+				var d9 := Vector2.from_angle(a9)
+				var q9 := Vector2(hx, 0) + d9 * 1.02 * r
+				var pq9 := Vector2(-d9.y, d9.x)
+				_fill(ci, PackedVector2Array([q9 + pq9 * 0.05 * r, q9 + d9 * 0.22 * r, q9 - pq9 * 0.05 * r]), Color(0.95, 0.97, 1.0), OL, lw * 0.4)
+			ci.draw_circle(Vector2(hx + 0.24 * r, 0), r * 0.2, Color(0.9, 0.92, 1.0))
+			ci.draw_line(Vector2(hx + 0.14 * r, -0.12 * r), Vector2(hx + 0.42 * r, -0.06 * r), Color(0.05, 0.04, 0.08), r * 0.06, true)
+			ci.draw_line(Vector2(hx + 0.14 * r, 0.12 * r), Vector2(hx + 0.42 * r, 0.06 * r), Color(0.05, 0.04, 0.08), r * 0.06, true)
+		24:
+			# chrono: a brass clock ring around the head, hands still turning
+			_head(ci, r, skin, hair, lw)
+			ci.draw_arc(Vector2(hx, 0), 0.95 * r, 0.0, TAU, 46, Color(0.85, 0.7, 0.35), r * 0.12, true)
+			for k in range(12):
+				var a10 := TAU * float(k) / 12.0
+				var d10 := Vector2.from_angle(a10)
+				ci.draw_circle(Vector2(hx, 0) + d10 * 0.95 * r, r * 0.05, Color(0.98, 0.9, 0.6))
+			ci.draw_line(Vector2(hx, 0), Vector2(hx, 0) + Vector2.from_angle(-t * 0.9) * 0.7 * r, Color(0.92, 1.0, 0.99), r * 0.08, true)
+			ci.draw_line(Vector2(hx, 0), Vector2(hx, 0) + Vector2.from_angle(-t * 2.4) * 0.95 * r, c2, r * 0.05, true)
+			ci.draw_circle(Vector2(hx, 0), r * 0.1, Color(1, 1, 1))
+			ci.draw_circle(Vector2(hx, 0), r * 0.05, Color(0.4, 0.3, 0.15))
+		25:
+			# genesis: a crown of leaves around a seed of light
+			_head(ci, r, skin, hair, lw)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				for k in range(4):
+					var a11 := -1.4 + float(k) * 0.42
+					var d11 := Vector2(cos(a11), sin(a11) * side)
+					var q11 := Vector2(hx - 0.1 * r, 0) + d11 * 0.62 * r
+					_fill(ci, _ellipse(q11.x, q11.y, 0.17 * r, 0.075 * r, a11, 10), Color(0.45, 0.85, 0.35), OL, lw * 0.6)
+			ci.draw_circle(Vector2(hx + 0.1 * r, 0), r * 0.17, Color(0.55, 1.0, 0.5))
+			ci.draw_circle(Vector2(hx + 0.1 * r, 0), r * 0.09, Color(1, 1, 1, 0.92))
+		26:
+			# aether: a smooth pale mask trailing ribbons of light
+			_fill(ci, _ellipse(hx, 0, 0.56 * r, 0.54 * r, 0.0, 24), Color(0.98, 0.95, 1.0), OL, lw)
+			ci.draw_line(Vector2(hx + 0.18 * r, -0.15 * r), Vector2(hx + 0.46 * r, -0.08 * r), c1.darkened(0.05), r * 0.09, true)
+			ci.draw_line(Vector2(hx + 0.18 * r, 0.15 * r), Vector2(hx + 0.46 * r, 0.08 * r), c1.darkened(0.05), r * 0.09, true)
+			ci.draw_circle(Vector2(hx + 0.3 * r, 0), r * 0.05, c2)
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([
+					Vector2(hx - 0.3 * r, side * 0.32 * r),
+					Vector2(hx - 1.05 * r, side * 0.5 * r + wv),
+					Vector2(hx - 1.45 * r, side * 0.95 * r + wv * 1.4),
+					Vector2(hx - 1.15 * r, side * 0.82 * r + wv * 0.8),
+					Vector2(hx - 0.5 * r, side * 0.52 * r)]), c2, OL, lw * 0.6)
+		27:
+			# the author: an open book hangs behind a luminous face
+			for s in range(2):
+				var side := -1.0 + float(s) * 2.0
+				_fill(ci, PackedVector2Array([
+					Vector2(hx - 0.05 * r, 0),
+					Vector2(hx - 0.6 * r, side * 0.95 * r),
+					Vector2(hx + 0.02 * r, side * 0.84 * r),
+					Vector2(hx + 0.55 * r, side * 0.76 * r)]), Color(1.0, 0.99, 0.93), OL, lw * 0.8)
+				ci.draw_line(Vector2(hx - 0.05 * r, 0), Vector2(hx + 0.05 * r, side * 0.86 * r), Color(0.7, 0.76, 0.9), lw * 0.5, true)
+			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.52 * r, 0.0, 24), Color(1.0, 1.0, 0.98), OL, lw)
+			ci.draw_circle(Vector2(hx + 0.2 * r, -0.16 * r), r * 0.07, Color(0.3, 0.72, 0.9))
+			ci.draw_circle(Vector2(hx + 0.2 * r, 0.16 * r), r * 0.07, Color(0.3, 0.72, 0.9))
+			ci.draw_arc(Vector2(hx, 0), 0.7 * r, 0.0, TAU, 40, Color(1.0, 0.9, 0.5, 0.9), r * 0.07, true)
+			ci.draw_arc(Vector2(hx, 0), 0.88 * r, 0.0, TAU, 44, Color(0.6, 0.9, 1.0, 0.5), r * 0.04, true)
 		_:
 			_head(ci, r, skin, hair, lw)
 			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.5 * r, 0.0, 22), c1.lightened(0.1), OL, lw)
@@ -684,6 +782,80 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 				Vector2(1.85, 0.34), Vector2(2.05, 0.34), Vector2(2.05, 0.5),
 				Vector2(2.25, 0.5), Vector2(2.25, 0.66), Vector2(1.85, 0.66)])),
 				Color(1.0, 0.93, 0.66), OL, lw * 0.4)
+		24:
+			# eclipse blade: a black greatsword with a white edge
+			var pu7 := 0.5 + 0.5 * sin(t * 3.2)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.5, 0.5, 1.7, 0.5, 0.0, 22)), Color(0.85, 0.9, 1.0, 0.11 + 0.07 * pu7))
+			_bar(ci, r, pv, ang, 0.3, 1.0, 0.5, 0.16, Color(0.2, 0.18, 0.26), lw)
+			var e0 := _wp(pv, ang, r, 0.97, 0.06)
+			var e1 := _wp(pv, ang, r, 0.97, 0.94)
+			ci.draw_line(e0, e1, OL, r * 0.18 + lw, true)
+			ci.draw_line(e0, e1, Color(0.9, 0.94, 1.0), r * 0.18, true)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.97, 0.36), Vector2(2.9, 0.38), Vector2(3.9, 0.5),
+				Vector2(2.9, 0.62), Vector2(0.97, 0.64)])), Color(0.07, 0.06, 0.1), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.0, 0.39), _wp(pv, ang, r, 3.72, 0.49), Color(0.95, 0.97, 1.0), lw * 1.2, true)
+			ci.draw_line(_wp(pv, ang, r, 1.0, 0.61), _wp(pv, ang, r, 3.72, 0.51), Color(0.95, 0.97, 1.0), lw * 1.2, true)
+			ci.draw_circle(_wp(pv, ang, r, 0.4, 0.5), r * 0.14, Color(0.95, 0.97, 1.0))
+		25:
+			# chrono halberd: a long brass shaft with an axe head and a spike
+			_bar(ci, r, pv, ang, 0.45, 3.0, 0.5, 0.1, Color(0.45, 0.33, 0.16), lw)
+			_bar(ci, r, pv, ang, 3.0, 3.45, 0.5, 0.09, Color(0.9, 0.94, 1.0), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.5, 0.5), Vector2(3.05, 0.1), Vector2(3.34, 0.28),
+				Vector2(3.05, 0.5), Vector2(2.9, 0.62)])), Color(0.92, 0.94, 1.0), OL, lw * 0.8)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.5, 0.5), Vector2(2.95, 0.84), Vector2(3.2, 0.68),
+				Vector2(3.0, 0.5)])), Color(0.85, 0.88, 0.96), OL, lw * 0.8)
+			ci.draw_line(_wp(pv, ang, r, 2.55, 0.5), _wp(pv, ang, r, 3.15, 0.29), c2, lw * 0.7, true)
+			ci.draw_arc(_wp(pv, ang, r, 1.9, 0.5), r * 0.17, 0.0, TAU, 20, c2, r * 0.07, true)
+			ci.draw_line(_wp(pv, ang, r, 1.9, 0.5), _wp(pv, ang, r, 2.0, 0.4), c2, r * 0.06, true)
+			ci.draw_line(_wp(pv, ang, r, 1.9, 0.5), _wp(pv, ang, r, 1.98, 0.62), c2, r * 0.06, true)
+		26:
+			# genesis spear: a living shaft crowned with a great leaf
+			_bar(ci, r, pv, ang, 0.45, 3.1, 0.5, 0.09, Color(0.24, 0.36, 0.2), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(3.0, 0.5), Vector2(3.24, 0.2), Vector2(3.78, 0.34),
+				Vector2(4.0, 0.5), Vector2(3.78, 0.66), Vector2(3.24, 0.8)])), Color(0.62, 0.95, 0.45), OL, lw * 0.8)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.55, 0.5), Vector2(2.82, 0.26), Vector2(3.05, 0.4),
+				Vector2(2.86, 0.5)])), Color(0.5, 0.85, 0.36), OL, lw * 0.6)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.55, 0.5), Vector2(2.82, 0.74), Vector2(3.05, 0.6),
+				Vector2(2.86, 0.5)])), Color(0.5, 0.85, 0.36), OL, lw * 0.6)
+			ci.draw_line(_wp(pv, ang, r, 3.1, 0.5), _wp(pv, ang, r, 3.88, 0.5), Color(0.95, 1.0, 0.75), lw, true)
+			ci.draw_circle(_wp(pv, ang, r, 3.9, 0.5), r * 0.11, Color(0.85, 1.0, 0.7))
+		27:
+			# aether warblade: a curved blade between two fins of light
+			_bar(ci, r, pv, ang, 0.35, 0.95, 0.5, 0.14, Color(0.32, 0.16, 0.4), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.5), Vector2(1.35, 0.12), Vector2(1.62, 0.24),
+				Vector2(1.18, 0.5)])), c2, OL, lw * 0.7)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.5), Vector2(1.35, 0.88), Vector2(1.62, 0.76),
+				Vector2(1.18, 0.5)])), c2, OL, lw * 0.7)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.42), Vector2(2.2, 0.3), Vector2(3.1, 0.4),
+				Vector2(3.75, 0.5), Vector2(3.0, 0.62), Vector2(2.0, 0.62),
+				Vector2(0.95, 0.58)])), Color(0.99, 0.82, 0.95), OL, lw)
+			ci.draw_polyline(_wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(1.05, 0.47), Vector2(2.3, 0.4), Vector2(3.2, 0.45),
+				Vector2(3.6, 0.5)])), Color(1.0, 0.95, 1.0), lw * 1.2, true)
+		28:
+			# quill of creation: a feather fan on a shaft with a golden nib
+			var pu8 := 0.5 + 0.5 * sin(t * 3.6)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.55, 0.5, 1.15, 0.5, 0.0, 22)), Color(0.55, 0.85, 1.0, 0.10 + 0.06 * pu8))
+			_bar(ci, r, pv, ang, 0.3, 3.7, 0.5, 0.06, Color(0.98, 0.96, 0.88), lw)
+			_fill(ci, _wpoly(pv, ang, r, _ellipse(2.55, 0.5, 1.12, 0.44, -0.06, 24)), Color(0.86, 0.97, 1.0), OL, lw * 0.9)
+			for k in range(6):
+				var f8 := -0.34 + float(k) * 0.136
+				ci.draw_line(_wp(pv, ang, r, 1.55, 0.5 + f8 * 0.5), _wp(pv, ang, r, 1.65 + 0.95 * (1.0 - absf(f8) * 1.6), 0.5 + f8), Color(0.55, 0.85, 1.0, 0.8), lw * 0.5, true)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(3.58, 0.5), Vector2(3.76, 0.38), Vector2(4.16, 0.5),
+				Vector2(3.76, 0.62)])), Color(1.0, 0.86, 0.42), OL, lw * 0.7)
+			ci.draw_circle(_wp(pv, ang, r, 3.72, 0.5), r * 0.09, Color(1.0, 0.97, 0.8))
+			ci.draw_circle(_wp(pv, ang, r, 0.34, 0.5), r * 0.13, Color(0.75, 0.95, 1.0))
+			ci.draw_circle(_wp(pv, ang, r, 0.34, 0.5), r * 0.07, Color(1, 1, 1))
 		_:
 			_bar(ci, r, pv, ang, 0.3, 0.95, 0.5, 0.16, Color(0.5, 0.1, 0.1), lw)
 			var blade := _wpoly(pv, ang, r, PackedVector2Array([Vector2(0.95, 0.34), Vector2(3.0, 0.3), Vector2(3.55, 0.5), Vector2(3.0, 0.7), Vector2(0.95, 0.66)]))

@@ -313,7 +313,7 @@ func _spawn_player(reset_clock: bool = true) -> void:
 
 
 func set_test_tier(evo: int) -> void:
-	# Test Range: become any of the 28 evolutions, right now.
+	# Test Range: become any of the evolutions, right now.
 	GameState.test_tier = clampi(evo, 0, Species.COUNT - 1)
 	_spawn_player(false)
 
@@ -480,10 +480,12 @@ func unit_to_convert(pos: Vector2, team_: int, reach: float):
 
 
 func _statue_damage(c) -> float:
-	# 1 at the smallest size up to 28 at the biggest; evolution only matters via size
+	# 1 at the smallest size up to one point per tier at the biggest;
+	# evolution only matters via size
 	var rr: float = c.r
-	var d := 1.0 + 27.0 * clampf((rr - 22.0) / (95.0 - 22.0), 0.0, 1.0)
-	return clampf(roundf(d), 1.0, 28.0)
+	var top: float = Species.radius_base(Species.COUNT - 1) * 1.16
+	var d := 1.0 + float(Species.COUNT - 1) * clampf((rr - 22.0) / (top - 22.0), 0.0, 1.0)
+	return clampf(roundf(d), 1.0, float(Species.COUNT))
 
 
 func _spawn_unit(size: int) -> void:
@@ -705,7 +707,7 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float) -> void:
 			u["atk"] = 0.0
 			u["flash"] = 0.3
 			fx.burst(up, team_color(ateam), 14, 220.0, 0.5)
-	# hitting the enemy statue chips its health (1-28 by size)
+	# hitting the enemy statue chips its health (one point per tier, by size)
 	var eb: Dictionary = enemy_base(ateam)
 	if eb.is_empty() or attacker.swing_hits.has(eb):
 		return
@@ -828,7 +830,7 @@ func _unhandled_input(event: InputEvent) -> void:
 		_leave_to_menu()
 		return
 	if mode == "test" and event is InputEventKey and event.pressed and not event.echo:
-		# Test Range: jump straight to any of the 28 tiers
+		# Test Range: jump straight to any tier
 		var kc: int = event.keycode
 		if kc >= KEY_1 and kc <= KEY_9:
 			set_test_tier(kc - KEY_1)

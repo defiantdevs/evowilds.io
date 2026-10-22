@@ -1,17 +1,28 @@
 # Evo Wilds (Godot 4.7)
 
-A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 28 humanoid tiers — from Caveman to Omniverse God.
+A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 33 humanoid tiers — from Caveman to Author of Worlds.
 
 ## Download
-Current build: **v1.14** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.14/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.15** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.15/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.14**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.15**, you are still running an older download.
+
+## What's new in v1.15
+- **Five new tiers above Omniverse God: the game now has 33.** Each has its own body, colours, face and weapon, so none of them is a recolour of the one before:
+  - **29 Eclipse Monarch** — a black sun for a face, rimmed in white, carrying the **eclipse blade**: a black greatsword edged in white light.
+  - **30 Chrono Warden** — a brass clock ring around its head with the hands still turning, carrying the **chrono halberd**: long brass shaft, axe head, spike, and a ticking dial on the haft.
+  - **31 Genesis Prime** — a crown of leaves around a seed of light, carrying the **genesis spear**: a living shaft crowned with a great leaf.
+  - **32 Aether Regent** — a smooth pale mask trailing ribbons of light, carrying the **aether warblade** between two fins of light.
+  - **33 Author of Worlds** — an open book hangs behind a luminous face, and it carries the longest weapon in the game, the **quill of creation**, with a feather fan and a golden nib.
+- The Test Range picker now lists all 33 tiers, five to a row; it still fits on one screen.
+- Bigger statues hit harder: Team Deathmatch statue damage now runs from 1 to 33 by size.
+- Every new weapon's kill zone is still built from its own drawn parts, so the quill's feather and nib, the spear's leaf, the halberd's axe head, the warblade's fins and the eclipse blade's edge are exactly what kills.
 
 ## What's new in v1.14
 - **Movement turns on a coin, with no slide.** Your run now goes exactly where you point it each frame: a 90° turn keeps its full speed and simply goes the new way, and turning right around does not carry you a single extra pixel forward. No more skating through corners.
 - **Levels 24 and 25 are now two different creatures.** Cosmos Emperor (24) is a violet figure carrying a **cosmic sceptre** — a dark rod with a ring of orbiting starlight. Astral Sovereign (25) is an **ice-blue** figure with a **double crescent astral glaive**. Different colours, different silhouette, different weapon.
 - **Level 27 — Eternal Seraph — now has wings and a holy sword.** Three feathered wings per side, beating slowly, and a white-gold blade with a cross guard and a line of light down its middle.
-- **Level 28 — Omniverse God — is rebuilt, not a recoloured 24.** It wears a **crown of light** (twin halo rings and ten rays), carries the longest blade in the game (the white-gold **omniverse blade** with a star guard), and is ringed by two counter-rotating circles of light instead of one.
+- **Level 28 — Omniverse God — is rebuilt, not a recoloured 24.** It wears a **crown of light** (twin halo rings and ten rays), carries the white-gold **omniverse blade** with a star guard, and is ringed by two counter-rotating circles of light instead of one.
 - Every new weapon's kill zone is built from its own drawn parts, exactly like the others: the ring of the sceptre, both crescents of the glaive, the cross guard of the holy sword and the whole omniverse blade are the killing ground, and nothing behind you is.
 
 ## What's new in v1.13
@@ -26,7 +37,7 @@ Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows th
 
 ## What's new in v1.11
 - **Secret Test Range.** Type the code name **`godmode`** on the start screen and a third button appears: **TEST RANGE**.
-  - A picker on the left lists all **28 evolutions** — click one, or press **1-9** / **0** / **[** / **]** to become that tier instantly.
+  - A picker on the left lists all **33 evolutions** — click one, or press **1-9** / **0** / **[** / **]** to become that tier instantly.
   - The tier you pick is pinned: you do not outgrow it while you test.
   - Every bot in the arena **runs straight at you and never swings**, so you can walk them into your own blade and see exactly what your weapon kills.
   - **You cannot die in here** — try the same swing as many times as you like.
@@ -41,7 +52,7 @@ Pick your name on the title screen, then choose a mode:
 
 - **DEATHMATCH** — free-for-all. A 10:00 timer counts down; when it hits zero the match ends.
 - **TEAM DEATHMATCH** — Red vs Blue. A timer counts **up** from 0:00 and there is no time limit.
-- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it. Pick any of the 28 tiers, set the number of charging bots from 1 to **25**, and swing away: no clock, no food, no loot orbs, and you cannot die.
+- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it. Pick any of the 33 tiers, set the number of charging bots from 1 to **25**, and swing away: no clock, no food, no loot orbs, and you cannot die.
 
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
@@ -55,16 +66,16 @@ When you are defeated the match **keeps running** — the clock ticks on, golems
 - Two base statues — one **Red**, one **Blue** — each with **15,000 HP**.
 - Grey golems spawn around the arena and stand still: **small** every 15s, **medium** every 40s, **large** every minute, **extra-large** every 2 minutes.
 - Hit a golem or statue and it joins **your** team, turns your colour, and marches off to chip the enemy statue (small 1, medium 2, large 3, extra-large 5 damage on a size-based cooldown).
-- You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **28** (biggest).
+- You can hit the enemy statue directly: damage scales with your size from **1** (smallest) to **33** (biggest).
 - First statue destroyed wins. Smaller bots charge the enemy statue; **big bots instead roam the arena and guard their own statue**, attacking anyone who comes near it.
 - No friendly fire — team-mates can't hurt each other.
 
-## Evolutions (28)
-Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor → Astral Sovereign → Void Titan → Eternal Seraph → Omniverse God
+## Evolutions (33)
+Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking → Soldier → Knight → Samurai → Ninja → Gladiator → Crusader → Paladin → Sorcerer → Necromancer → Dragon Knight → Warlord → Emperor → Immortal Sage → Storm Titan → Death Reaper → Celestial King → Cosmos Emperor → Astral Sovereign → Void Titan → Eternal Seraph → Omniverse God → Eclipse Monarch → Chrono Warden → Genesis Prime → Aether Regent → Author of Worlds
 
 ## Features
 - Title screen where you choose your name and pick a mode (Deathmatch, Team Deathmatch, or the secret Test Range)
-- A hidden Test Range for testing any of the 28 tiers: pick a tier, and the bots come running at you without ever swinging
+- A hidden Test Range for testing any of the 33 tiers: pick a tier, and the bots come running at you without ever swinging
 - Deathmatch: 10-minute countdown; Team Deathmatch: count-up timer, Red vs Blue statues
 - Captureable grey golems that switch sides when hit and march on the enemy statue
 - 28 AI bots with hunting/fleeing/wandering instincts — they notice you and gang up when you get close, but they react slowly and miss often
@@ -77,4 +88,4 @@ Caveman → Forager → Hunter → Tribesman → Peasant → Raider → Viking �
 ## Run
 Open this folder in Godot 4.7+ and press F5, or `godot --path .`
 
-Files: `scripts/species.gd` (the 28 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`, `test_panel.gd` (the Test Range tier picker).
+Files: `scripts/species.gd` (the 33 tier designs), `creature.gd` (movement, swing, bot AI, team logic), `main.gd` (world, food, combat, game modes), `menu.gd` + `game_state.gd` (start screen and mode/team memory), `hud.gd`, `fx.gd`, `test_panel.gd` (the Test Range tier picker).
