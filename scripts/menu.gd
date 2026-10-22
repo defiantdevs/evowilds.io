@@ -7,6 +7,7 @@ var name_edit: LineEdit
 var play_btn: Button
 var buttons_box: VBoxContainer
 var secret_label: Label
+var code_buf := ""
 var t := 0.0
 var mascot_evo := 0
 var shot_path := ""
@@ -39,9 +40,27 @@ func _build_ui() -> void:
 	_mk_label("EVO WILDS", 64, -322, Color(1.0, 0.95, 0.55), 900)
 	_mk_label("Eat. Evolve. Rule the wilds.", 20, -262, Color(0.78, 0.9, 1.0, 0.9), 900)
 
+	# build stamp: if this does not say the newest version, the download did
+	# not land and the game is still the old build.
+	var ver := Label.new()
+	ver.text = "BUILD " + GameState.VERSION
+	ver.add_theme_font_size_override("font_size", 12)
+	ver.add_theme_color_override("font_color", Color(0.72, 0.85, 0.95, 0.55))
+	ver.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	ver.anchor_left = 1.0
+	ver.anchor_top = 1.0
+	ver.anchor_right = 1.0
+	ver.anchor_bottom = 1.0
+	ver.offset_left = -180.0
+	ver.offset_top = -26.0
+	ver.offset_right = -12.0
+	ver.offset_bottom = -6.0
+	ver.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	add_child(ver)
+
 	_mk_label("YOUR NAME", 14, 26, Color(0.62, 0.8, 0.92, 0.9), 400)
 
-	secret_label = _mk_label("", 15, -200, Color(0.55, 1.0, 0.85, 0.95), 700)
+	secret_label = _mk_label("", 20, -206, Color(0.55, 1.0, 0.85, 0.95), 900)
 	secret_label.text = ""
 
 	name_edit = LineEdit.new()
@@ -73,7 +92,7 @@ func _build_ui() -> void:
 
 	_build_buttons()
 
-	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 300, Color(0.72, 0.85, 0.95, 0.7), 1000)
+	_mk_label("Move: WASD / arrows or mouse     Swing: SPACE / click     Sprint: SHIFT / right-click", 13, 318, Color(0.72, 0.85, 0.95, 0.7), 1000)
 
 
 func _on_name_changed(t: String) -> void:
@@ -82,12 +101,31 @@ func _on_name_changed(t: String) -> void:
 		_unlock_secret()
 
 
+func _input(event: InputEvent) -> void:
+	# The code also works if you just type it on the title screen: keep the
+	# last few letters and look for it. This runs before the text box does,
+	# so it still works when the name box is full and would cut the code off.
+	if not (event is InputEventKey) or not event.pressed or event.echo:
+		return
+	var k := event as InputEventKey
+	if k.ctrl_pressed or k.meta_pressed:
+		return
+	var ch := ""
+	if k.unicode > 0:
+		ch = String.chr(k.unicode).to_lower()
+	if ch.length() == 1 and ch >= "a" and ch <= "z":
+		code_buf = (code_buf + ch).right(24)
+		if code_buf.contains(GameState.SECRET_NAME):
+			code_buf = ""
+			_unlock_secret()
+
+
 func _unlock_secret() -> void:
 	GameState.secret_unlocked = true
 	_build_buttons()
 	if secret_label != null and is_instance_valid(secret_label):
-		secret_label.text = "TEST RANGE UNLOCKED"
-		secret_label.add_theme_color_override("font_color", Color(0.55, 1.0, 0.85, 0.95))
+		secret_label.text = "TEST RANGE UNLOCKED  -  NEW BUTTON BELOW"
+		secret_label.add_theme_color_override("font_color", Color(0.55, 1.0, 0.85, 1.0))
 
 
 func _build_buttons() -> void:
@@ -125,8 +163,8 @@ func _build_buttons() -> void:
 			var tr := _mk_button("TEST RANGE", Color(0.12, 0.5, 0.46))
 			tr.pressed.connect(func(): _start("test"))
 			buttons_box.add_child(tr)
-	buttons_box.offset_top = 96.0 if GameState.secret_unlocked else 110.0
-	buttons_box.offset_bottom = buttons_box.offset_top + 122.0
+	buttons_box.offset_top = 116.0
+	buttons_box.offset_bottom = 116.0 + 122.0
 
 
 func _mk_button(txt: String, base: Color) -> Button:
