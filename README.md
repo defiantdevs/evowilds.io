@@ -3,9 +3,14 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 43 humanoid tiers — from Caveman to The Infinite.
 
 ## Download
-Current build: **v1.16** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.16/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.18** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.18/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.16**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.18**, you are still running an older download.
+
+## What's new in v1.18
+- **Fixed: the biggest bots no longer fly around the arena.** Above tier 38 the run-acceleration curve went negative, so instead of building up to their walking speed they gained speed every single frame — by tier 43 a bot could hit a thousand pixels a second and would rocket across the map until it slammed into the arena edge. Acceleration now bottoms out at a sane value, so the titans move at their proper slow, heavy pace.
+- Added a hard ceiling on how fast anything can travel, so no future tier can ever outrun its own legs again.
+- The README's download header now points at the current build (it had been left on v1.16).
 
 ## What's new in v1.17
 - **Ten new tiers above Author of Worlds: the game now has 43.** Every one is bigger than the last, and every one fights with **a weapon in each hand**:

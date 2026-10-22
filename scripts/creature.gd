@@ -184,9 +184,12 @@ func _process(delta: float) -> void:
 		spd *= 0.7
 	# crisper control for the player: quick to build speed, quick to stop,
 	# and extra bite when reversing so direction changes don't slide.
-	var accel := 1500.0 - 40.0 * float(evo)
+	# acceleration falls off as you grow, but never to zero and never
+	# below it: a negative step would make big creatures accelerate
+	# without limit and sail across the arena
+	var accel := maxf(1500.0 - 40.0 * float(evo), 620.0)
 	if is_player:
-		accel = 3000.0 - 50.0 * float(evo)
+		accel = maxf(3000.0 - 50.0 * float(evo), 1200.0)
 	if is_player:
 		# The player runs where they point *this frame*: a turn redirects the
 		# whole of the current speed instead of coasting through a wide arc,
@@ -213,6 +216,10 @@ func _process(delta: float) -> void:
 			if vel.dot(dir) < 0.0:
 				accel *= 1.7
 			vel = vel.move_toward(dir * spd, accel * delta)
+	# nothing outruns its own legs by much, however big it gets
+	var cap := spd * 2.0 + 40.0
+	if vel.length() > cap:
+		vel = vel.normalized() * cap
 	position += vel * delta
 
 	main.push_out(self)
