@@ -1,9 +1,19 @@
 extends RefCounted
 
 const COUNT := 43
+# The Test Range only: five ranks above The Infinite, kept out of the normal
+# 43-tier game. A creature up here also has its floating orbs turned into
+# weapons (see ORB_KILL_FROM).
+const SECRET_FROM := 43
+const SECRET_COUNT := 5
+const TOTAL := COUNT + SECRET_COUNT
+# from this evo up the orbs that circle a body kill whatever they touch, but
+# only while the Test Range is running
+const ORB_KILL_FROM := 39
 const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God",
 	"Eclipse Monarch", "Chrono Warden", "Genesis Prime", "Aether Regent", "Author of Worlds",
-	"Sunforged", "Storm Herald", "Abyss Sovereign", "Crimson Colossus", "Shard Prophet", "Elder Warden", "Void Empress", "Dragon Ascendant", "Primordial", "The Infinite"]
+	"Sunforged", "Storm Herald", "Abyss Sovereign", "Crimson Colossus", "Shard Prophet", "Elder Warden", "Void Empress", "Dragon Ascendant", "Primordial", "The Infinite",
+	"Sovereign of Nothing", "The Hollow Crown", "World-Eater", "Shepherd of Suns", "The Last Idea"]
 const BLURB := [
 	"Club in hand. Everyone starts somewhere.",
 	"Sharpened stick, sharper instincts.",
@@ -48,38 +58,49 @@ const BLURB := [
 	"The last thing many worlds ever saw. Twice.",
 	"It was here before the word 'here'.",
 	"You have finally found the edge of the map. It is holding them.",
-]
-const XP_AT := [0.0, 50.0, 176.0, 364.0, 612.0, 913.0, 1267.0, 1674.0, 2128.0, 2630.0, 3181.0, 3775.0, 4415.0, 5099.0, 5827.0, 6597.0, 7411.0, 8266.0, 9160.0, 10096.0, 11077.0, 12103.0, 13183.0, 14317.0, 15498.0, 16722.0, 17982.0, 19296.0, 20664.0, 22086.0, 23562.0, 25092.0, 26676.0, 28576.0, 30626.0, 32826.0, 35176.0, 37676.0, 40326.0, 43126.0, 46076.0, 49176.0, 52426.0]
+	"Test Range only. Nothing is left for it to kneel to.",
+	"Test Range only. Its crown is the hole where a world used to be.",
+	"Test Range only. It eats planets the way you eat berries.",
+	"Test Range only. Every sun it owns is still burning, for it.",
+	"Test Range only. When it forgets you, you will stop having been."]
+const XP_AT := [0.0, 50.0, 176.0, 364.0, 612.0, 913.0, 1267.0, 1674.0, 2128.0, 2630.0, 3181.0, 3775.0, 4415.0, 5099.0, 5827.0, 6597.0, 7411.0, 8266.0, 9160.0, 10096.0, 11077.0, 12103.0, 13183.0, 14317.0, 15498.0, 16722.0, 17982.0, 19296.0, 20664.0, 22086.0, 23562.0, 25092.0, 26676.0, 28576.0, 30626.0, 32826.0, 35176.0, 37676.0, 40326.0, 43126.0, 46076.0, 49176.0, 52426.0, 72000.0, 120000.0, 250000.0, 550000.0, 999999.0]
 const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a"),
 	Color("141018"), Color("43301a"), Color("143a28"), Color("3a1440"), Color("f7f4ec"),
-	Color("7a2a08"), Color("1b2a5a"), Color("07222a"), Color("5a0a0a"), Color("3f4a5e"), Color("2f3d18"), Color("1a0a24"), Color("6a1010"), Color("120a2e"), Color("f4eaff")]
+	Color("7a2a08"), Color("1b2a5a"), Color("07222a"), Color("5a0a0a"), Color("3f4a5e"), Color("2f3d18"), Color("1a0a24"), Color("6a1010"), Color("120a2e"), Color("f4eaff"), Color("2a1c33"), Color("33240a"), Color("3a1a12"), Color("1c2a3a"), Color("2e0f2e")]
 const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("9fd8ff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff"),
 	Color("eef2ff"), Color("6ff0dc"), Color("b6ff6a"), Color("ff9ae4"), Color("8fe4ff"),
-	Color("ffc24a"), Color("7fe9ff"), Color("3affd0"), Color("ff6a3a"), Color("c9f4ff"), Color("a8f05a"), Color("d46aff"), Color("ffd25a"), Color("8affe0"), Color("ffd36a")]
+	Color("ffc24a"), Color("7fe9ff"), Color("3affd0"), Color("ff6a3a"), Color("c9f4ff"), Color("a8f05a"), Color("d46aff"), Color("ffd25a"), Color("8affe0"), Color("ffd36a"), Color("ff7ad9"), Color("ffd166"), Color("ff8a5c"), Color("8fd0ff"), Color("f0a6ff")]
 const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2"),
 	Color("c9c2d8"), Color("d8c9a8"), Color("a8d8b0"), Color("f0d0e8"), Color("ffffff"),
-	Color("e8b06a"), Color("cfd8f0"), Color("8fd8cf"), Color("d89a86"), Color("e6eef8"), Color("b8a878"), Color("c8b8e0"), Color("e0a070"), Color("9fb8d8"), Color("ffffff")]
+	Color("e8b06a"), Color("cfd8f0"), Color("8fd8cf"), Color("d89a86"), Color("e6eef8"), Color("b8a878"), Color("c8b8e0"), Color("e0a070"), Color("9fb8d8"), Color("ffffff"), Color("f0d8ff"), Color("ffe6b0"), Color("ffc9a8"), Color("d8ecff"), Color("f4dcff")]
 const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 22,
 	23, 24, 25, 26, 27,
-	28, 29, 30, 31, 32, 33, 34, 35, 36, 37]
+	28, 29, 30, 31, 32, 33, 34, 35, 36, 37,
+	38, 39, 40, 41, 42]
 const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 20, 21, 18, 23, 22,
 	24, 25, 26, 27, 28,
-	29, 30, 31, 32, 33, 34, 35, 36, 37, 38]
+	29, 30, 31, 32, 33, 34, 35, 36, 37, 38,
+	39, 40, 41, 42, 43]
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0,
 	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
 	1, 1, 1, 1, 1,
-	1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+	1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2,
 	2, 2, 2, 2, 2,
-	2, 2, 2, 2, 2, 2, 2, 2, 2, 2]
+	2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+	2, 2, 2, 2, 2]
 # 1 = feathered wings (Eternal Seraph only)
 const WINGS := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0,
 	0, 0, 0, 0, 0,
-	0, 0, 0, 0, 0, 0, 0, 0, 0, 0]
+	0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
+	0, 0, 0, 0, 0]
 # 1 = carries a blade in each hand
-const DUAL := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
+const DUAL := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1,
+	1, 1, 1, 1, 1]
 # The weapon's own shape, part by part. Each part is
 # [x0, y0, x1, y1, half_width] in weapon frame units: x runs along the
 # weapon, y across it, and the centre line sits at y = 0.5. The killing
@@ -171,12 +192,89 @@ const WEAPON_PARTS := [
 	[[0.35, 0.5, 0.95, 0.5, 0.05],
 		[0.95, 0.14, 0.95, 0.86, 0.09],
 		[0.95, 0.5, 3.5, 0.5, 0.1], [3.4, 0.5, 3.9, 0.5, 0.06]],            # 38 infinite blade
+
+	# ---- Test Range only: the five above The Infinite ----
+	[[0.3, 0.5, 3.0, 0.5, 0.035],
+		[2.95, 0.2, 2.95, 0.8, 0.05],
+		[2.28, 0.5, 3.0, 0.5, 0.15], [3.0, 0.5, 3.75, 0.5, 0.09]],          # 39 nothing blade
+	[[0.35, 0.5, 0.98, 0.5, 0.07],
+		[0.98, 0.16, 0.98, 0.84, 0.09],
+		[0.5, 0.5, 1.05, 0.2, 0.10], [0.5, 0.5, 1.05, 0.8, 0.10],
+		[1.0, 0.42, 2.9, 0.42, 0.11], [1.0, 0.58, 2.9, 0.58, 0.11],
+		[2.95, 0.3, 3.55, 0.4, 0.07], [2.95, 0.7, 3.55, 0.6, 0.07]],         # 40 hollow crown
+	[[0.4, 0.5, 3.3, 0.5, 0.13],
+		[3.2, 0.5, 4.2, 0.36, 0.26], [3.2, 0.5, 4.2, 0.64, 0.26]],           # 41 world-eater
+	[[0.35, 0.5, 3.1, 0.5, 0.04],
+		[3.05, 0.12, 3.05, 0.88, 0.05],
+		[2.05, 0.08, 2.05, 0.92, 0.05],
+		[1.05, 0.16, 1.05, 0.84, 0.05],
+		[0.7, 0.3, 1.6, 0.3, 0.06], [1.6, 0.5, 2.5, 0.5, 0.06], [2.5, 0.7, 3.3, 0.7, 0.06]],  # 42 sun shepherd
+	[[0.3, 0.5, 2.8, 0.5, 0.045],
+		[0.75, 0.5, 0.75, 0.5, 0.46],
+		[1.75, 0.5, 1.75, 0.5, 0.52],
+		[2.75, 0.5, 2.75, 0.5, 0.50],
+		[2.8, 0.5, 3.5, 0.5, 0.14]],                                         # 43 the last idea
 ]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
 
 
+static func orb_body(e: int) -> bool:
+	# does this body wear rings of floating orbs?
+	return e >= ORB_KILL_FROM and e < TOTAL
+
+
+static func orb_count(e: int) -> int:
+	if not orb_body(e):
+		return 0
+	return 6 if is_secret(e) else 4
+
+
+static func orb_radius(e: int) -> float:
+	# how far out from the centre the orbs circle, in body radii
+	return 1.9 + 0.9 * float(maxi(e - COUNT, 0))
+
+
+static func orb_positions(e: int, r: float, t: float) -> Array:
+	# where each orb sits right now, relative to the body's centre. What those
+	# orbs are allowed to hit lives in main.gd.
+	var out: Array = []
+	var n := orb_count(e)
+	if n == 0:
+		return out
+	if e == COUNT - 1:
+		# The Infinite already spins a second, tighter ring the other way
+		for k in range(n):
+			out.append(Vector2.from_angle(t * 1.4 + TAU * float(k) / float(n)) * r * 1.9)
+		return out
+	var spin := t * (0.9 if is_secret(e) else 1.4)
+	var dist := orb_radius(e) * r
+	for k in range(n):
+		out.append(Vector2.from_angle(spin + TAU * float(k) / float(n)) * dist)
+	return out
+
+
+static func orb_hit_radius(e: int, r: float) -> float:
+	# the drawn size of one orb, as a radius
+	return r * (0.085 if is_secret(e) else 0.11)
+
+
+static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color, lethal: bool) -> void:
+	if not orb_body(e):
+		return
+	var hr := orb_hit_radius(e, r)
+	for op in orb_positions(e, r, t):
+		if lethal:
+			# Test Range: these are weapons now, and they say so
+			ci.draw_circle(op, hr * 1.6, Color(1.0, 0.35, 0.3, 0.28))
+		ci.draw_circle(op, hr, Color(ac.r, ac.g, ac.b, 0.8))
+		ci.draw_circle(op, hr * 0.45, Color(1, 1, 1, 0.9))
+
+
 static func radius_base(i: int) -> float:
+	if i >= SECRET_FROM:
+		# the five above The Infinite: each one a real step up again
+		return 200.0 + 40.0 * float(i - SECRET_FROM)
 	var base := 22.0 + 2.6 * float(i)
 	if i > 32:
 		# the last ten grow faster than the rest: every one is a step up
@@ -185,13 +283,24 @@ static func radius_base(i: int) -> float:
 
 
 static func speed_base(i: int) -> float:
+	if i >= SECRET_FROM:
+		return 88.0 - 6.0 * float(i - SECRET_FROM)
 	if i > 32:
 		return 158.0 - 1.1 * float(i - 32)
 	return 270.0 - 3.5 * float(i)
 
 
 static func is_dual(e: int) -> bool:
-	return DUAL[clampi(e, 0, COUNT - 1)] > 0
+	return DUAL[clampi(e, 0, TOTAL - 1)] > 0
+
+
+static func is_secret(e: int) -> bool:
+	# the five ranks above The Infinite: Test Range only
+	return e >= SECRET_FROM and e < TOTAL
+
+
+static func orbs_kill(e: int) -> bool:
+	return e >= ORB_KILL_FROM and e < TOTAL
 
 
 static func weapon_parts(e: int) -> Array:
@@ -209,11 +318,19 @@ static func dmg_for(i: int) -> float:
 
 static func evo_for_xp(xp: float) -> int:
 	var e := 0
-	for i in range(COUNT):
+	for i in range(TOTAL):
 		var need: float = XP_AT[i]
 		if xp >= need:
 			e = i
 	return e
+
+
+static func capped_for_mode(e: int, mode: String) -> int:
+	# The five ranks above The Infinite never turn up in a normal match; they
+	# exist only in the Test Range. Everything else walks tiers 1 to 43.
+	if mode == "test":
+		return clampi(e, 0, TOTAL - 1)
+	return clampi(e, 0, COUNT - 1)
 
 
 static func progress(xp: float) -> float:
@@ -320,7 +437,7 @@ static func _helmet(ci: CanvasItem, r: float, col: Color, lw: float) -> void:
 	ci.draw_line(Vector2(hx + 0.5 * r, 0), Vector2(hx - 0.1 * r, 0), col.darkened(0.3), r * 0.07, true)
 
 
-static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c2: Color, swing: float = 0.12) -> void:
+static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c2: Color, swing: float = 0.12, lethal_orbs: bool = false) -> void:
 	var skin: Color = SKIN[evo]
 	var lw := maxf(r * 0.09, 2.0)
 	var pv := Vector2(0, 0.8 * r)
@@ -333,12 +450,7 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 40, Color(ac.r, ac.g, ac.b, 0.5), 2.5, true)
 		if evo >= 21:
 			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 36, Color(ac.r, ac.g, ac.b, 0.35), 1.5, true)
-		if evo >= COUNT - 4:
-			for k in range(4):
-				var oa := t * 1.4 + TAU * float(k) / 4.0
-				var op := Vector2.from_angle(oa) * r * 1.9
-				ci.draw_circle(op, r * 0.11, Color(ac.r, ac.g, ac.b, 0.8))
-				ci.draw_circle(op, r * 0.05, Color(1, 1, 1, 0.9))
+		draw_orbs(ci, evo, r, t, ac, lethal_orbs)
 		if evo == COUNT - 1:
 			# the last one in the game wears a second ring of light, turning
 			# the other way, so it never reads as just another purple emperor
@@ -767,6 +879,63 @@ static func _headgear(ci: CanvasItem, r: float, kind: int, t: float, skin: Color
 			ci.draw_circle(ga + Vector2(0.06 * r, 0), r * 0.17, c1.darkened(0.2))
 			ci.draw_circle(ga + Vector2(0.06 * r, 0), r * 0.1, Color(0.02, 0.02, 0.05))
 			ci.draw_circle(ga + Vector2(0.12 * r, -0.06 * r), r * 0.04, Color(1, 1, 1, 0.9))
+		38:
+			# sovereign of nothing: a hole in the air where a face should be
+			_head(ci, r, skin, hair, lw)
+			_fill(ci, _ellipse(hx, 0, 0.6 * r, 0.58 * r, 0.0, 24), Color(0.03, 0.02, 0.05), OL, lw)
+			ci.draw_arc(Vector2(hx, 0), 0.6 * r, 0.0, TAU, 32, c2, r * 0.07, true)
+			ci.draw_arc(Vector2(hx, 0), 0.44 * r, t * 1.2, t * 1.2 + 4.4, 20, Color(c2.r, c2.g, c2.b, 0.6), r * 0.04, true)
+			for k in range(5):
+				var a38 := -t * 0.9 + TAU * float(k) / 5.0
+				ci.draw_circle(Vector2(hx, 0) + Vector2.from_angle(a38) * 0.76 * r, r * 0.045, Color(1, 1, 1, 0.85))
+		39:
+			# the hollow crown: a crown of gold spikes around a masked face
+			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.52 * r, 0.0, 24), Color(0.95, 0.9, 0.7), OL, lw)
+			for s39 in range(2):
+				var side39 := -1.0 + float(s39) * 2.0
+				ci.draw_line(Vector2(hx + 0.16 * r, side39 * 0.1 * r), Vector2(hx + 0.44 * r, side39 * 0.07 * r), Color(0.2, 0.16, 0.1), r * 0.06, true)
+			for k in range(6):
+				var a39 := PI + (float(k) - 2.5) * 0.42
+				var d39 := Vector2.from_angle(a39)
+				var q39 := Vector2(hx, 0) + d39 * 0.62 * r
+				var pq39 := Vector2(-d39.y, d39.x)
+				var tip39 := q39 + d39 * 0.34 * r
+				_fill(ci, PackedVector2Array([
+					q39 - pq39 * 0.09 * r, tip39,
+					q39 + pq39 * 0.09 * r]), Color(1.0, 0.78, 0.2), OL, lw * 0.6)
+			ci.draw_line(Vector2(hx, -0.5 * r), Vector2(hx, 0.5 * r), Color(0.3, 0.22, 0.1), r * 0.05, true)
+		40:
+			# world-eater: a maw of teeth under three hunting eyes
+			_fill(ci, _ellipse(hx, 0, 0.6 * r, 0.56 * r, 0.0, 26), Color(0.12, 0.06, 0.06), OL, lw)
+			ci.draw_circle(Vector2(hx + 0.2 * r, -0.3 * r), r * 0.13, Color(1.0, 0.35, 0.1))
+			ci.draw_circle(Vector2(hx + 0.36 * r, -0.3 * r), r * 0.06, Color(0.05, 0.02, 0.02))
+			ci.draw_circle(Vector2(hx + 0.2 * r, 0.3 * r), r * 0.13, Color(1.0, 0.35, 0.1))
+			ci.draw_circle(Vector2(hx + 0.36 * r, 0.3 * r), r * 0.06, Color(0.05, 0.02, 0.02))
+			ci.draw_circle(Vector2(hx + 0.14 * r, 0.0), r * 0.17, Color(1.0, 0.55, 0.15))
+			ci.draw_circle(Vector2(hx + 0.34 * r, 0.0), r * 0.07, Color(0.05, 0.02, 0.02))
+			for k in range(5):
+				var ty40 := (float(k) - 2.0) * 0.16 * r
+				_fill(ci, PackedVector2Array([Vector2(hx + 0.6 * r, ty40 - 0.06 * r), Vector2(hx + 0.78 * r, ty40), Vector2(hx + 0.6 * r, ty40 + 0.06 * r)]), Color(1, 1, 0.95), OL, lw * 0.4)
+		41:
+			# shepherd of suns: a sun for a face, red giants hanging in orbit
+			_head(ci, r, skin, hair, lw)
+			var sc41 := Vector2(hx - 0.02 * r, 0)
+			ci.draw_circle(sc41, r * (0.56 + 0.04 * sin(t * 2.4)), Color(1.0, 0.72, 0.2, 0.35))
+			ci.draw_circle(sc41, r * 0.44, Color(1.0, 0.86, 0.35))
+			ci.draw_circle(sc41, r * 0.3, Color(1.0, 0.97, 0.8))
+			for k in range(6):
+				var a41 := t * 0.8 + TAU * float(k) / 6.0
+				var rp41 := Vector2.from_angle(a41) * 0.8 * r
+				ci.draw_circle(sc41 + rp41, r * 0.09, Color(1.0, 0.35, 0.12))
+				ci.draw_circle(sc41 + rp41, r * 0.045, Color(1.0, 0.9, 0.6))
+		42:
+			# the last idea: a blank white mask, a thought already fading
+			_fill(ci, _ellipse(hx, 0, 0.56 * r, 0.54 * r, 0.0, 26), Color(1, 1, 1), OL, lw)
+			ci.draw_arc(Vector2(hx, 0), 0.56 * r, -0.9, 0.9, 18, Color(c2.r, c2.g, c2.b, 0.5), r * 0.05, true)
+			for s42 in range(2):
+				var side42 := -1.0 + float(s42) * 2.0
+				ci.draw_line(Vector2(hx + 0.18 * r, side42 * 0.22 * r), Vector2(hx + 0.44 * r, side42 * 0.16 * r), Color(0.35, 0.25, 0.45), r * 0.05, true)
+			ci.draw_arc(Vector2(hx + 0.14 * r, 0), 0.24 * r, 0.5, 2.64, 16, Color(0.35, 0.25, 0.45), r * 0.04, true)
 		37:
 			# the infinite: two interlocking rings over a calm, blank face
 			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.52 * r, 0.0, 24), Color(1, 1, 1), OL, lw)
@@ -1151,6 +1320,65 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 				Vector2(1.9, 0.44), Vector2(2.9, 0.36), Vector2(3.55, 0.5),
 				Vector2(2.9, 0.62), Vector2(1.9, 0.56)])), Color(0.35, 0.3, 0.6), OL, lw)
 			ci.draw_line(_wp(pv, ang, r, 1.95, 0.5), _wp(pv, ang, r, 3.42, 0.5), Color(0.6, 1.0, 0.9), lw * 0.8, true)
+		39:
+			# nothing blade: a black blade with its centre missing
+			var pb39 := 0.5 + 0.5 * sin(t * 2.2)
+			_bar(ci, r, pv, ang, 0.3, 0.98, 0.5, 0.07, Color(0.14, 0.1, 0.22), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.98, 0.34), Vector2(2.24, 0.4), Vector2(3.02, 0.5),
+				Vector2(2.24, 0.6), Vector2(0.98, 0.66)])), Color(0.16, 0.12, 0.28), OL, lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.3, 0.42), Vector2(3.78, 0.5), Vector2(2.3, 0.58)])), Color(0.03, 0.02, 0.05), OL, lw * 0.8)
+			ci.draw_arc(_wp(pv, ang, r, 2.62, 0.5), r * 0.32, 0.0, TAU, 22, c2, lw * 0.9, true)
+			ci.draw_line(_wp(pv, ang, r, 1.05, 0.38), _wp(pv, ang, r, 2.2, 0.42), Color(c2.r, c2.g, c2.b, 0.7 + 0.3 * pb39), lw, true)
+		40:
+			# hollow crown: curved gold prongs reaching round from the haft
+			_bar(ci, r, pv, ang, 0.35, 2.55, 0.5, 0.09, Color(0.12, 0.09, 0.16), lw)
+			for s40 in range(2):
+				var side40 := -1.0 + float(s40) * 2.0
+				for k in range(2):
+					var rc := 2.0 + float(k) * 0.6
+					var rr40 := 0.52 - float(k) * 0.08
+					var bow := 0.72 + float(k) * 0.1
+					ci.draw_arc(_wp(pv, ang, r, rc, 0.5 + side40 * 0.16), r * rr40, ang - bow * side40 - 0.7, ang - bow * side40 + 0.7, 14, Color(1.0, 0.8 - 0.25 * float(k), 0.25), lw * 1.1, true)
+			_bar(ci, r, pv, ang, 0.93, 1.03, 0.5, 0.62, c2, lw * 0.5)
+			ci.draw_circle(_wp(pv, ang, r, 0.98, 0.5), r * 0.12, Color(1.0, 0.9, 0.4))
+		41:
+			# world-eater: a long dark haft ending in a jaw of teeth
+			_bar(ci, r, pv, ang, 0.4, 3.25, 0.5, 0.13, Color(0.2, 0.06, 0.06), lw)
+			var jb41 := _wp(pv, ang, r, 3.2, 0.5)
+			for s41 in range(2):
+				var side41 := -1.0 + float(s41) * 2.0
+				_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+					Vector2(3.05, 0.5), Vector2(3.5, 0.5 + side41 * 0.3),
+					Vector2(4.2, 0.5 + side41 * 0.3), Vector2(4.05, 0.5)])), Color(0.55, 0.15, 0.1), OL, lw)
+				for k in range(3):
+					var tx41 := 3.5 + float(k) * 0.28
+					_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+						Vector2(tx41, 0.5 + side41 * 0.26), Vector2(tx41 + 0.14, 0.5 + side41 * 0.34),
+						Vector2(tx41 + 0.28, 0.5 + side41 * 0.24)])), Color(1, 1, 0.95), OL, lw * 0.4)
+			ci.draw_circle(jb41, r * 0.18, Color(1.0, 0.4, 0.12))
+			ci.draw_circle(jb41, r * 0.09, Color(0.1, 0.02, 0.02))
+			_bar(ci, r, pv, ang, 0.94, 1.06, 0.5, 0.9, c2, lw * 0.5)
+		42:
+			# shepherd of suns: a dark shaft hung with burning suns
+			_bar(ci, r, pv, ang, 0.35, 3.1, 0.5, 0.05, Color(0.14, 0.11, 0.06), lw)
+			for k in range(4):
+				var sx42 := 0.9 + float(k) * 0.72
+				var pc42 := _wp(pv, ang, r, sx42, 0.5)
+				ci.draw_arc(pc42, r * 0.36, 0.0, TAU, 22, Color(1.0, 0.75, 0.25, 0.55), lw * 0.8, true)
+				ci.draw_circle(pc42, r * (0.16 + 0.03 * sin(t * 3.0 + float(k))), Color(1.0, 0.9, 0.45))
+			ci.draw_line(_wp(pv, ang, r, 1.0, 0.32), _wp(pv, ang, r, 3.1, 0.32), c2, lw * 0.6, true)
+			ci.draw_line(_wp(pv, ang, r, 1.0, 0.68), _wp(pv, ang, r, 3.1, 0.68), c2, lw * 0.6, true)
+		43:
+			# the last idea: one long whisper, with rings floating along it
+			_bar(ci, r, pv, ang, 0.3, 2.85, 0.5, 0.05, Color(0.9, 0.88, 0.8), lw)
+			ci.draw_line(_wp(pv, ang, r, 0.4, 0.5), _wp(pv, ang, r, 3.1, 0.5), Color(1, 1, 1, 0.95), lw * 1.2, true)
+			for k in range(3):
+				var rc43 := _wp(pv, ang, r, 0.75 + float(k) * 1.0, 0.5)
+				ci.draw_arc(rc43, r * (0.44 + 0.05 * sin(t * 2.0 + float(k) * 1.3)), ang + PI * 0.5 - 1.2, ang + PI * 0.5 + 1.2, 18, c2, lw * 0.9, true)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.8, 0.4), Vector2(3.5, 0.5), Vector2(2.8, 0.6)])), Color(1, 1, 1), OL, lw * 0.7)
 		38:
 			# the infinite blade: twin crescents and a split tip
 			var pi9 := 0.5 + 0.5 * sin(t * 3.0)

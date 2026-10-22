@@ -38,11 +38,14 @@ var wander_dir := Vector2.RIGHT
 var bot_attack_t := 1.0
 var bot_sprint := false
 var aim_err := 0.0
+var last_orb_t := -1.0   # Test Range: where the orbiting orbs were last frame
 var locked_tier := -1   # Test Range: the tier is pinned, so it never drifts
 
 
 func _ready() -> void:
-	evo = Species.evo_for_xp(xp)
+	evo = Species.capped_for_mode(Species.evo_for_xp(xp), main.mode if main != null else "dm")
+	if locked_tier >= 0:
+		evo = locked_tier
 	r = Species.radius_for(evo, xp)
 	max_hp = Species.max_hp_for(evo)
 	hp = max_hp
@@ -71,7 +74,7 @@ func add_xp(v: float) -> void:
 		return
 	var before := evo
 	xp += v
-	evo = Species.evo_for_xp(xp)
+	evo = Species.capped_for_mode(Species.evo_for_xp(xp), main.mode if main != null else "dm")
 	if evo != before:
 		_refresh_colors()
 		z_index = evo
@@ -112,6 +115,7 @@ func _process(delta: float) -> void:
 	hit_flash = maxf(hit_flash - delta, 0.0)
 	swing_cd = maxf(swing_cd - delta, 0.0)
 	since_hit += delta
+	main._orbs_versus(self)
 	r = lerpf(r, Species.radius_for(evo, xp), minf(delta * 4.0, 1.0))
 	if swing_t >= 0.0:
 		# the blade's angle last frame, so we can work out the slice of the
@@ -529,7 +533,10 @@ func _draw() -> void:
 		for i in range(3):
 			var y := float(i - 1) * r * 0.55
 			draw_line(Vector2(-r * (1.3 + float(i) * 0.4), y), Vector2(-r * (2.4 + float(i) * 0.7), y), Color(1, 1, 1, 0.45), 2.0, true)
-	Species.draw_body(self, evo, r, anim_t, c1, c2, sa)
+	# Test Range: from tier 40 up the floating orbs are live weapons, so they
+	# read as weapons on screen too
+	var lethal: bool = main.mode == "test" and Species.orb_body(evo)
+	Species.draw_body(self, evo, r, anim_t, c1, c2, sa, lethal)
 	if hit_flash > 0.0:
 		draw_circle(Vector2.ZERO, r * 1.0, Color(1, 1, 1, hit_flash * 2.2))
 	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)

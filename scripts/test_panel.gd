@@ -121,12 +121,15 @@ func _ready() -> void:
 	grid.add_theme_constant_override("v_separation", 4)
 	body.add_child(grid)
 
-	for i in range(Species.COUNT):
+	for i in range(Species.TOTAL):
 		var b := Button.new()
-		b.text = "%02d %s" % [i + 1, Species.NAMES[i]]
+		var name_str: String = Species.NAMES[i] if i < Species.NAMES.size() else str(i + 1)
+		b.text = "%02d %s" % [i + 1, name_str]
 		b.focus_mode = Control.FOCUS_NONE
 		b.custom_minimum_size = Vector2(136, 24)
-		b.add_theme_font_size_override("font_size", 12)
+		b.add_theme_font_size_override("font_size", 11)
+		if Species.is_secret(i):
+			b.add_theme_color_override("font_color", Color(1.0, 0.7, 0.9))
 		b.pressed.connect(func(): _pick(i))
 		grid.add_child(b)
 		buttons.append(b)

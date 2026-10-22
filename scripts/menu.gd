@@ -234,6 +234,8 @@ func _center_node(c: Control, w: float, top: float, h: float) -> void:
 func _process(delta: float) -> void:
 	t += delta
 	mascot_evo = int(t / 2.2) % Species.COUNT
+	if Species.is_secret(mascot_evo):
+		mascot_evo = 0
 	queue_redraw()
 	if shot_path != "" and t > shot_time:
 		var img := get_viewport().get_texture().get_image()
