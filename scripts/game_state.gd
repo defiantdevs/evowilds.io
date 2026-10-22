@@ -3,13 +3,14 @@ extends Node
 
 # Type this in as your name on the start screen to unlock the Test Range.
 const SECRET_NAME := "godmode"
-const VERSION := "v1.12"
+const VERSION := "v1.13"
 
 var player_name := "You"
 var mode := "dm"   # "dm" = Deathmatch, "tdm" = Team Deathmatch, "test" = Test Range
 var team := -1     # 0 = Red, 1 = Blue, -1 = none
 var secret_unlocked := false   # the Test Range stays unlocked once found
 var test_tier := 0             # which evolution you are trying in the Test Range
+var test_bots := 12            # how many bots the Test Range keeps charging you
 
 
 func clean_name() -> String:

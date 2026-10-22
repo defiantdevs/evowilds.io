@@ -101,7 +101,8 @@ func _ready() -> void:
 	if shot_gallery:
 		_spawn_gallery()
 	else:
-		for i in range(BOT_COUNT):
+		var bots := GameState.test_bots if mode == "test" else BOT_COUNT
+		for i in range(bots):
 			_spawn_bot(true)
 	var layer := CanvasLayer.new()
 	layer.layer = 5
@@ -193,8 +194,11 @@ func _build_world() -> void:
 			obstacles.append([pos, sz * 0.5])
 		elif kind == 1:
 			obstacles.append([pos, sz * 0.7])
-	for i in range(FOOD_TARGET):
-		_add_food(_random_food_pos(), _random_food_kind())
+	if mode != "test":
+		# the Test Range spawns no food at all: nothing to eat, nothing to draw,
+		# nothing to slow the frame down
+		for i in range(FOOD_TARGET):
+			_add_food(_random_food_pos(), _random_food_kind())
 
 
 func push_out(c) -> void:
@@ -312,6 +316,52 @@ func set_test_tier(evo: int) -> void:
 	# Test Range: become any of the 28 evolutions, right now.
 	GameState.test_tier = clampi(evo, 0, Species.COUNT - 1)
 	_spawn_player(false)
+
+
+func set_test_bots(n: int) -> void:
+	# Test Range: how many bots keep charging you (1 to 25).
+	GameState.test_bots = clampi(n, 1, 25)
+	_apply_test_bots()
+
+
+func _live_bots() -> int:
+	var n := 0
+	for c in creatures:
+		if not c.is_player:
+			n += 1
+	return n
+
+
+func _apply_test_bots() -> void:
+	if mode != "test":
+		return
+	var alive_bots: Array = []
+	for c in creatures:
+		if not c.is_player:
+			alive_bots.append(c)
+	# too many: take the ones furthest away out of the arena
+	while alive_bots.size() > GameState.test_bots:
+		var worst = null
+		var wd := -1.0
+		for c in alive_bots:
+			var d: float = 0.0
+			if player != null and is_instance_valid(player):
+				d = c.position.distance_to(player.position)
+			if d > wd:
+				wd = d
+				worst = c
+		if worst == null:
+			break
+		alive_bots.erase(worst)
+		creatures.erase(worst)
+		board.erase(worst)
+		if leader == worst:
+			leader = null
+		worst.queue_free()
+	# too few: bring the rest in
+	var short := GameState.test_bots - alive_bots.size()
+	for i in range(short):
+		_spawn_bot(false)
 
 
 func _random_bot_evo() -> int:
@@ -591,11 +641,13 @@ func devour(eater, victim) -> void:
 	var vc: Color = Species.COL2[victim.evo]
 	fx.burst(victim.position, Species.glow(vc, 1.8), 36, 360.0, 0.8)
 	fx.ring(victim.position, Species.glow(vc, 1.6), 160.0 + victim.r * 1.5, 0.6)
-	var drops := clampi(int(victim.xp / 14.0) + 3, 3, 18)
-	for k in range(drops):
-		var vr: float = victim.r
-		var off: Vector2 = Vector2.from_angle(randf() * TAU) * randf() * vr * 1.6
-		_add_food(victim.position + off, 3 if randf() < 0.6 else 1)
+	if mode != "test":
+		# Test Range: no loot orbs dropped, keeps the arena clean and fast
+		var drops := clampi(int(victim.xp / 14.0) + 3, 3, 18)
+		for k in range(drops):
+			var vr: float = victim.r
+			var off: Vector2 = Vector2.from_angle(randf() * TAU) * randf() * vr * 1.6
+			_add_food(victim.position + off, 3 if randf() < 0.6 else 1)
 	_post(eater.cname + " defeated " + victim.cname, Species.COL2[eater.evo])
 	if victim.is_player:
 		player_dead = true
@@ -710,7 +762,7 @@ func _process(delta: float) -> void:
 			if leave_t > 2.2:
 				_spawn_player(false)
 	var spawn_budget := 6
-	while food_pos.size() < FOOD_TARGET and spawn_budget > 0:
+	while mode != "test" and food_pos.size() < FOOD_TARGET and spawn_budget > 0:
 		_add_food(_random_food_pos(), _random_food_kind())
 		spawn_budget -= 1
 	var i := respawns.size() - 1
@@ -719,7 +771,12 @@ func _process(delta: float) -> void:
 		if float(respawns[i]) <= 0.0:
 			respawns.remove_at(i)
 			if not shot_gallery:
-				_spawn_bot(false)
+				if mode == "test":
+					# keep the arena at the chosen number of bots
+					if _live_bots() < GameState.test_bots:
+						_spawn_bot(false)
+				else:
+					_spawn_bot(false)
 		i -= 1
 	i = feed.size() - 1
 	while i >= 0:
@@ -788,6 +845,12 @@ func _unhandled_input(event: InputEvent) -> void:
 		if kc == KEY_TAB:
 			if test_picker != null and is_instance_valid(test_picker):
 				test_picker.visible = not test_picker.visible
+			return
+		if kc == KEY_MINUS or kc == KEY_KP_SUBTRACT:
+			set_test_bots(GameState.test_bots - 1)
+			return
+		if kc == KEY_EQUAL or kc == KEY_PLUS or kc == KEY_KP_ADD:
+			set_test_bots(GameState.test_bots + 1)
 			return
 	if match_over:
 		if result_t > 3.7:

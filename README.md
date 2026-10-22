@@ -3,13 +3,19 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 28 humanoid tiers — from Caveman to Omniverse God.
 
 ## Download
-Current build: **v1.12** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.12/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.13** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.13/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.12**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.13**, you are still running an older download.
+
+## What's new in v1.13
+- **Test Range: choose how many bots you want.** A `BOTS` row at the top of the picker with **−** / **+** buttons, from 1 up to **25**. It also works from the keyboard: `-` and `=` (or `+`).
+- **No more orbs in the Test Range.** Kills no longer drop loot orbs, and no food spawns at all — the arena starts clean and stays clean, which removes the biggest drawing cost in that mode.
+- The badge on screen now reads `TEST RANGE` with `N BOTS CHARGING` underneath.
+- Deathmatch and Team Deathmatch are untouched: 620 food items, 28 bots, orbs still drop on kills.
 
 ## What's new in v1.12
 - The secret code is much easier to trigger: type `godmode` anywhere on the start screen — name box focused or not, any capitalisation, with spaces (`God Mode`), or even appended to a name that was already in the box.
-- The start screen now shows its build number, so you can confirm which version you are running.
+- The start screen shows its build number, so you can confirm which version you are running.
 
 ## What's new in v1.11
 - **Secret Test Range.** Type the code name **`godmode`** on the start screen and a third button appears: **TEST RANGE**.
@@ -28,7 +34,7 @@ Pick your name on the title screen, then choose a mode:
 
 - **DEATHMATCH** — free-for-all. A 10:00 timer counts down; when it hits zero the match ends.
 - **TEAM DEATHMATCH** — Red vs Blue. A timer counts **up** from 0:00 and there is no time limit.
-- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it.
+- **TEST RANGE** — the secret one. Type `godmode` anywhere on this screen to unlock it. Pick any of the 28 tiers, set the number of charging bots from 1 to **25**, and swing away: no clock, no food, no loot orbs, and you cannot die.
 
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
