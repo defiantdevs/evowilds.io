@@ -201,7 +201,13 @@ func _build_world() -> void:
 			_add_food(_random_food_pos(), _random_food_kind())
 
 
-func push_out(c) -> void:
+func push_out(c, delta: float = 0.016) -> void:
+	# A creature too big to fit between the trees can no longer be *snapped* to
+	# the far side of a trunk in a single frame: that snap was what made giant
+	# bots (tier 42/43) look like they were flying around the map. It is eased
+	# out at a walking pace instead, and any speed pointed into the trunk is
+	# turned into a slide along it.
+	var budget := maxf(700.0, c.vel.length() * 1.5) * delta
 	for o in obstacles:
 		var op: Vector2 = o[0]
 		var orad: float = o[1]
@@ -209,8 +215,21 @@ func push_out(c) -> void:
 		var d: Vector2 = c.position - op
 		var l := d.length()
 		var minr := orad + cr * 0.7
-		if l < minr and l > 0.01:
-			c.position = op + d / l * minr
+		if l >= minr:
+			continue
+		var n := d / l if l > 0.01 else Vector2.RIGHT.rotated(float(c.get_instance_id()))
+		var step := minf(minr - l, budget)
+		if step <= 0.0:
+			break
+		c.position += n * step
+		budget -= step
+		if c.vel.dot(n) < 0.0:
+			# keep the speed that runs along the trunk, and lean a little of
+			# what runs into it around the side, so nobody stays pinned
+			var tang := Vector2(-n.y, n.x)
+			if tang.dot(c.vel) < 0.0:
+				tang = -tang
+			c.vel = c.vel.slide(n) + tang * minf(c.vel.length() * 0.35, 90.0)
 
 
 func _blocked(p: Vector2) -> bool:
@@ -220,6 +239,32 @@ func _blocked(p: Vector2) -> bool:
 		if p.distance_to(op) < orad + 18.0:
 			return true
 	return false
+
+
+func _clear_enough(p: Vector2, cr: float) -> bool:
+	# is there room here for a body of this size, with a little to spare?
+	for o in obstacles:
+		if p.distance_to(o[0]) < float(o[1]) + cr * 0.75:
+			return false
+	return true
+
+
+func _nearest_clear(p: Vector2, cr: float) -> Vector2:
+	# spawn spots are picked without knowing the creature's size, so a tier 43
+	# bot could start life buried in a tree. Walk outwards in rings and take the
+	# first spot the body actually fits in (the smooth push-out covers the rest).
+	if _clear_enough(p, cr):
+		return p
+	var ring_step := maxf(cr * 0.6, 40.0)
+	for ring in range(1, 14):
+		var rad := float(ring) * ring_step
+		for k in range(14):
+			var q: Vector2 = p + Vector2.from_angle(TAU * float(k) / 14.0 + float(ring) * 0.23) * rad
+			if q.length() > ARENA_R - cr * 0.8 - 10.0:
+				continue
+			if _clear_enough(q, cr):
+				return q
+	return p
 
 
 func _random_food_pos() -> Vector2:
@@ -263,6 +308,8 @@ func _spawn_creature(is_pl: bool, evo: int, pos: Vector2, nm: String, extra_xp: 
 	c.position = pos
 	c.shield = 2.0
 	add_child(c)
+	if shot_path == "" and not shot_gallery:
+		c.position = _nearest_clear(pos, c.r)
 	creatures.append(c)
 	return c
 

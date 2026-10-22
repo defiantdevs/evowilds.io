@@ -222,7 +222,7 @@ func _process(delta: float) -> void:
 		vel = vel.normalized() * cap
 	position += vel * delta
 
-	main.push_out(self)
+	main.push_out(self, delta)
 	var lim: float = main.ARENA_R - r * 0.8
 	if position.length() > lim:
 		position = position.normalized() * lim

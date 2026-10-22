@@ -3,9 +3,14 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 43 humanoid tiers — from Caveman to The Infinite.
 
 ## Download
-Current build: **v1.18** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.18/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.19** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.19/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.18**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.19**, you are still running an older download.
+
+## What's new in v1.19
+- **Fixed: the tier 42 and 43 giants no longer fly around the map.** A body that size cannot fit between the trees, and whenever one of them overlapped a trunk the game shoved it out to the far side of the trunk in a single frame — up to a hundred pixels at once. That snap was the "flying": the bot was not moving fast, it was being teleported from one side of a tree to the other, over and over. Big bodies are now eased out of a trunk at a walking pace, and any speed pointed into it is turned into a slide along its side, so titans step around trees instead of being flung across the arena.
+- **Big bots no longer hatch inside a tree.** Spawn spots were chosen without knowing how wide the creature would be, so a giant could start its life buried in a trunk and be flung out on its first frame. Spawns now search outwards for the first gap the body actually fits in.
+- Measured in the Test Range with 25 bots all pinned to tiers 42 and 43: the worst single-frame jump is now under 3 px, down from 93 px, and no creature anywhere on the map exceeds a normal running step.
 
 ## What's new in v1.18
 - **Fixed: the biggest bots no longer fly around the arena.** Above tier 38 the run-acceleration curve went negative, so instead of building up to their walking speed they gained speed every single frame — by tier 43 a bot could hit a thousand pixels a second and would rocket across the map until it slammed into the arena edge. Acceleration now bottoms out at a sane value, so the titans move at their proper slow, heavy pace.
