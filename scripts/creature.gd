@@ -176,15 +176,32 @@ func _process(delta: float) -> void:
 	var accel := 1500.0 - 40.0 * float(evo)
 	if is_player:
 		accel = 3000.0 - 50.0 * float(evo)
-	if dir.length_squared() < 0.000001:
-		var fric := accel
-		if is_player:
-			fric = 2800.0 - 40.0 * float(evo)
-		vel = vel.move_toward(Vector2.ZERO, maxf(fric, 400.0) * delta)
+	if is_player:
+		# The player runs where they point *this frame*: a turn redirects the
+		# whole of the current speed instead of coasting through a wide arc,
+		# and reversing drops the old speed to nothing rather than skidding on
+		# backwards for a moment.
+		if dir.length_squared() < 0.000001:
+			# let go: plant your feet, no glide
+			vel = vel.move_toward(Vector2.ZERO, 9000.0 * delta)
+		else:
+			var d := dir.normalized()
+			var mag := clampf(dir.length(), 0.0, 1.0)
+			var sp := vel.length()
+			# only a genuine reversal (or a hair sharper than square) drops the
+			# speed; a square turn keeps its pace and simply goes the new way
+			if sp > 1.0 and vel.dot(d) < -0.05 * sp:
+				sp = 0.0
+			sp = minf(sp + accel * delta, spd * mag)
+			vel = d * sp
 	else:
-		if is_player and vel.dot(dir) < 0.0:
-			accel *= 1.7
-		vel = vel.move_toward(dir * spd, accel * delta)
+		if dir.length_squared() < 0.000001:
+			var fric := accel
+			vel = vel.move_toward(Vector2.ZERO, maxf(fric, 400.0) * delta)
+		else:
+			if vel.dot(dir) < 0.0:
+				accel *= 1.7
+			vel = vel.move_toward(dir * spd, accel * delta)
 	position += vel * delta
 
 	main.push_out(self)

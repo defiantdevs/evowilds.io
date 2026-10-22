@@ -33,14 +33,16 @@ const BLURB := [
 	"Every world, every age, every ending. Yours.",
 ]
 const XP_AT := [0.0, 28.0, 98.0, 202.0, 340.0, 507.0, 704.0, 930.0, 1182.0, 1461.0, 1767.0, 2097.0, 2453.0, 2833.0, 3237.0, 3665.0, 4117.0, 4592.0, 5089.0, 5609.0, 6154.0, 6724.0, 7324.0, 7954.0, 8610.0, 9290.0, 9990.0, 10720.0]
-const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("2a1a4a"), Color("2e1f5e"), Color("120e1c"), Color("efe6cc"), Color("f2c84a")]
-const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("b58cff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff")]
+const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a")]
+const COL2 := [Color("f1e2c6"), Color("e8d27a"), Color("e4a43a"), Color("2e8bd6"), Color("7a3b2a"), Color("b0b0b8"), Color("c8b88a"), Color("e0e0e8"), Color("d94b4b"), Color("e8c15a"), Color("b04bff"), Color("c03030"), Color("d03030"), Color("5fa8ff"), Color("5de0ff"), Color("7cff8a"), Color("ff9a2a"), Color("ff6a2a"), Color("8a1010"), Color("59e0d0"), Color("ffe25a"), Color("b23a4a"), Color("ffd25a"), Color("b06aff"), Color("9fd8ff"), Color("8a4bff"), Color("ffe9a8"), Color("ffffff")]
 const SKIN := [Color("e0a878"), Color("f0c9a0"), Color("e8b98a"), Color("c98f62"), Color("f0c9a0"), Color("e0a878"), Color("f3d3b3"), Color("e9b890"), Color("f3d3b3"), Color("efc9a2"), Color("d9b38c"), Color("c98f62"), Color("f3d3b3"), Color("f5d9bc"), Color("f3d3b3"), Color("cfd8c8"), Color("d9a679"), Color("b98660"), Color("f0c9a0"), Color("e8c9a8"), Color("c9a27a"), Color("cfc8bc"), Color("f3d9bc"), Color("e0c9a8"), Color("e6d9f2"), Color("b8aec8"), Color("f7e9d2"), Color("f7e9d2")]
-const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 21]
-const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 19, 19, 18, 17, 19]
+const HEAD := [0, 1, 2, 3, 4, 5, 6, 7, 7, 8, 9, 7, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 20, 17, 13, 22]
+const WEAPON := [0, 1, 2, 3, 4, 5, 5, 6, 6, 7, 7, 8, 9, 10, 11, 12, 14, 13, 15, 11, 16, 17, 18, 20, 21, 18, 23, 22]
 const SHIELD := [0, 0, 0, 0, 0, 1, 1, 2, 3, 0, 0, 1, 4, 3, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 2, 3, 0]
 const CAPE := [0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 1, 1, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1]
 const PAULD := [0, 0, 0, 0, 0, 0, 0, 1, 1, 1, 0, 1, 1, 1, 0, 0, 2, 2, 2, 0, 2, 0, 2, 2, 2, 2, 0, 2]
+# 1 = feathered wings (Eternal Seraph only)
+const WINGS := [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 0]
 # The weapon's own shape, part by part. Each part is
 # [x0, y0, x1, y1, half_width] in weapon frame units: x runs along the
 # weapon, y across it, and the centre line sits at y = 0.5. The killing
@@ -73,6 +75,22 @@ const WEAPON_PARTS := [
 	[[2.54, 0.5, 2.54, 0.5, 0.30], [2.6, 0.5, 3.3, 0.2, 0.08],
 		[2.6, 0.5, 3.3, 0.8, 0.08]],                                      # 18 twin blade
 	[[0.97, 0.5, 0.97, 0.5, 0.575], [0.95, 0.5, 3.7, 0.5, 0.20]],          # 19 god blade
+	[[0.45, 0.5, 2.45, 0.5, 0.06],
+		[3.17, 0.5, 3.047, 0.797, 0.05], [3.047, 0.797, 2.75, 0.92, 0.05],
+		[2.75, 0.92, 2.453, 0.797, 0.05], [2.453, 0.797, 2.33, 0.5, 0.05],
+		[2.33, 0.5, 2.453, 0.203, 0.05], [2.453, 0.203, 2.75, 0.08, 0.05],
+		[2.75, 0.08, 3.047, 0.203, 0.05], [3.047, 0.203, 3.17, 0.5, 0.05],
+		[2.75, 0.5, 2.75, 0.5, 0.22]],                                     # 20 cosmic sceptre
+	[[0.45, 0.5, 2.6, 0.5, 0.05],
+		[2.55, 0.18, 2.55, 0.82, 0.06],
+		[2.6, 0.5, 3.5, 0.03, 0.12], [2.6, 0.5, 3.5, 0.97, 0.12]],          # 21 astral glaive
+	[[0.3, 0.5, 1.0, 0.5, 0.08],
+		[0.95, 0.05, 0.95, 0.95, 0.09],
+		[0.95, 0.5, 2.3, 0.5, 0.18], [2.2, 0.5, 3.2, 0.5, 0.12],
+		[3.1, 0.5, 3.95, 0.5, 0.07]],                                      # 22 omniverse blade
+	[[0.32, 0.5, 0.95, 0.5, 0.06],
+		[0.95, 0.16, 0.95, 0.84, 0.075],
+		[0.98, 0.5, 3.25, 0.5, 0.175], [3.25, 0.5, 3.6, 0.5, 0.05]],        # 23 holy sword
 ]
 const OL := Color(0.12, 0.07, 0.07)
 const STEEL := Color(0.8, 0.84, 0.92)
@@ -168,6 +186,25 @@ static func _feet(ci: CanvasItem, r: float, t: float, col: Color, lw: float) -> 
 	_fill(ci, _ellipse(0.25 * r - st, 0.38 * r, 0.3 * r, 0.18 * r, 0.0, 10), col, OL, lw * 0.7)
 
 
+static func _wings(ci: CanvasItem, r: float, t: float, lw: float) -> void:
+	# a pair of feathered wings, sweeping back and beating slowly
+	var flap := sin(t * 2.1) * 0.1
+	var lit := Color(0.99, 0.97, 0.9)
+	var shade := Color(0.85, 0.89, 0.98)
+	for s in range(2):
+		var side := -1.0 + float(s) * 2.0
+		for k in range(3):
+			var f := float(k)
+			var spread := 0.5 + 0.32 * f + flap * (1.0 + 0.3 * f)
+			var reach := 1.15 + 0.4 * f
+			var root := Vector2(-0.15 * r, side * (0.28 + 0.2 * f) * r)
+			var b1 := Vector2(-0.62 * r, side * (0.16 + 0.22 * f) * r)
+			var b2 := Vector2(-1.05 * r, side * (spread * 0.55) * r)
+			var tip := Vector2(-reach * r, side * spread * r)
+			_fill(ci, PackedVector2Array([root, b1, b2, tip]), lit if k == 0 else shade, OL, lw * 0.8)
+			ci.draw_line(b1, tip, Color(0.72, 0.77, 0.92, 0.7), lw * 0.5, true)
+
+
 static func _arm(ci: CanvasItem, r: float, from: Vector2, to: Vector2, sleeve: Color, skin: Color, lw: float) -> void:
 	ci.draw_line(from, to, OL, r * 0.26 + lw * 1.6, true)
 	ci.draw_line(from, to, sleeve, r * 0.26, true)
@@ -212,6 +249,17 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 				var op := Vector2.from_angle(oa) * r * 1.9
 				ci.draw_circle(op, r * 0.11, Color(ac.r, ac.g, ac.b, 0.8))
 				ci.draw_circle(op, r * 0.05, Color(1, 1, 1, 0.9))
+		if evo == COUNT - 1:
+			# the last one in the game wears a second ring of light, turning
+			# the other way, so it never reads as just another purple emperor
+			ci.draw_arc(Vector2.ZERO, r * (2.25 + 0.12 * pu), 0.0, TAU, 52, Color(1.0, 0.95, 0.6, 0.45), 2.5, true)
+			for k in range(6):
+				var oa2 := -t * 1.9 + TAU * float(k) / 6.0
+				var op2 := Vector2.from_angle(oa2) * r * 2.3
+				ci.draw_circle(op2, r * 0.085, Color(1, 1, 1, 0.9))
+				ci.draw_circle(op2, r * 0.04, Color(1.0, 0.88, 0.4))
+	if WINGS[evo] > 0:
+		_wings(ci, r, t, lw)
 	var cape: int = CAPE[evo]
 	if cape == 1:
 		var w := sin(t * 4.0) * r * 0.2
@@ -422,6 +470,19 @@ static func _headgear(ci: CanvasItem, r: float, kind: int, t: float, skin: Color
 				ci.draw_circle(Vector2(hx, 0) + Vector2.from_angle(a6) * 0.62 * r, r * 0.05, Color(0.75, 0.5, 1.0, 0.9))
 			ci.draw_arc(Vector2(hx, 0), 0.62 * r, 0.0, TAU, 30, Color(0.65, 0.35, 1.0, 0.5), r * 0.05, true)
 			_fill(ci, PackedVector2Array([Vector2(hx - 0.2 * r, -0.3 * r), Vector2(hx + 0.15 * r, -0.45 * r), Vector2(hx + 0.5 * r, -0.25 * r)]), Color(0.85, 0.7, 1.0), OL, lw * 0.5)
+		22:
+			# the last face in the game: a crown of pure light, not a mask
+			_fill(ci, _ellipse(hx, 0, 0.6 * r, 0.58 * r, 0.0, 24), Color(1.0, 0.98, 0.9), OL, lw)
+			ci.draw_arc(Vector2(hx, 0), 0.92 * r, 0.0, TAU, 40, Color(1.0, 0.94, 0.6, 0.9), r * 0.1, true)
+			ci.draw_arc(Vector2(hx, 0), 1.16 * r, 0.0, TAU, 44, Color(1.0, 0.86, 0.36, 0.35), r * 0.05, true)
+			for k in range(10):
+				var a7 := TAU * float(k) / 10.0 + t * 0.35
+				var d7 := Vector2.from_angle(a7)
+				var q7 := Vector2(hx, 0) + d7 * 0.92 * r
+				var pq7 := Vector2(-d7.y, d7.x)
+				_fill(ci, PackedVector2Array([q7 + pq7 * 0.07 * r, q7 + d7 * 0.32 * r, q7 - pq7 * 0.07 * r]), Color(1.0, 0.9, 0.45), OL, lw * 0.5)
+			ci.draw_circle(Vector2(hx + 0.3 * r, 0), r * 0.15, Color(1, 1, 0.92))
+			ci.draw_circle(Vector2(hx + 0.34 * r, 0), r * 0.08, Color(1.0, 0.84, 0.2))
 		_:
 			_head(ci, r, skin, hair, lw)
 			_fill(ci, _ellipse(hx, 0, 0.54 * r, 0.5 * r, 0.0, 22), c1.lightened(0.1), OL, lw)
@@ -560,6 +621,69 @@ static func _weapon(ci: CanvasItem, r: float, kind: int, pv: Vector2, ang: float
 				var sx := 1.4 + float(k) * 0.5
 				ci.draw_circle(_wp(pv, ang, r, sx, 0.5 + (-0.1 + 0.2 * float(k % 2))), r * 0.045, Color(0.85, 0.75, 1.0, 0.9))
 			_bar(ci, r, pv, ang, 0.93, 1.01, 0.5, 1.15, c2, lw * 0.5)
+		20:
+			# cosmic sceptre: a dark rod carrying a ring of starlight
+			_bar(ci, r, pv, ang, 0.45, 2.45, 0.5, 0.12, Color(0.2, 0.11, 0.36), lw)
+			_bar(ci, r, pv, ang, 0.45, 0.55, 0.5, 0.3, Color(0.7, 0.5, 1.0), lw * 0.4)
+			var rc := _wp(pv, ang, r, 2.75, 0.5)
+			var pu4 := 0.5 + 0.5 * sin(t * 3.4)
+			ci.draw_arc(rc, r * (0.42 + 0.015 * pu4), 0.0, TAU, 26, Color(0.8, 0.52, 1.0, 0.95), r * 0.09, true)
+			for k in range(4):
+				var a8 := t * 1.1 + TAU * float(k) / 4.0
+				var sp4 := rc + Vector2.from_angle(a8) * r * 0.42
+				ci.draw_circle(sp4, r * 0.07, Color(1.0, 0.96, 0.8))
+			ci.draw_circle(rc, r * 0.23, Color(0.72, 0.42, 1.0))
+			ci.draw_circle(rc, r * 0.15, Color(1, 1, 1, 0.95))
+		21:
+			# astral glaive: one shaft, two ice-blue crescent blades
+			_bar(ci, r, pv, ang, 0.45, 2.6, 0.5, 0.1, Color(0.24, 0.34, 0.5), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.55, 0.5), Vector2(2.82, 0.32), Vector2(3.22, 0.1),
+				Vector2(3.5, 0.02), Vector2(3.32, 0.28), Vector2(2.92, 0.44)])),
+				Color(0.83, 0.95, 1.0), OL, lw * 0.8)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(2.55, 0.5), Vector2(2.82, 0.68), Vector2(3.22, 0.9),
+				Vector2(3.5, 0.98), Vector2(3.32, 0.72), Vector2(2.92, 0.56)])),
+				Color(0.83, 0.95, 1.0), OL, lw * 0.8)
+			var b0 := _wp(pv, ang, r, 2.55, 0.18)
+			var b1 := _wp(pv, ang, r, 2.55, 0.82)
+			ci.draw_line(b0, b1, OL, r * 0.14 + lw, true)
+			ci.draw_line(b0, b1, Color(0.55, 0.8, 1.0), r * 0.14, true)
+			ci.draw_circle(_wp(pv, ang, r, 2.62, 0.5), r * 0.11, Color(0.92, 0.99, 1.0))
+		22:
+			# omniverse blade: the biggest blade in the game, white gold
+			var pu5 := 0.5 + 0.5 * sin(t * 2.6)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.5, 0.5, 1.7, 0.62, 0.0, 22)), Color(1.0, 0.9, 0.5, 0.15 + 0.08 * pu5))
+			_bar(ci, r, pv, ang, 0.3, 1.0, 0.5, 0.16, Color(0.55, 0.36, 0.12), lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.02), Vector2(1.07, 0.5), Vector2(0.95, 0.98), Vector2(0.83, 0.5)])),
+				Color(1.0, 0.88, 0.4), OL, lw)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.95, 0.34), Vector2(2.7, 0.4), Vector2(3.95, 0.5),
+				Vector2(2.7, 0.6), Vector2(0.95, 0.66)])),
+				Color(1.0, 0.97, 0.86), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.1, 0.5), _wp(pv, ang, r, 3.75, 0.5), Color(1.0, 0.86, 0.34), lw * 1.4, true)
+			for k in range(5):
+				ci.draw_circle(_wp(pv, ang, r, 1.35 + float(k) * 0.5, 0.5 + (-0.07 + 0.14 * float(k % 2))), r * 0.05, Color(1.0, 0.84, 0.3, 0.9))
+		23:
+			# holy sword: a white blade with a cross guard and a line of light
+			var pu6 := 0.5 + 0.5 * sin(t * 4.6)
+			ci.draw_colored_polygon(_wpoly(pv, ang, r, _ellipse(2.2, 0.5, 1.4, 0.4, 0.0, 20)), Color(1.0, 0.95, 0.66, 0.13 + 0.07 * pu6))
+			_bar(ci, r, pv, ang, 0.32, 0.95, 0.5, 0.12, Color(0.85, 0.7, 0.3), lw)
+			ci.draw_circle(_wp(pv, ang, r, 0.3, 0.5), r * 0.16, Color(1.0, 0.91, 0.52))
+			var h0 := _wp(pv, ang, r, 0.95, 0.16)
+			var h1 := _wp(pv, ang, r, 0.95, 0.84)
+			ci.draw_line(h0, h1, OL, r * 0.16 + lw, true)
+			ci.draw_line(h0, h1, Color(1.0, 0.88, 0.45), r * 0.16, true)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(0.98, 0.32), Vector2(3.0, 0.36), Vector2(3.6, 0.5),
+				Vector2(3.0, 0.64), Vector2(0.98, 0.68)])),
+				Color(1.0, 0.99, 0.94), OL, lw)
+			ci.draw_line(_wp(pv, ang, r, 1.1, 0.5), _wp(pv, ang, r, 3.45, 0.5), Color(1.0, 0.92, 0.55), lw * 1.3, true)
+			_fill(ci, _wpoly(pv, ang, r, PackedVector2Array([
+				Vector2(1.85, 0.34), Vector2(2.05, 0.34), Vector2(2.05, 0.5),
+				Vector2(2.25, 0.5), Vector2(2.25, 0.66), Vector2(1.85, 0.66)])),
+				Color(1.0, 0.93, 0.66), OL, lw * 0.4)
 		_:
 			_bar(ci, r, pv, ang, 0.3, 0.95, 0.5, 0.16, Color(0.5, 0.1, 0.1), lw)
 			var blade := _wpoly(pv, ang, r, PackedVector2Array([Vector2(0.95, 0.34), Vector2(3.0, 0.3), Vector2(3.55, 0.5), Vector2(3.0, 0.7), Vector2(0.95, 0.66)]))

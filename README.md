@@ -3,9 +3,16 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 28 humanoid tiers — from Caveman to Omniverse God.
 
 ## Download
-Current build: **v1.13** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.13/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.14** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.14/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.13**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.14**, you are still running an older download.
+
+## What's new in v1.14
+- **Movement turns on a coin, with no slide.** Your run now goes exactly where you point it each frame: a 90° turn keeps its full speed and simply goes the new way, and turning right around does not carry you a single extra pixel forward. No more skating through corners.
+- **Levels 24 and 25 are now two different creatures.** Cosmos Emperor (24) is a violet figure carrying a **cosmic sceptre** — a dark rod with a ring of orbiting starlight. Astral Sovereign (25) is an **ice-blue** figure with a **double crescent astral glaive**. Different colours, different silhouette, different weapon.
+- **Level 27 — Eternal Seraph — now has wings and a holy sword.** Three feathered wings per side, beating slowly, and a white-gold blade with a cross guard and a line of light down its middle.
+- **Level 28 — Omniverse God — is rebuilt, not a recoloured 24.** It wears a **crown of light** (twin halo rings and ten rays), carries the longest blade in the game (the white-gold **omniverse blade** with a star guard), and is ringed by two counter-rotating circles of light instead of one.
+- Every new weapon's kill zone is built from its own drawn parts, exactly like the others: the ring of the sceptre, both crescents of the glaive, the cross guard of the holy sword and the whole omniverse blade are the killing ground, and nothing behind you is.
 
 ## What's new in v1.13
 - **Test Range: choose how many bots you want.** A `BOTS` row at the top of the picker with **−** / **+** buttons, from 1 up to **25**. It also works from the keyboard: `-` and `=` (or `+`).
@@ -39,7 +46,7 @@ Pick your name on the title screen, then choose a mode:
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
 ## Controls
-- **Move:** WASD / arrow keys (or steer with the mouse)
+- **Move:** WASD / arrow keys (or steer with the mouse). Direction changes are instant — a turn goes where you point it, with no sliding.
 - **Swing:** SPACE or left-click — the killing ground is the weapon itself: the drawn blade, and the whole arc it sweeps through. One hit kills at any tier.
 - **Sprint:** SHIFT or right-click (drains XP)
 - **Back to start screen:** ESC (or click / any key on the match-over screen)
