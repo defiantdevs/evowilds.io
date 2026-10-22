@@ -3,9 +3,14 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 33 humanoid tiers — from Caveman to Author of Worlds.
 
 ## Download
-Current build: **v1.15** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.15/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.16** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.16/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.15**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.16**, you are still running an older download.
+
+## What's new in v1.16
+- **The Test Range box folds away.** Click the **–** in its top-right corner (or press **M**) and the whole tier list collapses into a slim title bar in the bottom-left corner that still shows the tier you are playing. Click **+** (or press **M** again) and the full picker comes back exactly where it was, centred down the left edge.
+- Everything keeps working while it is folded: **1-9** / **0** pick a tier, **[** and **]** step through them, **- / +** change the bot count, **TAB** hides the bar outright, **ESC** leaves.
+- It folds out of the way of the score, the kill feed and the middle of the arena, so nothing important is covered while you test.
 
 ## What's new in v1.15
 - **Five new tiers above Omniverse God: the game now has 33.** Each has its own body, colours, face and weapon, so none of them is a recolour of the one before:
@@ -41,7 +46,7 @@ Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows th
   - The tier you pick is pinned: you do not outgrow it while you test.
   - Every bot in the arena **runs straight at you and never swings**, so you can walk them into your own blade and see exactly what your weapon kills.
   - **You cannot die in here** — try the same swing as many times as you like.
-  - No clock, no scoreboard rules: the Test Range runs until you press **ESC** (or **TAB** to hide the picker).
+  - No clock, no scoreboard rules: the Test Range runs until you press **ESC** (or **TAB** to hide the picker, **M** to fold it away).
 
 ## What's new in v1.10
 - **The killing ground is the weapon itself.** Every weapon carries a table of its own drawn parts — blade, guard, head, tines — and the swing's hit test is built from those parts, so a swing kills exactly what the visible blade touches. No reach bonus, no graze padding, and nothing behind you.

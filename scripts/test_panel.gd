@@ -10,6 +10,10 @@ var shown := -1
 var shown_bots := -1
 var panel: PanelContainer
 var bot_label: Label
+var title: Label
+var min_btn: Button
+var body: VBoxContainer
+var minimized := false
 
 
 func _ready() -> void:
@@ -47,18 +51,40 @@ func _ready() -> void:
 	col.add_theme_constant_override("separation", 6)
 	panel.add_child(col)
 
-	var title := Label.new()
+	# --- header: title and the minimise button -------------------------
+	var head := HBoxContainer.new()
+	head.add_theme_constant_override("separation", 6)
+	col.add_child(head)
+
+	title = Label.new()
 	title.text = "TEST RANGE  -  PICK A TIER"
-	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
+	title.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
+	title.size_flags_horizontal = Control.SIZE_EXPAND_FILL
+	title.custom_minimum_size = Vector2(250, 0)
 	title.add_theme_font_size_override("font_size", 14)
 	title.add_theme_color_override("font_color", Color(0.6, 1.0, 0.9))
-	col.add_child(title)
+	head.add_child(title)
+
+	min_btn = Button.new()
+	min_btn.text = "-"
+	min_btn.tooltip_text = "Minimise (M)"
+	min_btn.focus_mode = Control.FOCUS_NONE
+	min_btn.custom_minimum_size = Vector2(26, 22)
+	min_btn.add_theme_font_size_override("font_size", 15)
+	_style(min_btn, false)
+	min_btn.pressed.connect(func(): set_minimized(not minimized))
+	head.add_child(min_btn)
+
+	# everything below the header can be folded away
+	body = VBoxContainer.new()
+	body.add_theme_constant_override("separation", 6)
+	col.add_child(body)
 
 	# --- how many bots charge you -------------------------------------
 	var row := HBoxContainer.new()
 	row.alignment = BoxContainer.ALIGNMENT_CENTER
 	row.add_theme_constant_override("separation", 8)
-	col.add_child(row)
+	body.add_child(row)
 
 	var bl := Label.new()
 	bl.text = "BOTS"
@@ -93,7 +119,7 @@ func _ready() -> void:
 	grid.columns = 5
 	grid.add_theme_constant_override("h_separation", 4)
 	grid.add_theme_constant_override("v_separation", 4)
-	col.add_child(grid)
+	body.add_child(grid)
 
 	for i in range(Species.COUNT):
 		var b := Button.new()
@@ -106,11 +132,11 @@ func _ready() -> void:
 		buttons.append(b)
 
 	var hint := Label.new()
-	hint.text = "1-9 0 tier    [ ] step    - + bots    TAB hide    ESC leave"
+	hint.text = "1-9 0 tier    [ ] step    - + bots    M minimise    TAB hide    ESC leave"
 	hint.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	hint.add_theme_font_size_override("font_size", 11)
 	hint.add_theme_color_override("font_color", Color(0.65, 0.8, 0.9, 0.8))
-	col.add_child(hint)
+	body.add_child(hint)
 
 	get_viewport().size_changed.connect(_place)
 	_place()
@@ -130,12 +156,41 @@ func _small_button(txt: String) -> Button:
 
 func _place() -> void:
 	# this control does not get the viewport rect for free, so place the
-	# panel by hand: down the left edge, centred vertically.
+	# panel by hand: down the left edge. Folded up it tucks into the top
+	# corner, unfolded it sits centred vertically.
 	size = get_viewport_rect().size
 	if panel == null:
 		return
 	var vs: Vector2 = get_viewport_rect().size
-	panel.position = Vector2(16.0, maxf(vs.y * 0.5 - panel.size.y * 0.5, 96.0))
+	# folded up, tuck it away in the bottom-left corner so it covers
+	# neither the score, the kill feed nor the arena's middle
+	var y := (vs.y - panel.size.y - 16.0) if minimized else vs.y * 0.5 - panel.size.y * 0.5
+	panel.position = Vector2(16.0, maxf(y, 96.0))
+
+
+func set_minimized(on: bool) -> void:
+	if on == minimized:
+		return
+	minimized = on
+	if body != null:
+		body.visible = not on
+	if min_btn != null:
+		min_btn.text = "+" if on else "-"
+		min_btn.tooltip_text = "Expand (M)" if on else "Minimise (M)"
+	_refresh()
+	_fit()
+
+
+func _fit() -> void:
+	# the panel is not inside a container, so re-fit it by hand after folding
+	if panel == null:
+		return
+	panel.reset_size()
+	await get_tree().process_frame
+	if not is_instance_valid(panel):
+		return
+	panel.reset_size()
+	_place()
 
 
 func _pick(evo: int) -> void:
@@ -165,6 +220,10 @@ func _style(b: Button, on: bool) -> void:
 
 func _refresh() -> void:
 	var cur: int = GameState.test_tier
+	if title != null:
+		var want := ("TEST RANGE  -  %02d %s" % [cur + 1, Species.NAMES[cur]]) if minimized else "TEST RANGE  -  PICK A TIER"
+		if title.text != want:
+			title.text = want
 	if cur != shown:
 		shown = cur
 		for i in range(buttons.size()):

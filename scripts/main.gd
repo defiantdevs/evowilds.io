@@ -844,6 +844,11 @@ func _unhandled_input(event: InputEvent) -> void:
 		if kc == KEY_BRACKETRIGHT:
 			set_test_tier(GameState.test_tier + 1)
 			return
+		if kc == KEY_M:
+			if test_picker != null and is_instance_valid(test_picker):
+				test_picker.visible = true
+				test_picker.set_minimized(not test_picker.minimized)
+			return
 		if kc == KEY_TAB:
 			if test_picker != null and is_instance_valid(test_picker):
 				test_picker.visible = not test_picker.visible
