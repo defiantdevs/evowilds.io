@@ -872,10 +872,11 @@ func _update_camera(delta: float) -> void:
 	if player != null and player.alive:
 		var e: int = player.evo
 		target_zoom = clampf(1.1 - 0.033 * float(e) - 0.02 * Species.progress(player.xp), 0.46, 1.1)
-		if e >= 45:
-			# tier 46 and up: these bodies (and their blades) outgrow the
-			# normal view, so keep roughly the same amount of them in frame
-			target_zoom = minf(target_zoom, clampf(78.0 / maxf(player.r, 1.0), 0.22, 0.46))
+		if e >= 43:
+			# level 44 and up: these bodies (and their blades) outgrow the
+			# normal view, so pull back hard and keep roughly the same amount
+			# of the creature in frame as it grows
+			target_zoom = minf(target_zoom, clampf(62.0 / maxf(player.r, 1.0), 0.22, 0.46))
 		cam.position = cam.position.lerp(player.position + player.vel * 0.15, minf(delta * 6.0, 1.0))
 	if shot_gallery:
 		target_zoom = 0.4

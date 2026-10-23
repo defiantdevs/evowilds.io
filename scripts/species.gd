@@ -2,14 +2,13 @@ extends RefCounted
 
 const COUNT := 43
 # The Test Range only: five ranks above The Infinite, kept out of the normal
-# 43-tier game. A creature up here also has its floating orbs turned into
-# weapons (see ORB_KILL_FROM).
+# 43-tier game.
 const SECRET_FROM := 43
 const SECRET_COUNT := 5
 const TOTAL := COUNT + SECRET_COUNT
-# from this evo up the orbs that circle a body kill whatever they touch, but
-# only while the Test Range is running
-const ORB_KILL_FROM := 39
+# from this evo up a body wears rings of floating orbs. They are decoration
+# only and cannot hurt anything.
+const ORB_FROM := 39
 const NAMES := ["Caveman", "Forager", "Hunter", "Tribesman", "Peasant", "Raider", "Viking", "Soldier", "Knight", "Samurai", "Ninja", "Gladiator", "Crusader", "Paladin", "Sorcerer", "Necromancer", "Dragon Knight", "Warlord", "Emperor", "Immortal Sage", "Storm Titan", "Death Reaper", "Celestial King", "Cosmos Emperor", "Astral Sovereign", "Void Titan", "Eternal Seraph", "Omniverse God",
 	"Eclipse Monarch", "Chrono Warden", "Genesis Prime", "Aether Regent", "Author of Worlds",
 	"Sunforged", "Storm Herald", "Abyss Sovereign", "Crimson Colossus", "Shard Prophet", "Elder Warden", "Void Empress", "Dragon Ascendant", "Primordial", "The Infinite",
@@ -221,7 +220,7 @@ const STEEL := Color(0.8, 0.84, 0.92)
 
 static func orb_body(e: int) -> bool:
 	# does this body wear rings of floating orbs?
-	return e >= ORB_KILL_FROM and e < TOTAL
+	return e >= ORB_FROM and e < TOTAL
 
 
 static func orb_count(e: int) -> int:
@@ -236,8 +235,8 @@ static func orb_radius(e: int) -> float:
 
 
 static func orb_positions(e: int, r: float, t: float) -> Array:
-	# where each orb sits right now, relative to the body's centre. What those
-	# orbs are allowed to hit lives in main.gd.
+	# where each orb sits right now, relative to the body's centre. Purely
+	# cosmetic: nothing reads these positions for damage.
 	var out: Array = []
 	var n := orb_count(e)
 	if n == 0:
@@ -254,7 +253,7 @@ static func orb_positions(e: int, r: float, t: float) -> Array:
 	return out
 
 
-static func orb_hit_radius(e: int, r: float) -> float:
+static func orb_draw_radius(e: int, r: float) -> float:
 	# the drawn size of one orb, as a radius
 	return r * (0.085 if is_secret(e) else 0.11)
 
@@ -263,7 +262,7 @@ static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color) -> 
 	# purely decorative: nothing here can hurt anyone
 	if not orb_body(e):
 		return
-	var hr := orb_hit_radius(e, r)
+	var hr := orb_draw_radius(e, r)
 	for op in orb_positions(e, r, t):
 		ci.draw_circle(op, hr, Color(ac.r, ac.g, ac.b, 0.8))
 		ci.draw_circle(op, hr * 0.45, Color(1, 1, 1, 0.9))
