@@ -1,11 +1,13 @@
 extends RefCounted
 
-const COUNT := 43
-# The Test Range only: five ranks above The Infinite, kept out of the normal
-# 43-tier game.
-const SECRET_FROM := 43
-const SECRET_COUNT := 5
-const TOTAL := COUNT + SECRET_COUNT
+const COUNT := 48
+# The five newest ranks (tiers 44-48). They are part of the normal climb now;
+# TOP_FROM only marks them for their extra orbs and their wide swings.
+const TOP_FROM := 43
+const TOTAL := COUNT
+# From this level up (The Infinite, tier 43, and every newest rank above it)
+# each blade of a dual pair sweeps a 200 degree cut.
+const WIDE_SWING_FROM := 42
 # from this evo up a body wears rings of floating orbs. They are decoration
 # only and cannot hurt anything.
 const ORB_FROM := 39
@@ -57,11 +59,11 @@ const BLURB := [
 	"The last thing many worlds ever saw. Twice.",
 	"It was here before the word 'here'.",
 	"You have finally found the edge of the map. It is holding them.",
-	"Test Range only. Nothing is left for it to kneel to.",
-	"Test Range only. Its crown is the hole where a world used to be.",
-	"Test Range only. It eats planets the way you eat berries.",
-	"Test Range only. Every sun it owns is still burning, for it.",
-	"Test Range only. When it forgets you, you will stop having been."]
+	"Nothing is left for it to kneel to.",
+	"Its crown is the hole where a world used to be.",
+	"It eats planets the way you eat berries.",
+	"Every sun it owns is still burning, for it.",
+	"When it forgets you, you will stop having been."]
 const XP_AT := [0.0, 50.0, 176.0, 364.0, 612.0, 913.0, 1267.0, 1674.0, 2128.0, 2630.0, 3181.0, 3775.0, 4415.0, 5099.0, 5827.0, 6597.0, 7411.0, 8266.0, 9160.0, 10096.0, 11077.0, 12103.0, 13183.0, 14317.0, 15498.0, 16722.0, 17982.0, 19296.0, 20664.0, 22086.0, 23562.0, 25092.0, 26676.0, 28576.0, 30626.0, 32826.0, 35176.0, 37676.0, 40326.0, 43126.0, 46076.0, 49176.0, 52426.0, 72000.0, 120000.0, 250000.0, 550000.0, 999999.0]
 const COL1 := [Color("8a5a3a"), Color("7a8f3a"), Color("4f8f3a"), Color("b5532f"), Color("9a8a6a"), Color("6b5a4a"), Color("7a4a2a"), Color("3f6fa8"), Color("8d9bb0"), Color("a83232"), Color("2c2c3c"), Color("c9a06a"), Color("e8e8ee"), Color("d4b13a"), Color("6d3fb5"), Color("2f1f3f"), Color("8f1d2c"), Color("4a2a2a"), Color("e0b020"), Color("6a4fae"), Color("2f6f9e"), Color("221c2c"), Color("e8e2c8"), Color("241242"), Color("22407f"), Color("120e1c"), Color("efe6cc"), Color("f2c84a"),
 	Color("141018"), Color("43301a"), Color("143a28"), Color("3a1440"), Color("f7f4ec"),
@@ -226,12 +228,12 @@ static func orb_body(e: int) -> bool:
 static func orb_count(e: int) -> int:
 	if not orb_body(e):
 		return 0
-	return 6 if is_secret(e) else 4
+	return 6 if is_top_rank(e) else 4
 
 
 static func orb_radius(e: int) -> float:
 	# how far out from the centre the orbs circle, in body radii
-	return 1.9 + 0.9 * float(maxi(e - COUNT, 0))
+	return 1.9 + 0.9 * float(maxi(e - TOP_FROM, 0))
 
 
 static func orb_positions(e: int, r: float, t: float) -> Array:
@@ -241,12 +243,12 @@ static func orb_positions(e: int, r: float, t: float) -> Array:
 	var n := orb_count(e)
 	if n == 0:
 		return out
-	if e == COUNT - 1:
+	if e == TOP_FROM - 1:
 		# The Infinite already spins a second, tighter ring the other way
 		for k in range(n):
 			out.append(Vector2.from_angle(t * 1.4 + TAU * float(k) / float(n)) * r * 1.9)
 		return out
-	var spin := t * (0.9 if is_secret(e) else 1.4)
+	var spin := t * (0.9 if is_top_rank(e) else 1.4)
 	var dist := orb_radius(e) * r
 	for k in range(n):
 		out.append(Vector2.from_angle(spin + TAU * float(k) / float(n)) * dist)
@@ -255,7 +257,7 @@ static func orb_positions(e: int, r: float, t: float) -> Array:
 
 static func orb_draw_radius(e: int, r: float) -> float:
 	# the drawn size of one orb, as a radius
-	return r * (0.085 if is_secret(e) else 0.11)
+	return r * (0.085 if is_top_rank(e) else 0.11)
 
 
 static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color) -> void:
@@ -269,9 +271,9 @@ static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color) -> 
 
 
 static func radius_base(i: int) -> float:
-	if i >= SECRET_FROM:
-		# the five above The Infinite: each one a real step up again
-		return 200.0 + 40.0 * float(i - SECRET_FROM)
+	if i >= TOP_FROM:
+		# the five newest ranks: each one a real step up again
+		return 200.0 + 40.0 * float(i - TOP_FROM)
 	var base := 22.0 + 2.6 * float(i)
 	if i > 32:
 		# the last ten grow faster than the rest: every one is a step up
@@ -280,8 +282,8 @@ static func radius_base(i: int) -> float:
 
 
 static func speed_base(i: int) -> float:
-	if i >= SECRET_FROM:
-		return 88.0 - 6.0 * float(i - SECRET_FROM)
+	if i >= TOP_FROM:
+		return 88.0 - 6.0 * float(i - TOP_FROM)
 	if i > 32:
 		return 158.0 - 1.1 * float(i - 32)
 	return 270.0 - 3.5 * float(i)
@@ -291,9 +293,9 @@ static func is_dual(e: int) -> bool:
 	return DUAL[clampi(e, 0, TOTAL - 1)] > 0
 
 
-static func is_secret(e: int) -> bool:
-	# the five ranks above The Infinite: Test Range only
-	return e >= SECRET_FROM and e < TOTAL
+static func is_top_rank(e: int) -> bool:
+	# the five newest ranks, 44 to 48
+	return e >= TOP_FROM and e < TOTAL
 
 
 static func weapon_parts(e: int) -> Array:
@@ -318,12 +320,9 @@ static func evo_for_xp(xp: float) -> int:
 	return e
 
 
-static func capped_for_mode(e: int, mode: String) -> int:
-	# The five ranks above The Infinite never turn up in a normal match; they
-	# exist only in the Test Range. Everything else walks tiers 1 to 43.
-	if mode == "test":
-		return clampi(e, 0, TOTAL - 1)
-	return clampi(e, 0, COUNT - 1)
+static func capped_for_mode(e: int, _mode: String) -> int:
+	# every tier is part of the normal climb now
+	return clampi(e, 0, TOTAL - 1)
 
 
 static func progress(xp: float) -> float:

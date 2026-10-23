@@ -501,8 +501,10 @@ func _swing_angle() -> float:
 		rest = 1.30
 		wind = PI * 0.5
 		end = -PI * 0.5
-		if evo == Species.COUNT - 1:
-			# The Infinite swings wider than anyone: a 200 degree cut
+		if evo >= Species.WIDE_SWING_FROM:
+			# The Infinite and every newest rank above it swing wider than
+			# anyone: a 200 degree cut with each blade, so the pair fills the
+			# circle with room to spare
 			rest = 1.45
 			wind = deg_to_rad(100.0)
 			end = deg_to_rad(-100.0)
