@@ -3,7 +3,7 @@ extends Node
 
 # Type this in as your name on the start screen to unlock the Test Range.
 const SECRET_NAME := "godmode"
-const VERSION := "v1.21"
+const VERSION := "v1.22"
 
 var player_name := "You"
 var mode := "dm"   # "dm" = Deathmatch, "tdm" = Team Deathmatch, "test" = Test Range

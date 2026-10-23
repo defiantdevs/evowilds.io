@@ -500,6 +500,11 @@ func _swing_angle() -> float:
 		rest = 1.30
 		wind = 1.48
 		end = -1.32
+		if evo == Species.COUNT - 1:
+			# The Infinite swings wider than anyone: a 200 degree cut
+			rest = 1.45
+			wind = 1.70
+			end = -1.80
 	var ang := rest + sin(anim_t * 3.0) * 0.04
 	if swing_t >= 0.0:
 		var p := clampf(swing_t / SWING_TIME, 0.0, 1.0)

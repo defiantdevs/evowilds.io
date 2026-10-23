@@ -418,6 +418,10 @@ func _random_bot_evo() -> int:
 
 func _spawn_bot(initial: bool) -> void:
 	var evo := _random_bot_evo() if initial else mini(int(pow(randf(), 3.0) * 6.0), 5)
+	if mode == "tdm":
+		# Team Deathmatch: everybody starts the match as a caveman and earns
+		# their size during the fight
+		evo = 0
 	var pos := Vector2.ZERO
 	for tries in range(10):
 		pos = Vector2.from_angle(randf() * TAU) * sqrt(randf()) * (ARENA_R - 200.0)
@@ -537,6 +541,8 @@ func _statue_damage(c) -> float:
 
 
 func _spawn_unit(size: int) -> void:
+	if units.size() >= 24:
+		return
 	var pos := Vector2.ZERO
 	for tries in range(14):
 		pos = Vector2.from_angle(randf() * TAU) * sqrt(randf()) * (ARENA_R - 340.0)
@@ -744,17 +750,23 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vec
 	var ateam: int = attacker.team
 	if ateam < 0:
 		return
-	# hitting a neutral (or enemy) golem flips it to your colour
+	# a golem is not captured: one clean hit destroys it, and it never changes
+	# sides
+	var smashed: Array = []
 	for u in units:
 		if int(u["team"]) == ateam or attacker.swing_hits.has(u):
 			continue
 		var up: Vector2 = u["pos"]
 		if _zone_hits(up, float(u["r"]), pivot, attacker.heading, bands, s_lo, s_hi):
 			attacker.swing_hits.append(u)
-			u["team"] = ateam
-			u["atk"] = 0.0
-			u["flash"] = 0.3
-			fx.burst(up, team_color(ateam), 14, 220.0, 0.5)
+			smashed.append(u)
+			fx.burst(up, Species.glow(team_color(ateam), 1.5), 22, 280.0, 0.6)
+			fx.ring(up, team_color(ateam), float(u["r"]) * 2.4, 0.5)
+	for u in smashed:
+		units.erase(u)
+		attacker.add_xp(6.0 + 5.0 * float(u["size"]))
+	if not smashed.is_empty() and attacker.is_player:
+		shake = maxf(shake, 4.0)
 	# hitting the enemy statue chips its health (one point per tier, by size)
 	var eb: Dictionary = enemy_base(ateam)
 	if eb.is_empty() or attacker.swing_hits.has(eb):
