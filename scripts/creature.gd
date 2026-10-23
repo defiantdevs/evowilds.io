@@ -495,16 +495,17 @@ func _swing_angle() -> float:
 	var wind := 1.35
 	var end := -1.35
 	if dual_wield():
-		# two blades, one each side: they rest out at the sides and the pair
-		# turns a full 160 degrees through the swing
+		# two blades, one each side: each blade cuts a half circle (180
+		# degrees) and, being exactly opposite each other, the pair fills the
+		# whole circle between them
 		rest = 1.30
-		wind = 1.48
-		end = -1.32
+		wind = PI * 0.5
+		end = -PI * 0.5
 		if evo == Species.COUNT - 1:
 			# The Infinite swings wider than anyone: a 200 degree cut
 			rest = 1.45
-			wind = 1.70
-			end = -1.80
+			wind = deg_to_rad(100.0)
+			end = deg_to_rad(-100.0)
 	var ang := rest + sin(anim_t * 3.0) * 0.04
 	if swing_t >= 0.0:
 		var p := clampf(swing_t / SWING_TIME, 0.0, 1.0)

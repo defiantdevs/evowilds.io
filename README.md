@@ -3,9 +3,13 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 43 humanoid tiers — from Caveman to The Infinite.
 
 ## Download
-Current build: **v1.23** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.23/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.24** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.24/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.23**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.24**, you are still running an older download.
+
+## What's new in v1.24
+
+- **Twin-blade swings are true half circles.** Every dual-wielding tier now cuts 180 degrees with each blade; the two blades sit exactly opposite, so together they fill the whole circle with no gaps.
 
 ## What's new in v1.23
 
