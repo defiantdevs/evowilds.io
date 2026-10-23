@@ -259,14 +259,12 @@ static func orb_hit_radius(e: int, r: float) -> float:
 	return r * (0.085 if is_secret(e) else 0.11)
 
 
-static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color, lethal: bool) -> void:
+static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color) -> void:
+	# purely decorative: nothing here can hurt anyone
 	if not orb_body(e):
 		return
 	var hr := orb_hit_radius(e, r)
 	for op in orb_positions(e, r, t):
-		if lethal:
-			# Test Range: these are weapons now, and they say so
-			ci.draw_circle(op, hr * 1.6, Color(1.0, 0.35, 0.3, 0.28))
 		ci.draw_circle(op, hr, Color(ac.r, ac.g, ac.b, 0.8))
 		ci.draw_circle(op, hr * 0.45, Color(1, 1, 1, 0.9))
 
@@ -297,10 +295,6 @@ static func is_dual(e: int) -> bool:
 static func is_secret(e: int) -> bool:
 	# the five ranks above The Infinite: Test Range only
 	return e >= SECRET_FROM and e < TOTAL
-
-
-static func orbs_kill(e: int) -> bool:
-	return e >= ORB_KILL_FROM and e < TOTAL
 
 
 static func weapon_parts(e: int) -> Array:
@@ -437,7 +431,7 @@ static func _helmet(ci: CanvasItem, r: float, col: Color, lw: float) -> void:
 	ci.draw_line(Vector2(hx + 0.5 * r, 0), Vector2(hx - 0.1 * r, 0), col.darkened(0.3), r * 0.07, true)
 
 
-static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c2: Color, swing: float = 0.12, lethal_orbs: bool = false) -> void:
+static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c2: Color, swing: float = 0.12) -> void:
 	var skin: Color = SKIN[evo]
 	var lw := maxf(r * 0.09, 2.0)
 	var pv := Vector2(0, 0.8 * r)
@@ -450,7 +444,7 @@ static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c
 		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 40, Color(ac.r, ac.g, ac.b, 0.5), 2.5, true)
 		if evo >= 21:
 			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 36, Color(ac.r, ac.g, ac.b, 0.35), 1.5, true)
-		draw_orbs(ci, evo, r, t, ac, lethal_orbs)
+		draw_orbs(ci, evo, r, t, ac)
 		if evo == COUNT - 1:
 			# the last one in the game wears a second ring of light, turning
 			# the other way, so it never reads as just another purple emperor

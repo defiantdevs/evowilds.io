@@ -721,102 +721,6 @@ func devour(eater, victim) -> void:
 	eater.add_xp(gain)
 
 
-func _orbs_versus(c) -> void:
-	# Test Range only: from tier 40 up the floating orbs are weapons.
-	if not (mode == "test" and c.alive and Species.orb_body(c.evo)):
-		c.last_orb_t = -1.0
-		return
-	var ateam: int = c.team
-	if ateam >= 0:
-		# team rules: never a team-mate, and the enemy statue can be bitten
-		for o in creatures:
-			if o == c or not o.alive or o.frozen or o.team == ateam:
-				continue
-			var hr := Species.orb_hit_radius(c.evo, c.r)
-			if _orb_over_body(c, o.position - c.position, o.r + hr):
-				_orb_bite(c, o, o.position)
-		if not c.alive:
-			return
-		for u in units:
-			if int(u["team"]) == ateam or c.swing_hits.has(u):
-				continue
-			var hr2 := Species.orb_hit_radius(c.evo, c.r)
-			if _orb_over_body(c, Vector2(u["pos"]) - c.position, float(u["r"]) + hr2):
-				c.swing_hits.append(u)
-				u["team"] = ateam
-				u["atk"] = 0.0
-				u["flash"] = 0.3
-				fx.burst(Vector2(u["pos"]), team_color(ateam), 14, 220.0, 0.5)
-		var eb: Dictionary = enemy_base(ateam)
-		if not eb.is_empty() and not c.swing_hits.has(eb):
-			var er: float = float(eb["r"]) + Species.orb_hit_radius(c.evo, c.r)
-			if _orb_over_body(c, Vector2(eb["pos"]) - c.position, er):
-				c.swing_hits.append(eb)
-				eb["hp"] = maxf(float(eb["hp"]) - _statue_damage(c), 0.0)
-				eb["flash"] = 0.3
-				fx.burst(Vector2(eb["pos"]), team_color(ateam), 18, 260.0, 0.5)
-		return
-	# free-for-all (Deathmatch and the Test Range): the whole orbit is a blade,
-	# so it is tested as a swept arc — an orb kills on its way round even while
-	# its owner stands still.
-	var hit_any := _orb_hit_zone(c)
-	if hit_any and c.is_player:
-		shake = maxf(shake, 5.0)
-
-
-func _orb_bite(c, victim, at: Vector2) -> void:
-	if c.swing_hits.has(victim):
-		return
-	c.swing_hits.append(victim)
-	fx.burst(at, Color(1.0, 0.45, 0.35), 10, 220.0, 0.35)
-	victim.take_damage(0.0, c)
-
-
-func _orb_over_body(c, p: Vector2, tol: float) -> bool:
-	# is any orb, at this instant, overlapping a body at p?
-	var n := Species.orb_count(c.evo)
-	if n == 0:
-		return false
-	var hr: float = Species.orb_hit_radius(c.evo, c.r)
-	for op in Species.orb_positions(c.evo, c.r, c.anim_t):
-		var ov: Vector2 = op
-		if ov.distance_to(p) <= hr + tol:
-			return true
-	return false
-
-
-func _orb_hit_zone(attacker) -> bool:
-	# Does the orbit itself cross a body between last frame and this one?
-	var hit_any := false
-	var n := Species.orb_count(attacker.evo)
-	if n == 0:
-		return false
-	var hr: float = Species.orb_hit_radius(attacker.evo, attacker.r)
-	var spin := 0.9 if Species.is_secret(attacker.evo) else 1.4
-	var dist: float = Species.orb_radius(attacker.evo) * attacker.r
-	if attacker.evo == Species.COUNT - 1:
-		spin = 1.4
-		dist = attacker.r * 1.9
-	var prev_t: float = attacker.last_orb_t if attacker.last_orb_t >= 0.0 else attacker.anim_t
-	attacker.last_orb_t = attacker.anim_t
-	for o in creatures:
-		if o == attacker or not o.alive or o.frozen:
-			continue
-		if mode == "tdm" and attacker.team >= 0 and o.team == attacker.team:
-			continue
-		if attacker.swing_hits.has(o):
-			continue
-		for k in range(n):
-			var a0: float = spin * prev_t + TAU * float(k) / float(n)
-			var a1: float = spin * attacker.anim_t + TAU * float(k) / float(n)
-			if _arc_hits_body(Vector2.ZERO, dist, o.position - attacker.position, o.r + hr, a0, a1):
-				_orb_bite(attacker, o, o.position)
-				hit_any = true
-				if not attacker.alive:
-					return hit_any
-				break
-	return hit_any
-
 func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vector2 = Vector2(0.0, 0.8)) -> void:
 	# The killing ground is the weapon itself: the drawn blade, part by part,
 	# and the slice of the arc it swept through on this frame. Nothing kills
@@ -884,28 +788,6 @@ func _zone_hits(p: Vector2, target_r: float, pivot: Vector2, heading: float, ban
 		if rel >= s_lo - h - eps and rel <= s_hi + h + eps:
 			return true
 	return false
-
-
-func _arc_hits_body(c: Vector2, radius: float, p: Vector2, tol: float, a0: float, a1: float) -> bool:
-	# Does a small body (radius + tol around p) cross the arc of a circle
-	# centred on c between angles a0 and a1? If it does, the nearest and
-	# furthest points of the arc to p are enough to decide it.
-	var v: Vector2 = p - c
-	var d := v.length()
-	if d < 0.001:
-		return true
-	var va := v.angle()
-	for a in [a0, a1]:
-		if absf(angle_difference(va, a)) <= asin(clampf(tol / d, 0.0, 1.0)):
-			return true
-	var span: float = absf(angle_difference(a0, a1))
-	if span >= TAU - 0.001:
-		return true
-	var mid: float = a0 + angle_difference(a0, a1) * 0.5
-	var e0: float = absf(angle_difference(va, a0))
-	var e1: float = absf(angle_difference(va, a1))
-	var near_inside: bool = (minf(e0, e1) <= span * 0.5) and e0 <= PI * 0.5 and e1 <= PI * 0.5
-	return near_inside and absf(d - radius) <= tol
 
 
 func _process(delta: float) -> void:
@@ -978,6 +860,10 @@ func _update_camera(delta: float) -> void:
 	if player != null and player.alive:
 		var e: int = player.evo
 		target_zoom = clampf(1.1 - 0.033 * float(e) - 0.02 * Species.progress(player.xp), 0.46, 1.1)
+		if e >= 45:
+			# tier 46 and up: these bodies (and their blades) outgrow the
+			# normal view, so keep roughly the same amount of them in frame
+			target_zoom = minf(target_zoom, clampf(78.0 / maxf(player.r, 1.0), 0.22, 0.46))
 		cam.position = cam.position.lerp(player.position + player.vel * 0.15, minf(delta * 6.0, 1.0))
 	if shot_gallery:
 		target_zoom = 0.4
