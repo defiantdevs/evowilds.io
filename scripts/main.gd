@@ -727,19 +727,28 @@ func devour(eater, victim) -> void:
 	eater.add_xp(gain)
 
 
-func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vector2 = Vector2(0.0, 0.8)) -> void:
+func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, at_heading: float, candidates: Array, grip: Vector2 = Vector2(0.0, 0.8), band_rotate: float = 0.0) -> void:
 	# The killing ground is the weapon itself: the drawn blade, part by part,
 	# and the slice of the arc it swept through on this frame. Nothing kills
-	# outside the weapon.
-	var pivot: Vector2 = attacker.position + (grip * attacker.r).rotated(attacker.heading)
-	for o in creatures:
+	# outside the weapon. `candidates` is the short list of bodies near enough
+	# for this swing to reach; a flick tests the same short list many times.
+	var pivot: Vector2 = attacker.position + (grip * attacker.r).rotated(at_heading)
+	# tidy broad phase: the blade cannot touch anything whose centre is
+	# outside its furthest reach plus that body's own radius
+	var reach := 0.0
+	for b in bands:
+		reach = maxf(reach, float(b[2]) + float(b[4]))
+	for o in candidates:
 		if o == attacker or not o.alive or o.frozen:
 			continue
 		if mode == "tdm" and attacker.team >= 0 and o.team == attacker.team:
 			continue
 		if attacker.swing_hits.has(o):
 			continue
-		if not _zone_hits(o.position, o.r, pivot, attacker.heading, bands, s_lo, s_hi):
+		var room: float = reach + float(o.r)
+		if o.position.distance_squared_to(pivot) > room * room:
+			continue
+		if not _zone_hits(o.position, o.r, pivot, at_heading, bands, s_lo, s_hi, band_rotate):
 			continue
 		attacker.swing_hits.append(o)
 		o.take_damage(0.0, attacker)
@@ -757,7 +766,10 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vec
 		if int(u["team"]) == ateam or attacker.swing_hits.has(u):
 			continue
 		var up: Vector2 = u["pos"]
-		if _zone_hits(up, float(u["r"]), pivot, attacker.heading, bands, s_lo, s_hi):
+		var uroom: float = reach + float(u["r"])
+		if up.distance_squared_to(pivot) > uroom * uroom:
+			continue
+		if _zone_hits(up, float(u["r"]), pivot, at_heading, bands, s_lo, s_hi, band_rotate):
 			attacker.swing_hits.append(u)
 			smashed.append(u)
 			fx.burst(up, Species.glow(team_color(ateam), 1.5), 22, 280.0, 0.6)
@@ -772,7 +784,10 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vec
 	if eb.is_empty() or attacker.swing_hits.has(eb):
 		return
 	var ep: Vector2 = eb["pos"]
-	if _zone_hits(ep, float(eb["r"]), pivot, attacker.heading, bands, s_lo, s_hi):
+	var eroom: float = reach + float(eb["r"])
+	if ep.distance_squared_to(pivot) > eroom * eroom:
+		return
+	if _zone_hits(ep, float(eb["r"]), pivot, at_heading, bands, s_lo, s_hi, band_rotate):
 		attacker.swing_hits.append(eb)
 		var dmg := _statue_damage(attacker)
 		eb["hp"] = maxf(float(eb["hp"]) - dmg, 0.0)
@@ -782,7 +797,7 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, grip: Vec
 			shake = maxf(shake, 5.0)
 
 
-func _zone_hits(p: Vector2, target_r: float, pivot: Vector2, heading: float, bands: Array, s_lo: float, s_hi: float) -> bool:
+func _zone_hits(p: Vector2, target_r: float, pivot: Vector2, heading: float, bands: Array, s_lo: float, s_hi: float, band_rotate: float = 0.0) -> bool:
 	# Does a body of that size at p overlap the weapon? Each part of the
 	# weapon owns a band of radii and a slice of the arc it just swept.
 	var v: Vector2 = (p - pivot).rotated(-heading)
@@ -794,7 +809,7 @@ func _zone_hits(p: Vector2, target_r: float, pivot: Vector2, heading: float, ban
 		var tol: float = target_r + float(b[4])
 		if d < float(b[1]) - tol or d > float(b[2]) + tol:
 			continue
-		var rel: float = angle_difference(va, (b[0] as Vector2).angle())
+		var rel: float = angle_difference((b[0] as Vector2).angle() + band_rotate, va)
 		var eps := asin(clampf(tol / d, 0.0, 1.0))
 		var h: float = float(b[3])
 		if rel >= s_lo - h - eps and rel <= s_hi + h + eps:

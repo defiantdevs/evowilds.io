@@ -3,6 +3,8 @@ extends Node2D
 const Species = preload("res://scripts/species.gd")
 const SWING_TIME := 0.42
 const BIG_EVO := 15   # at this evolution a Team Deathmatch bot becomes a base defender
+const FLICK_STEP := PI / 90.0   # 2 degrees: how finely a fast turn is swept
+const TRAIL_MAX := 96           # long enough to keep a whole flick slash
 
 var main
 var is_player := false
@@ -115,30 +117,36 @@ func _process(delta: float) -> void:
 	swing_cd = maxf(swing_cd - delta, 0.0)
 	since_hit += delta
 	r = lerpf(r, Species.radius_for(evo, xp), minf(delta * 4.0, 1.0))
+
+	# EvoWars movement: the warrior runs at the mouse and faces it at once.
+	# Read that new facing before the blade resolves, so a fast flick cuts
+	# everything the steel passes over on its way around.
+	var prev_heading := heading
+	var dir := Vector2.ZERO
+	var want_sprint := false
+	if not frozen:
+		if is_player:
+			var to_m := get_global_mouse_position() - global_position
+			_face(to_m)
+			dir = _player_dir(to_m)
+			want_sprint = Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
+			if Input.is_physical_key_pressed(KEY_SPACE) or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
+				start_swing()
+			main.eat_food_near(self)
+		else:
+			mode_t -= delta
+			if mode_t <= 0.0:
+				_choose_mode()
+			dir = _bot_dir(delta)
+			want_sprint = bot_sprint
+
 	if swing_t >= 0.0:
-		# the blade's angle last frame, so we can work out the slice of the
-		# weapon's own arc that this swing just swept through
+		# the blade's angle last frame, so we can sweep the slice it cut
 		var prev_ang: float = _swing_angle()
 		swing_t += delta
 		var sp := swing_t / SWING_TIME
 		if sp >= 0.2 and sp <= 0.72:
-			var ang: float = _swing_angle()
-			trail.append(_weapon_tip(ang))
-			if trail.size() > 9:
-				trail.remove_at(0)
-			if dual_wield():
-				trail2.append(_weapon_tip(ang, 1))
-				if trail2.size() > 9:
-					trail2.remove_at(0)
-
-			# The killing ground is the weapon itself: the drawn blade, and
-			# the slice of the arc it swept through on this frame.
-			var shift: float = prev_ang - ang
-			main.weapon_hit_zone(self, _weapon_bands(ang), minf(0.0, shift), maxf(0.0, shift))
-			if dual_wield():
-				# the other blade turns the other way, half a circle around
-				var shift2: float = -shift
-				main.weapon_hit_zone(self, _weapon_bands(ang, 1), minf(0.0, shift2), maxf(0.0, shift2), Vector2(0.0, -0.8))
+			_sweep_blade(prev_heading, prev_ang, heading, _swing_angle())
 		if swing_t >= SWING_TIME:
 			swing_t = -1.0
 			trail.clear()
@@ -146,24 +154,6 @@ func _process(delta: float) -> void:
 	if frozen:
 		queue_redraw()
 		return
-
-	var dir := Vector2.ZERO
-	var want_sprint := false
-	if is_player:
-		dir = _player_dir()
-		want_sprint = Input.is_physical_key_pressed(KEY_SHIFT) or Input.is_mouse_button_pressed(MOUSE_BUTTON_RIGHT)
-		if Input.is_physical_key_pressed(KEY_SPACE) or Input.is_mouse_button_pressed(MOUSE_BUTTON_LEFT):
-			start_swing()
-		var to_m := get_global_mouse_position() - global_position
-		if to_m.length() > 6.0:
-			heading = lerp_angle(heading, to_m.angle(), minf(16.0 * delta, 1.0))
-		main.eat_food_near(self)
-	else:
-		mode_t -= delta
-		if mode_t <= 0.0:
-			_choose_mode()
-		dir = _bot_dir(delta)
-		want_sprint = bot_sprint
 
 	var floor_xp := tier_floor()
 	sprinting = want_sprint and dir.length() > 0.1
@@ -182,7 +172,7 @@ func _process(delta: float) -> void:
 		spd *= 0.8
 	if sprinting:
 		spd *= 1.6
-	if swing_t >= 0.0:
+	if swing_t >= 0.0 and not is_player:
 		spd *= 0.7
 	# crisper control for the player: quick to build speed, quick to stop,
 	# and extra bite when reversing so direction changes don't slide.
@@ -248,7 +238,14 @@ func _process(delta: float) -> void:
 	queue_redraw()
 
 
-func _player_dir() -> Vector2:
+func _face(to_m: Vector2) -> void:
+	# EvoWars has no turn rate: the warrior is already looking at the cursor.
+	# That is what makes a flick a cut instead of a slow pivot.
+	if to_m.length() > 6.0:
+		heading = to_m.angle()
+
+
+func _player_dir(to_m: Vector2) -> Vector2:
 	var d := Vector2.ZERO
 	if Input.is_physical_key_pressed(KEY_A) or Input.is_physical_key_pressed(KEY_LEFT):
 		d.x -= 1.0
@@ -260,11 +257,12 @@ func _player_dir() -> Vector2:
 		d.y += 1.0
 	if d != Vector2.ZERO:
 		return d.normalized()
-	var to_m := get_global_mouse_position() - global_position
-	var dist := to_m.length()
-	if dist < r * 0.9:
+	# On the mouse the warrior always runs flat out, however close the cursor
+	# is: EvoWars has no analogue throttle, and no pause just because you are
+	# about to reach the pointer.
+	if to_m.length() < r * 0.9:
 		return Vector2.ZERO
-	return to_m.normalized() * clampf(dist / (r * 3.0), 0.3, 1.0)
+	return to_m.normalized()
 
 
 func is_big() -> bool:
@@ -524,17 +522,78 @@ func _swing_angle() -> float:
 	return ang
 
 
+func _sweep_blade(prev_heading: float, prev_ang: float, cur_heading: float, cur_ang: float) -> void:
+	# The killing ground is the weapon itself, moved through time. A flick can
+	# turn the warrior most of the way around in a single frame, so walk the
+	# blade through that turn in small steps and test the steel at each one:
+	# everything it really passes over dies, and nothing beyond it does.
+	var dh := angle_difference(prev_heading, cur_heading)
+	var ds := cur_ang - prev_ang
+	var steps := clampi(int(ceil(absf(dh) / FLICK_STEP)), 1, 96)
+	# Build the blade once, then turn the cached shape through the flick. The
+	# weapon's radii and width do not change as it swings, only its angle, so
+	# this is the same blade without rebuilding every part on every step.
+	var bands: Array = _weapon_bands(cur_ang)
+	var twin := dual_wield()
+	var bands2: Array = _weapon_bands(cur_ang, 1) if twin else []
+	var reach := 0.0
+	for b in bands:
+		reach = maxf(reach, float(b[2]) + float(b[4]))
+	if twin:
+		for b in bands2:
+			reach = maxf(reach, float(b[2]) + float(b[4]))
+	# One short list of bodies that the blade could possibly touch anywhere in
+	# this frame's turn. Everything else is discarded once, not on every step.
+	var grip_off := 0.8 * r
+	var candidates: Array = []
+	for c in main.creatures:
+		if c == self or not c.alive or c.frozen:
+			continue
+		if main.mode == "tdm" and team >= 0 and c.team == team:
+			continue
+		if swing_hits.has(c):
+			continue
+		var lim: float = grip_off + reach + float(c.r)
+		if position.distance_squared_to(c.position) <= lim * lim:
+			candidates.append(c)
+	var unit_check: bool = main.mode == "tdm"
+	for i in range(1, steps + 1):
+		var t := float(i) / float(steps)
+		var t0 := float(i - 1) / float(steps)
+		var h := prev_heading + dh * t
+		var s := lerpf(prev_ang, cur_ang, t)
+		var turn := s - cur_ang
+		var slice := (prev_ang + ds * t0) - s
+		if not candidates.is_empty() or unit_check:
+			main.weapon_hit_zone(self, bands, minf(0.0, slice), maxf(0.0, slice), h, candidates, Vector2(0.0, 0.8), turn)
+			if twin:
+				# the other blade mirrors across the body but turns the same way
+				main.weapon_hit_zone(self, bands2, minf(0.0, slice), maxf(0.0, slice), h, candidates, Vector2(0.0, -0.8), turn)
+		# The trail is world-space: a flick leaves the whole arc behind it
+		# instead of dragging the old slash around with the body.
+		if trail.size() >= TRAIL_MAX:
+			trail.remove_at(0)
+		trail.append(to_global(_weapon_tip(s).rotated(h)))
+		if twin:
+			if trail2.size() >= TRAIL_MAX:
+				trail2.remove_at(0)
+			trail2.append(to_global(_weapon_tip(s, 1).rotated(h)))
+
+
 func _draw() -> void:
+	# the slash arcs are world-space, so a flick shows the path it cut
+	draw_set_transform(Vector2.ZERO, 0.0, Vector2.ONE)
+	for tr in [trail, trail2]:
+		if tr.size() > 1:
+			for i in range(1, tr.size()):
+				var f := float(i) / float(tr.size())
+				var w := minf(r * (0.09 + 0.24 * f), 32.0)
+				draw_line(to_local(tr[i - 1]), to_local(tr[i]), Color(1, 1, 1, f * 0.55), w, true)
 	draw_set_transform(Vector2.ZERO, heading, Vector2.ONE)
 	if main.mode == "tdm" and team >= 0:
 		var tc: Color = main.team_color(team)
 		draw_arc(Vector2.ZERO, r * 1.3, 0.0, TAU, 40, Color(tc.r, tc.g, tc.b, 0.9), 3.5, true)
 	var sa := _swing_angle()
-	for tr in [trail, trail2]:
-		if tr.size() > 1:
-			for i in range(1, tr.size()):
-				var f := float(i) / float(tr.size())
-				draw_line(tr[i - 1], tr[i], Color(1, 1, 1, f * 0.7), r * (0.1 + 0.28 * f), true)
 	if sprinting:
 		for i in range(3):
 			var y := float(i - 1) * r * 0.55

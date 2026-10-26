@@ -3,9 +3,19 @@
 A top-down eat-to-grow arena. Eat food, defeat rivals with one-hit weapon swings, and evolve through 48 humanoid tiers — from Caveman to The Last Idea.
 
 ## Download
-Current build: **v1.25** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.25/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
+Current build: **v1.26** — [evo-wilds.zip (direct link)](https://github.com/defiantdevs/evowilds.io/releases/download/v1.26/evo-wilds.zip) · [always-latest link](https://github.com/defiantdevs/evowilds.io/releases/latest/download/evo-wilds.zip) · all versions on the [Releases page](https://github.com/defiantdevs/evowilds.io/releases).
 
-Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.25**, you are still running an older download.
+Unzip it, open the folder in Godot 4.7+, and press F5. The start screen shows the build number in the bottom-right corner — if it does not say **BUILD v1.26**, you are still running an older download.
+
+## What's new in v1.26
+
+- **EvoWars movement.** Steering with the mouse now runs the warrior **flat out toward the cursor**, however close the pointer is — no analogue throttle, no slowing down just because you are about to reach it.
+- **Instant facing.** The warrior turns to the cursor the moment it moves, instead of easing around at a fixed turn rate. A hard mouse flick now points the whole body — and both blades — where you actually flicked.
+- **Flicks cut.** The killing ground follows the blade **through the turn**, not just where it happens to be at the end of the frame. Whip the cursor around during a swing and the steel slices through everything it genuinely passes over, including opponents beside or behind you. One swing can cut several bodies as it goes.
+- **The slash is drawn in world space.** A flick leaves the arc it actually cut, instead of dragging an old trail around with the body.
+- **No extra reach.** The flick is still exactly the weapon: each sub-step tests the drawn blade, and the broad phase only discards bodies the steel could not touch. There is no invisible circle around a fast turn.
+- **Fixed an old sweep bug.** The analytic slice a swing uses between frames was mirrored, so it covered the wrong side of the blade. Small swings hid it; big steps and flicks exposed it. It now covers the ground the blade really crossed.
+- **Swinging no longer slows you down.** You keep your full run while the blade is out, as in EvoWars. Bots still slow a little while swinging.
 
 ## What's new in v1.25
 
@@ -121,8 +131,8 @@ Pick your name on the title screen, then choose a mode:
 When you are defeated the match **keeps running** — the clock ticks on, golems keep marching and the statues keep the health they had. You respawn into the same match after a couple of seconds (or immediately with a click / key press), starting small again while the battle carries on around you. Only when the match itself ends (timer out, or a statue destroyed) do you return to the start screen. ESC still takes you back to the start screen whenever you want to leave.
 
 ## Controls
-- **Move:** WASD / arrow keys (or steer with the mouse). Direction changes are instant — a turn goes where you point it, with no sliding.
-- **Swing:** SPACE or left-click — the killing ground is the weapon itself: the drawn blade, and the whole arc it sweeps through. One hit kills at any tier.
+- **Move:** WASD / arrow keys, or steer with the mouse. Mouse steering runs at full pace toward the cursor and turns instantly — a quick flick whips the warrior and its blade around. Direction changes are instant, with no sliding.
+- **Swing:** SPACE or left-click — the killing ground is the weapon itself: the drawn blade, and the whole path it sweeps through, including a fast flick. One hit kills at any tier.
 - **Sprint:** SHIFT or right-click (drains XP)
 - **Back to start screen:** ESC (or click / any key on the match-over screen)
 
