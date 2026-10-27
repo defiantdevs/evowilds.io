@@ -419,8 +419,7 @@ func _random_bot_evo() -> int:
 func _spawn_bot(initial: bool) -> void:
 	var evo := _random_bot_evo() if initial else mini(int(pow(randf(), 3.0) * 6.0), 5)
 	if mode == "tdm":
-		# Team Deathmatch: everybody starts the match as a caveman and earns
-		# their size during the fight
+		# Team Deathmatch: bots level up, some go to statue
 		evo = 0
 	var pos := Vector2.ZERO
 	for tries in range(10):
@@ -437,7 +436,24 @@ func _spawn_bot(initial: bool) -> void:
 		var a: float = Species.XP_AT[evo]
 		var b: float = Species.XP_AT[evo + 1]
 		span = (b - a) * 0.6
-	var c := _spawn_creature(false, evo, pos, BOT_NAMES[randi() % BOT_NAMES.size()], randf() * span, _team_with_fewer() if mode == "tdm" else -1)
+	var team_assign: int = -1
+	if mode == "tdm":
+		team_assign = _team_with_fewer()
+		if randf() >= 0.4:
+			team_assign = -1
+		if player != null and is_instance_valid(player) and player.alive:
+			evo = maxi(player.evo - 2, 0)
+			if evo < Species.TOTAL - 1:
+				var a2: float = Species.XP_AT[evo]
+				var b2: float = Species.XP_AT[evo + 1]
+				span = (b2 - a2) * 0.6
+		else:
+			evo = 0
+			if evo < Species.TOTAL - 1:
+				var a2: float = Species.XP_AT[evo]
+				var b2: float = Species.XP_AT[evo + 1]
+				span = (b2 - a2) * 0.6
+	var c := _spawn_creature(false, evo, pos, BOT_NAMES[randi() % BOT_NAMES.size()], randf() * span, team_assign)
 	c.shield = 0.0 if mode == "test" else 3.0
 
 
@@ -628,6 +644,21 @@ func on_evolve(c, before: int) -> void:
 		banner_col = col
 		shake = 14.0
 		best_evo = maxi(best_evo, c.evo)
+		# make bots level up to 2 levels behind player every time
+		if mode == "tdm" or mode == "dm":
+			for bot in creatures:
+				if bot == null or bot.is_player or not bot.alive:
+					continue
+				var target_evo := maxi(c.evo - 2, 0)
+				if bot.evo < target_evo:
+					bot.evo = target_evo
+					bot.xp = Species.XP_AT[bot.evo] if bot.evo < Species.XP_AT.size() else bot.xp
+					bot._refresh_colors()
+					bot.z_index = bot.evo
+					bot.shield = 2.0
+					bot.max_hp = Species.max_hp_for(bot.evo)
+					bot.hp = bot.max_hp
+					bot.r = Species.radius_for(bot.evo, bot.xp)
 	elif c.evo >= 3:
 		var nm2: String = Species.NAMES[c.evo]
 		_post(c.cname + " evolved into " + nm2, col)
@@ -759,18 +790,33 @@ func weapon_hit_zone(attacker, bands: Array, s_lo: float, s_hi: float, at_headin
 	var ateam: int = attacker.team
 	if ateam < 0:
 		return
-	# a golem is not captured: one clean hit destroys it, and it never changes
-	# sides
+	# golems: first hit turns them to the side that hits them, second hit by opposing color destroys them
 	var smashed: Array = []
 	for u in units:
-		if int(u["team"]) == ateam or attacker.swing_hits.has(u):
+		if attacker.swing_hits.has(u):
+			continue
+		var ut: int = int(u.get("team", -1))
+		if ut == ateam:
 			continue
 		var up: Vector2 = u["pos"]
 		var uroom: float = reach + float(u["r"])
 		if up.distance_squared_to(pivot) > uroom * uroom:
 			continue
-		if _zone_hits(up, float(u["r"]), pivot, at_heading, bands, s_lo, s_hi, band_rotate):
-			attacker.swing_hits.append(u)
+		if not _zone_hits(up, float(u["r"]), pivot, at_heading, bands, s_lo, s_hi, band_rotate):
+			continue
+		attacker.swing_hits.append(u)
+		if ut == -1:
+			# first hit: turn to the side that hits them
+			u["team"] = ateam
+			u["flipped"] = true
+			u["flash"] = 0.4
+			fx.burst(up, Species.glow(team_color(ateam), 1.6), 18, 240.0, 0.55)
+			fx.ring(up, Species.glow(team_color(ateam), 1.4), float(u["r"]) * 2.0, 0.45)
+			if attacker.is_player:
+				shake = maxf(shake, 3.0)
+			attacker.add_xp(3.0 + 2.0 * float(u.get("size", 0)))
+		elif ut >= 0 and ut != ateam:
+			# opposing color hits captured golem: second hit destroys it
 			smashed.append(u)
 			fx.burst(up, Species.glow(team_color(ateam), 1.5), 22, 280.0, 0.6)
 			fx.ring(up, team_color(ateam), float(u["r"]) * 2.4, 0.5)

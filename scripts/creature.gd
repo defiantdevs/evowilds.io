@@ -223,7 +223,7 @@ func _process(delta: float) -> void:
 	if not is_player and vel.length() > 25.0 and mode != 2:
 		heading = lerp_angle(heading, vel.angle(), minf(6.0 * delta, 1.0))
 
-	if not is_player and main.mode == "tdm" and team >= 0 and swing_t < 0.0 and swing_cd <= 0.0:
+	if not is_player and main.mode == "tdm" and team >= 0 and swing_t < 0.0 and swing_cd <= 0.0 and randf() < 0.25:
 		# bots flip nearby neutral/enemy golems to their side
 		var u = main.unit_to_convert(position, team, weapon_reach() + r * 0.4)
 		if u != null:
@@ -239,9 +239,8 @@ func _process(delta: float) -> void:
 
 
 func _face(to_m: Vector2) -> void:
-	# EvoWars has no turn rate: the warrior is already looking at the cursor.
-	# That is what makes a flick a cut instead of a slow pivot.
-	if to_m.length() > 6.0:
+	# EvoWars-like: face cursor quickly, allow flicks to cut by turning with mouse
+	if to_m.length() > 2.0:
 		heading = to_m.angle()
 
 
@@ -257,12 +256,17 @@ func _player_dir(to_m: Vector2) -> Vector2:
 		d.y += 1.0
 	if d != Vector2.ZERO:
 		return d.normalized()
-	# On the mouse the warrior always runs flat out, however close the cursor
-	# is: EvoWars has no analogue throttle, and no pause just because you are
-	# about to reach the pointer.
-	if to_m.length() < r * 0.9:
+	# On the mouse the warrior always runs toward the pointer, closer to EvoWars
+	if to_m.length() < 4.0:
 		return Vector2.ZERO
-	return to_m.normalized()
+	var d := to_m.normalized()
+	var dist := to_m.length()
+	# slow slightly when very close but don't fully stop
+	if dist < r * 0.5:
+		return d * 0.4
+	if dist < r * 0.8:
+		return d * 0.7
+	return d
 
 
 func is_big() -> bool:
@@ -305,7 +309,7 @@ func _choose_mode() -> void:
 			bot_sprint = randf() < 0.7
 			bot_attack_t = randf_range(0.25, 0.7)
 			return
-	var aggro := 300.0 + r * 1.5
+	var aggro := 200.0 + r * 1.2
 	var best = null
 	var best_d := aggro
 	# the player is always fair game, even when far bigger than this bot
@@ -313,18 +317,18 @@ func _choose_mode() -> void:
 	if pl != null and is_instance_valid(pl) and pl.alive and not pl.frozen:
 		var ally: bool = main.mode == "tdm" and team >= 0 and pl.team == team
 		var dp: float = position.distance_to(pl.position)
-		if not ally and dp < aggro + 110.0:
+		if not ally and dp < aggro + 60.0:
 			best = pl
 			best_d = dp
 	var threat = null
-	var threat_d := 165.0 + r * 0.8
+	var threat_d := 140.0 + r * 0.6
 	for o in main.creatures:
 		if o == self or o.is_player or not o.alive or o.frozen:
 			continue
 		if main.mode == "tdm" and team >= 0 and o.team == team:
 			continue
 		var d: float = position.distance_to(o.position)
-		if o.evo > evo + 1:
+		if o.evo > evo + 2:
 			if d < threat_d:
 				threat_d = d
 				threat = o
@@ -332,29 +336,29 @@ func _choose_mode() -> void:
 			best_d = d
 			best = o
 	if best != null:
-		var chance := 0.82 if best.is_player else 0.6
+		var chance := 0.4 if best.is_player else 0.3
 		if best.evo >= evo and not best.is_player:
-			chance -= 0.16
+			chance -= 0.1
 		elif best.evo < evo - 2:
 			chance += 0.05
 		if randf() < chance:
 			mode = 2
 			target = best
-			bot_sprint = best_d < 380.0 and randf() < 0.4
-			bot_attack_t = randf_range(0.4, 1.1)
+			bot_sprint = best_d < 300.0 and randf() < 0.25
+			bot_attack_t = randf_range(0.6, 1.4)
 			return
-	if threat != null and randf() < 0.4:
+	if threat != null and randf() < 0.25:
 		mode = 3
 		target = threat
-		bot_sprint = randf() < 0.3
+		bot_sprint = randf() < 0.2
 		return
-	# Team Deathmatch: some bots march on the enemy statue instead of grazing
-	if main.mode == "tdm" and team >= 0 and not is_big() and randf() < 0.42:
+	# Team Deathmatch: few bots march on the enemy statue
+	if main.mode == "tdm" and team >= 0 and not is_big() and randf() < 0.05:
 		mode = 4
 		target = null
 		bot_sprint = true
 		return
-	if randf() < 0.7:
+	if randf() < 0.8:
 		var fi: int = main.nearest_food(position, 320.0 + r)
 		if fi >= 0:
 			mode = 1
@@ -493,19 +497,14 @@ func _swing_angle() -> float:
 	var wind := 1.35
 	var end := -1.35
 	if dual_wield():
-		# two blades, one each side: each blade cuts a half circle (180
-		# degrees) and, being exactly opposite each other, the pair fills the
-		# whole circle between them
-		rest = 1.30
-		wind = PI * 0.5
-		end = -PI * 0.5
+		# two blades, one each side: make them do half circles at 2 weapon levels
+		rest = PI * 0.5
+		wind = PI
+		end = 0.0
 		if evo >= Species.WIDE_SWING_FROM:
-			# The Infinite and every newest rank above it swing wider than
-			# anyone: a 200 degree cut with each blade, so the pair fills the
-			# circle with room to spare
-			rest = 1.45
-			wind = deg_to_rad(100.0)
-			end = deg_to_rad(-100.0)
+			rest = PI * 0.5
+			wind = PI
+			end = 0.0
 	var ang := rest + sin(anim_t * 3.0) * 0.04
 	if swing_t >= 0.0:
 		var p := clampf(swing_t / SWING_TIME, 0.0, 1.0)
@@ -594,7 +593,7 @@ func _draw() -> void:
 		var tc: Color = main.team_color(team)
 		draw_arc(Vector2.ZERO, r * 1.3, 0.0, TAU, 40, Color(tc.r, tc.g, tc.b, 0.9), 3.5, true)
 	var sa := _swing_angle()
-	if sprinting:
+	if sprinting and evo < 35:
 		for i in range(3):
 			var y := float(i - 1) * r * 0.55
 			draw_line(Vector2(-r * (1.3 + float(i) * 0.4), y), Vector2(-r * (2.4 + float(i) * 0.7), y), Color(1, 1, 1, 0.45), 2.0, true)
