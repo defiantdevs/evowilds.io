@@ -264,6 +264,15 @@ static func draw_orbs(ci: CanvasItem, e: int, r: float, t: float, ac: Color) -> 
 	# purely decorative: nothing here can hurt anyone
 	if not orb_body(e):
 		return
+	if e >= 30:
+		var hr := orb_draw_radius(e, r) * 0.7
+		var ops := orb_positions(e, r, t)
+		var limit := mini(ops.size(), 6)
+		for i in range(limit):
+			var op := ops[i]
+			ci.draw_circle(op, hr, Color(ac.r, ac.g, ac.b, 0.7))
+			ci.draw_circle(op, hr * 0.4, Color(1, 1, 1, 0.8))
+		return
 	var hr := orb_draw_radius(e, r)
 	for op in orb_positions(e, r, t):
 		ci.draw_circle(op, hr, Color(ac.r, ac.g, ac.b, 0.8))
@@ -430,32 +439,32 @@ static func _helmet(ci: CanvasItem, r: float, col: Color, lw: float) -> void:
 
 
 static func draw_body(ci: CanvasItem, evo: int, r: float, t: float, c1: Color, c2: Color, swing: float = 0.12) -> void:
-	var simple := evo >= 28
+	var simple := evo >= 24
 	var skin: Color = SKIN[evo]
-	var lw := maxf(r * 0.09, 2.0) if not simple else maxf(r * 0.07, 1.6)
+	var lw := maxf(r * 0.09, 2.0) if not simple else maxf(r * 0.06, 1.4)
 	var pv := Vector2(0, 0.8 * r)
 	var big: float = 1.0 + float(evo) * 0.03
-	ci.draw_colored_polygon(_ellipse(0.1 * r, 0.2 * r, 1.0 * r * big, 1.1 * r * big, 0.0, 18 if simple else 24), Color(0, 0, 0, 0.17))
+	ci.draw_colored_polygon(_ellipse(0.1 * r, 0.2 * r, 1.0 * r * big, 1.1 * r * big, 0.0, 12 if simple else 18), Color(0, 0, 0, 0.17))
 	if evo >= 16 and not simple:
 		var pu := 0.5 + 0.5 * sin(t * 3.0)
 		var ac: Color = c2
 		ci.draw_circle(Vector2.ZERO, r * (1.5 + 0.1 * pu), Color(ac.r, ac.g, ac.b, 0.12))
-		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 24, Color(ac.r, ac.g, ac.b, 0.45), 1.8, true)
+		ci.draw_arc(Vector2.ZERO, r * (1.5 + 0.1 * pu), 0.0, TAU, 18, Color(ac.r, ac.g, ac.b, 0.4), 1.5, true)
 		if evo >= 21:
-			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 20, Color(ac.r, ac.g, ac.b, 0.3), 1.0, true)
+			ci.draw_arc(Vector2.ZERO, r * (1.15 + 0.08 * pu), 0.0, TAU, 14, Color(ac.r, ac.g, ac.b, 0.25), 0.9, true)
 		draw_orbs(ci, evo, r, t, ac)
 	elif evo >= 16 and simple:
 		var pu := 0.5 + 0.5 * sin(t * 3.0)
 		var ac: Color = c2
-		ci.draw_arc(Vector2.ZERO, r * (1.35 + 0.06 * pu), 0.0, TAU, 16, Color(ac.r, ac.g, ac.b, 0.3), 1.4, true)
+		ci.draw_arc(Vector2.ZERO, r * (1.3 + 0.05 * pu), 0.0, TAU, 10, Color(ac.r, ac.g, ac.b, 0.25), 1.2, true)
 		draw_orbs(ci, evo, r, t, ac)
 		if evo == COUNT - 1:
-			ci.draw_arc(Vector2.ZERO, r * (1.9 + 0.1 * pu), 0.0, TAU, 20, Color(ac.r, ac.g, ac.b, 0.4), 1.6, true)
-			for k in range(4):
-				var oa2 := -t * 1.9 + TAU * float(k) / 6.0
-				var op2 := Vector2.from_angle(oa2) * r * 2.3
-				ci.draw_circle(op2, r * 0.085, Color(1, 1, 1, 0.9))
-				ci.draw_circle(op2, r * 0.04, Color(ac.r, ac.g, ac.b))
+			ci.draw_arc(Vector2.ZERO, r * (1.7 + 0.08 * pu), 0.0, TAU, 14, Color(ac.r, ac.g, ac.b, 0.35), 1.4, true)
+			for k in range(3):
+				var oa2 := -t * 1.9 + TAU * float(k) / 3.0
+				var op2 := Vector2.from_angle(oa2) * r * 1.95
+				ci.draw_circle(op2, r * 0.07, Color(1, 1, 1, 0.85))
+				ci.draw_circle(op2, r * 0.035, Color(ac.r, ac.g, ac.b))
 	if WINGS[evo] > 0:
 		_wings(ci, r, t, lw)
 	var cape: int = CAPE[evo]

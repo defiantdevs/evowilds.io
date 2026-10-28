@@ -497,7 +497,7 @@ func _swing_angle() -> float:
 	var wind := 1.35
 	var end := -1.35
 	if dual_wield():
-		# two blades, one each side: make them do half circles at 2 weapon levels
+		# two blades, one each side: half circles at 2 weapon levels
 		rest = PI * 0.5
 		wind = PI
 		end = 0.0
