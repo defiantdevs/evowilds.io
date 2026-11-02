@@ -259,8 +259,8 @@ func _player_dir(to_m: Vector2) -> Vector2:
 	# On the mouse the warrior always runs toward the pointer, closer to EvoWars
 	if to_m.length() < 4.0:
 		return Vector2.ZERO
-	var d := to_m.normalized()
 	var dist := to_m.length()
+	d = to_m.normalized()
 	# slow slightly when very close but don't fully stop
 	if dist < r * 0.5:
 		return d * 0.4
